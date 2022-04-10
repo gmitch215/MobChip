@@ -50,5 +50,9 @@ public class EntityAI {
 	public static Class<? extends net.minecraft.world.entity.Entity> getNMSClass(Entity bukkit) {
 		return ((CraftEntity) bukkit).getHandle().getClass();
 	}
+	
+	public net.minecraft.world.entity.PathfinderMob getNMSMob() {
+		return this.entity;
+	}
 
 }
