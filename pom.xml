@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>me.gamercoder215</groupId>
@@ -7,16 +7,45 @@
 	<packaging>pom</packaging>
 	
 	<name>MobChip-Parent</name>
+	<url>https://github.com/GamerCoder215/MobChip</url>	
 
 	<properties>
-		<spigot.version>1.18.2-R0.1-SNAPSHOT</spigot.version>
+		<minecraft.version>1.18.2-R0.1-SNAPSHOT</minecraft.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>17</maven.compiler.release>
 		<java.version>17</java.version>
 	</properties>
 
+	<scm>
+	    <connection>scm:git:${project.url}.git</connection>
+	    <developerConnection>scm:git:git@github.com:GamerCoder215/MobChip.git</developerConnection>
+	    <url>${project.url}</url>
+	</scm>
+	
+	<repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot</artifactId>
+			<version>${minecraft.version}</version>
+			<scope>provided</scope>
+			<classifier>remapped-mojang</classifier>
+		</dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
+        </dependency>
+	</dependencies>
+
 	<build>
-		<finalName>${project.name}</finalName>
+		<finalName>${project.name}-${buildNumber}</finalName>
 		<defaultGoal>package clean install</defaultGoal>
         <plugins>
             <plugin>
@@ -37,13 +66,33 @@
 		          </execution>
 		        </executions>
 		        <configuration>
-				  <shortRevisionLength>6</shortRevisionLength>
+					<shortRevisionLength>6</shortRevisionLength>
 		        </configuration>
 		      </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <links>
+                        <link>https://hub.spigotmc.org/javadocs/spigot/</link>
+                        <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+              </plugin>
         </plugins>
 	</build>
-
+	
 	<modules>
-		
+		<module>mobchip-base</module>
 	</modules>
 </project>
