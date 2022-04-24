@@ -8,6 +8,7 @@
 	
 	<name>MobChip-Parent</name>
 	<url>https://github.com/GamerCoder215/MobChip</url>	
+	<description>PathfinderGoal and Behavior NMS Wrapper</description>
 
 	<properties>
 		<minecraft.version>1.18.2-R0.1-SNAPSHOT</minecraft.version>
@@ -22,6 +23,11 @@
 	    <url>${project.url}</url>
 	</scm>
 	
+	<modules>
+		<module>mobchip-base</module>
+		<module>mobchip-bukkit</module>
+	</modules>
+
 	<repositories>
         <repository>
             <id>spigot-repo</id>
@@ -91,8 +97,4 @@
               </plugin>
         </plugins>
 	</build>
-	
-	<modules>
-		<module>mobchip-base</module>
-	</modules>
 </project>
