@@ -51,7 +51,8 @@ public class BukkitAI implements EntityAI {
 
 	@Override
 	public boolean containsValue(Object value) {
-		return goals.containsValue(value);
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override

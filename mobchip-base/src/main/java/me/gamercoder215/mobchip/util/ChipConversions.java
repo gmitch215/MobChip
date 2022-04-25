@@ -1,9 +1,8 @@
 package me.gamercoder215.mobchip.util;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
-
-import me.gamercoder215.mobchip.ai.goal.Pathfinder;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Utility class for Converting Bukkit Classes to NMS Classes and vice-versa
@@ -25,29 +24,18 @@ public final class ChipConversions {
 			return null;
 		}
 	}
+// TODO	
+//	public static Class<? extends Entity> toBukkitClass(Class<? extends net.minecraft.world.entity.Entity> clazz) {
+//		
+//	}
 	
-	/**
-	 * Converts a NMS Goal Class into a Mob Chip Pathfinder Class.
-	 * @param g Goal Class to convert
-	 * @return Converted Mob Chip Pathfinder Class
-	 */
-	public static Class<? extends Pathfinder> wrap(Class<? extends Goal> g) {
-		if (g.getSimpleName().equals("Goal")) return Pathfinder.class;
-		
-		try {
-			if (g.getPackageName().contains("ai.goal.target")) {
-				return Class.forName("me.gamercoder215.ai.goal.target" + g.getSimpleName()).asSubclass(Pathfinder.class);
-			} else {
-				return Class.forName("me.gamercoder215.ai.goal" + g.getSimpleName()).asSubclass(Pathfinder.class);
+	public static Entity getById(int id) {
+		for (World w : Bukkit.getWorlds()) {
+			for (Entity en : w.getEntities()) {
+				if (en.getEntityId() == id) return en;
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return null;
 		}
+		
+		return null;
 	}
-	
-	
-	
-	
-	
 }
