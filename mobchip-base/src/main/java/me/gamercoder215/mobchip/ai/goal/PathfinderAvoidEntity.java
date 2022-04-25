@@ -1,5 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal;
 
+import java.lang.reflect.Field;
+
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftCreature;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
@@ -15,7 +17,7 @@ import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
  *
  * @param <T> Class of Entities to avoid
  */
-public class PathfinderGoalAvoidTarget<T extends LivingEntity> extends Pathfinder implements Filtering<T>, SpeedModifier {
+public class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder implements Filtering<T>, SpeedModifier {
 	
 	private double speedModifier = DEFAULT_SPEED_MODIFIER;
 	private float maxDistance;
@@ -24,13 +26,38 @@ public class PathfinderGoalAvoidTarget<T extends LivingEntity> extends Pathfinde
 	
 	private PathfinderMob nmsEntity;
 	
-	public PathfinderGoalAvoidTarget(@NotNull Creature entity, @NotNull Class<T> filter) {
+	public PathfinderAvoidEntity(AvoidEntityGoal<?> nmsGoal) {
+		super(Pathfinder.getEntity(nmsGoal, "mob"));
+		
+		try {
+			Field a = AvoidEntityGoal.class.getDeclaredField("i");
+			a.setAccessible(true);
+			this.speedModifier = a.getDouble(nmsGoal);
+			
+			Field b = AvoidEntityGoal.class.getDeclaredField("j");
+			b.setAccessible(true);
+			this.sprintModifier = b.getDouble(nmsGoal);
+			
+			Field c = AvoidEntityGoal.class.getDeclaredField("c");
+			c.setAccessible(true);
+			this.maxDistance = c.getFloat(nmsGoal);
+			
+			Field d = AvoidEntityGoal.class.getDeclaredField("i");
+			d.setAccessible(true);
+			this.speedModifier = d.getDouble(nmsGoal);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter) {
 		super(entity);
 		this.filter = filter;
 		this.nmsEntity = ((CraftCreature) entity).getHandle();
 	}
 	
-	public PathfinderGoalAvoidTarget(@NotNull Creature entity, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) {
+	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) {
 		this(entity, filter);
 		this.speedModifier = walkMod;
 		this.maxDistance = dist;
