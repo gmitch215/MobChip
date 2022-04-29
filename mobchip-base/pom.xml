@@ -8,6 +8,18 @@
 
 	<artifactId>mobchip-base</artifactId>
 	<name>MobChip</name>
-	
-	
+
+	<dependencies>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot</artifactId>
+			<version>${minecraft.version}</version>
+			<scope>provided</scope>
+			<classifier>remapped-mojang</classifier>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src/main/java/</sourceDirectory>
+	</build>
 </project>
