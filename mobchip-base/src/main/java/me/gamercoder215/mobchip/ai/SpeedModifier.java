@@ -1,4 +1,4 @@
-package me.gamercoder215.mobchip.ai.goal;
+package me.gamercoder215.mobchip.ai;
 
 /**
  * Represents a Pathfinder that has a speed modifier
@@ -12,7 +12,7 @@ public interface SpeedModifier {
 	/**
 	 * Default Speed Modifier
 	 */
-	double DEFAULT_SPEED_MODIFIER = 1.5;
+	float DEFAULT_SPEED_MODIFIER = 1.5F;
 	
 	/**
 	 * Get the Speed Modifier of this Pathfinder.

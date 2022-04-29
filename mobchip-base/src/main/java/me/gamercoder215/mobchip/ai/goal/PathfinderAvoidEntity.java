@@ -7,17 +7,19 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
+import me.gamercoder215.mobchip.ai.SpeedModifier;
 import me.gamercoder215.mobchip.ai.goal.target.Filtering;
 import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Pathfinder to avoid a LivingEntity
  *
  * @param <T> Class of Entities to avoid
  */
-public class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder implements Filtering<T>, SpeedModifier {
+public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder implements Filtering<T>, SpeedModifier {
 	
 	private double speedModifier = DEFAULT_SPEED_MODIFIER;
 	private float maxDistance;
@@ -26,6 +28,16 @@ public class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder im
 	
 	private PathfinderMob nmsEntity;
 	
+	@SuppressWarnings("unused")
+	private PathfinderAvoidEntity(Goal goal) {
+		this((AvoidEntityGoal<?>) goal);
+	}
+
+	/**
+	 * Constructs a PathfinderAvoidEntity from a NMS Pathfinder Goal
+	 * @param nmsGoal NMS Pathfinder Goal
+	 */
+	@SuppressWarnings("unchecked")
 	public PathfinderAvoidEntity(AvoidEntityGoal<?> nmsGoal) {
 		super(Pathfinder.getEntity(nmsGoal, "mob"));
 		
@@ -42,9 +54,9 @@ public class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder im
 			c.setAccessible(true);
 			this.maxDistance = c.getFloat(nmsGoal);
 			
-			Field d = AvoidEntityGoal.class.getDeclaredField("i");
+			Field d = AvoidEntityGoal.class.getDeclaredField("f");
 			d.setAccessible(true);
-			this.speedModifier = d.getDouble(nmsGoal);
+			this.filter = (Class<T>) ChipConversions.toBukkitClass(LivingEntity.class, d.getType().asSubclass(net.minecraft.world.entity.Entity.class));
 			
 		} catch (Exception e) {
 			e.printStackTrace();

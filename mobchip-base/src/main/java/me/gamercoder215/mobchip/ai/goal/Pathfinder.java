@@ -6,14 +6,15 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
-import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
- * Represents a Pathfinder Goal of an Entity
+ * Represents a Pathfinder Goal of an Entity.
+ * <p>
+ * <strong>For custom pathfinders, extend {@link CustomPathfinder}.</strong>
  */
-public abstract class Pathfinder {
+public abstract class Pathfinder implements PathfinderInfo {
 
 	static PathfinderMob getEntity(Goal g, String fieldName) {
 		try {
@@ -25,8 +26,8 @@ public abstract class Pathfinder {
 		}
 	}
 	
-	protected Mob entity;
-	protected net.minecraft.world.entity.Mob nmsEntity;
+	protected final Mob entity;
+	protected final net.minecraft.world.entity.Mob nmsEntity;
 	
 	protected Pathfinder(@NotNull Mob entity) {
 		this.entity = entity;
@@ -35,7 +36,7 @@ public abstract class Pathfinder {
 	
 	protected Pathfinder(@NotNull net.minecraft.world.entity.Mob entity) {
 		this.nmsEntity = entity;
-		this.entity = (Mob) ChipConversions.getById(entity.getId());
+		this.entity = (Mob) entity.getBukkitEntity();
 	}
 	
 	/**
@@ -51,14 +52,9 @@ public abstract class Pathfinder {
 	public final Mob getEntity() {
 		return this.entity;
 	}
-	
-	/**
-	 * Sets the Creature that this Pathfinder will belong to.
-	 * @param entity Creature to set
-	 */
-	public final void setEntity(@NotNull Mob entity) {
-		this.entity = entity;
-		this.nmsEntity = ((CraftMob) entity).getHandle();
+
+	public final String getInternalName() {
+		return getHandle().getClass().getSimpleName();
 	}
 	
 }

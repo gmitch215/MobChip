@@ -1,4 +1,4 @@
-package me.gamercoder215.mobchip.ai.goal;
+package me.gamercoder215.mobchip.ai;
 
 /**
  * Represents a Pathfinder that has a chance of succeeding
