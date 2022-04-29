@@ -7,7 +7,7 @@ buid.sh
 /mobchip-base/target/
 /mobchip-bukkit/target/
 /mobchip-paper/target/
-/mobchip-spigot/target/
+/target/
 
 .vscode/
 *.class
