@@ -26,6 +26,7 @@
 	<modules>
 		<module>mobchip-base</module>
 		<module>mobchip-bukkit</module>
+		<module>mobchip-paper</module>
 	</modules>
 
 	<repositories>
@@ -36,13 +37,6 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot</artifactId>
-			<version>${minecraft.version}</version>
-			<scope>provided</scope>
-			<classifier>remapped-mojang</classifier>
-		</dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -78,11 +72,12 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <links>
                         <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                         <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
+						<link>https://papermc.io/javadocs/paper/1.18/</link>
                     </links>
                 </configuration>
                 <executions>
