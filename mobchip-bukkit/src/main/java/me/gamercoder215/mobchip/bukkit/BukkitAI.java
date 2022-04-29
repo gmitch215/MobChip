@@ -1,26 +1,29 @@
 package me.gamercoder215.mobchip.bukkit;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
-import org.bukkit.entity.Mob;
-import org.jetbrains.annotations.NotNull;
-
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
+import me.gamercoder215.mobchip.ai.goal.PathfinderInfo;
+import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 
-public class BukkitAI implements EntityAI {
+/**
+ * Bukkit/Spigot Implementation of the MobChip API
+ */
+public final class BukkitAI implements EntityAI {
 	
 	private Map<Integer, Goal> goals = new HashMap<>();
 	private GoalSelector sel;
 	
-	private BukkitAI(GoalSelector sel) {
+	protected BukkitAI(GoalSelector sel) {
 		this.sel = sel;
 		updateMap();
 	}
@@ -29,9 +32,10 @@ public class BukkitAI implements EntityAI {
 		goals.clear();
 		for (WrappedGoal g : sel.getAvailableGoals()) goals.put(g.getPriority(), g.getGoal());
 	}
-	
-	public static EntityAI getAI(@NotNull Mob m) {
-		return new BukkitAI(((CraftMob) m).getHandle().goalSelector);
+
+	private void updateAI() {
+		sel.removeAllGoals();
+		for (Map.Entry<Integer, Goal> entry : goals.entrySet()) sel.addGoal(entry.getKey(), entry.getValue());
 	}
 
 	@Override
@@ -51,56 +55,76 @@ public class BukkitAI implements EntityAI {
 
 	@Override
 	public boolean containsValue(Object value) {
-		// TODO Auto-generated method stub
+		if (!(value instanceof PathfinderInfo info)) return false;
+		for (Goal g : sel.getAvailableGoals()) {
+			if (g.getClass().getSimpleName().equals(info.getInternalName())) return true;
+		}
+
 		return false;
 	}
 
 	@Override
 	public Pathfinder get(Object key) {
-		// TODO Auto-generated method stub
-		return null;
+		if (!(key instanceof Integer in)) return null;
+		return ChipConversions.wrapGoal(goals.get(in));
 	}
 
 	@Override
 	public Pathfinder put(Integer key, Pathfinder value) {
-		// TODO Auto-generated method stub
-		return null;
+		goals.put(key, value.getHandle());
+		updateAI();
+		return value;
+	}
+
+	public void putNoAI(Integer key, Pathfinder value) {
+		goals.put(key, value.getHandle());
 	}
 
 	@Override
 	public Pathfinder remove(Object key) {
-		// TODO Auto-generated method stub
-		return null;
+		Goal g = goals.remove(key);
+		updateAI();
+		return ChipConversions.wrapGoal(g);
 	}
 
 	@Override
 	public void putAll(Map<? extends Integer, ? extends Pathfinder> m) {
-		// TODO Auto-generated method stub
-		
+		for (Map.Entry<? extends Integer, ? extends Pathfinder> entry : m.entrySet()) {
+			putNoAI(entry.getKey(), entry.getValue());
+		}
+		updateAI();
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		goals.clear();
+		updateAI();
 	}
 
 	@Override
 	public Set<Integer> keySet() {
-		// TODO Auto-generated method stub
-		return null;
+		return goals.keySet();
 	}
 
 	@Override
-	public Collection<Pathfinder> values() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Pathfinder> values() {
+		List<Pathfinder> values = new ArrayList<>();
+		for (WrappedGoal g : sel.getAvailableGoals()) {
+			values.add(ChipConversions.wrapGoal(g.getGoal()));	
+		}
+
+		return values;
 	}
 
 	@Override
 	public Set<Entry<Integer, Pathfinder>> entrySet() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Entry<Integer, Pathfinder>> entries = new HashSet<>();
+
+		for (WrappedGoal g : sel.getAvailableGoals()) {
+			entries.add(Map.entry(g.getPriority(), ChipConversions.wrapGoal(g.getGoal())));
+		}
+
+		return entries;
 	}
 
 }
