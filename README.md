@@ -1,2 +1,2 @@
 # MobChip
-Minecraft Entity AI &amp; Bosses Library
+Minecraft Entity AI and Bosses Library
