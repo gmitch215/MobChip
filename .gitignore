@@ -1,7 +1,15 @@
 bin/
-target/
 .classpath
 .project
 .settings/
+.gitpod.yml
+buid.sh
+/mobchip-base/target/
+/mobchip-bukkit/target/
+/mobchip-paper/target/
+/mobchip-spigot/target/
 
+.vscode/
 *.class
+.apt_generated_tests/
+build.sh
