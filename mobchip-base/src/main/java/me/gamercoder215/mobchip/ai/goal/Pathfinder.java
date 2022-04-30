@@ -41,6 +41,8 @@ public abstract class Pathfinder implements PathfinderInfo {
 	
 	/**
 	 * Fetches the NMS Class that this Pathfinder is relating to.
+	 * <p>
+	 * <strong>For custom pathfinders, extend {@link CustomPathfinder} instead.</strong>
 	 * @return NMS Class
 	 */
 	public abstract Goal getHandle();

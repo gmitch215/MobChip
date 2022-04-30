@@ -113,7 +113,7 @@ public abstract class CustomPathfinder extends Pathfinder {
     /**
      * Whether or not this Pathfinder Goal will update every tick. Default: false
      * <p>
-     * The Goal will usually update every other tick. Returning true is not recommended.
+     * The Goal will usually update every 2-5 ticks. Returning true is not recommended.
      * @return true if updating every tick, else false
      */
     public boolean updateEveryTick() { return false; };
