@@ -13,6 +13,11 @@
             <id>papermc-repo</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+		<repository>
+		  <id>minecraft-libraries</id>
+		  <name>Minecraft Libraries</name>
+		  <url>https://libraries.minecraft.net</url>
+		</repository>
       </repositories>
 
       <dependencies>
@@ -40,7 +45,13 @@
             <artifactId>paper-api</artifactId>
             <version>${minecraft.version}</version>
             <scope>provided</scope>
-        </dependency>
+          </dependency>
+		  <dependency>
+	      	<groupId>com.mojang</groupId>
+			<artifactId>datafixerupper</artifactId>
+			<version>4.1.27</version>
+			<scope>provided</scope>
+		  </dependency>
       </dependencies>	
   
       <build>
