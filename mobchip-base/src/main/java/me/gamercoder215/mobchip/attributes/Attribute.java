@@ -46,7 +46,7 @@ public abstract class Attribute {
 	 * @param defaultValue Default Value of Attribute
 	 * @param min Minimum Value of Attribute
 	 * @param max Maximum Value of Attribute
-	 * @throws IllegalArgumentException if ID is null, value is greater than {@value #MAX_NAME_LENGTH}, <code>min > max</code>, <code>max < min</code>, or <code>defaultValue < min || defaultValue > max</code>
+	 * @throws IllegalArgumentException if ID is null, value is greater than {@value #MAX_NAME_LENGTH}, min greater than max, max less than min, or defaultValue less than min || defaultValue greater than max
 	 */
 	protected Attribute(@NotNull RegistryKey id, double defaultValue, double min, double max) throws IllegalArgumentException {
 		if (id == null) throw new IllegalArgumentException("ID cannot be null");
