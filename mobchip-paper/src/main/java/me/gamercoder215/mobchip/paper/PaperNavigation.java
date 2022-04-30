@@ -11,10 +11,7 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 
-/**
- * Paper/Purpur Implementation of Entity Navigation
- */
-public final class PaperNavigation implements EntityNavigation {
+final class PaperNavigation implements EntityNavigation {
 
     private final PathNavigation handle;
     

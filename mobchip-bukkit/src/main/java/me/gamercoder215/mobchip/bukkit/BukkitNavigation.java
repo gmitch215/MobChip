@@ -11,10 +11,7 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 
-/**
- * Represents a Bukkit Navigation System
- */
-public final class BukkitNavigation implements EntityNavigation {
+final class BukkitNavigation implements EntityNavigation {
     
     private final PathNavigation handle;
     

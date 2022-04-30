@@ -8,10 +8,7 @@ import net.minecraft.world.entity.ai.control.JumpControl;
 import net.minecraft.world.entity.ai.control.LookControl;
 import net.minecraft.world.entity.ai.control.MoveControl;
 
-/**
- * Represents a Bukkit Entity Controller
- */
-public final class BukkitController implements EntityController {
+final class BukkitController implements EntityController {
 
     private final JumpControl jumpC;
     private final LookControl lookC;

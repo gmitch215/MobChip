@@ -15,10 +15,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 
-/**
- * Bukkit/Spigot Implementation of the MobChip API
- */
-public final class BukkitAI implements EntityAI {
+final class BukkitAI implements EntityAI {
 	
 	private Map<Integer, Goal> goals = new HashMap<>();
 	private GoalSelector sel;
