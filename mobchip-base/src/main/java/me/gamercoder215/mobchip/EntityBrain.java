@@ -11,6 +11,8 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
+import me.gamercoder215.mobchip.attributes.Attribute;
+import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 
 public interface EntityBrain {
     
@@ -142,4 +144,14 @@ public interface EntityBrain {
      * @param s Sensor to use
      */
     void addSensor(@NotNull Sensor s);
+    
+    /**
+     * Get the Attribute Instance associated with this Attribute.
+     * @param a Attribute to get
+     * @return Found Attribute Instance, can be null if not registered
+     */
+    @Nullable
+    ChipAttributeInstance getAttribute(@NotNull Attribute a);
+    
+    
 }

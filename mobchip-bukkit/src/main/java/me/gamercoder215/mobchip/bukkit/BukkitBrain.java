@@ -15,7 +15,10 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
+import me.gamercoder215.mobchip.attributes.Attribute;
+import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 import me.gamercoder215.mobchip.util.ChipGetter;
+import net.minecraft.core.Registry;
 
 public final class BukkitBrain implements EntityBrain {
 	
@@ -120,5 +123,14 @@ public final class BukkitBrain implements EntityBrain {
 	@Override
 	public boolean addBehavior(@NotNull Behavior b) {
 		return b.getHandle().tryStart(ChipGetter.getLevel(m.getWorld()), nmsMob, 0L);
+	}
+
+	@Override
+	public ChipAttributeInstance getAttribute(@NotNull Attribute a) {
+		try {
+			return new BukkitAttributeInstance(a, nmsMob.getAttribute(Registry.ATTRIBUTE.getOptional(a.getId().toResourceLocation()).get()));
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 	}
 }
