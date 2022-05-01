@@ -1,4 +1,4 @@
-package me.gamercoder215.mobchip.util;
+package me.gamercoder215.mobchip.registry;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,12 +64,29 @@ public final class ChipRegistry {
 		}
 		
 		/**
+		 * Constructs a RegistryKey from a NMS ResourceLocation.
+		 * @param loc ResourceLocation to use
+		 */
+		public RegistryKey(@NotNull ResourceLocation loc) {
+			this(loc.getNamespace(), loc.getPath());
+		}
+		
+		/**
 		 * Converts this RegistryKey to a NMS ResourceLocation.
 		 * @return Converted ResourceLocation
 		 */
 		@NotNull
 		public ResourceLocation toResourceLocation() {
 			return new ResourceLocation(namespace, value);
+		}
+		
+		/**
+		 * Adds this RegistryKey's Value to a NamespacedKey with a Plugin.
+		 * @param p Plugin to add
+		 * @return NamespacedKey Added
+		 */
+		public NamespacedKey toKey(@NotNull Plugin p) {
+			return new NamespacedKey(p, this.value);
 		}
 		
 		/**
@@ -122,9 +138,9 @@ public final class ChipRegistry {
 	
 	private static List<Attribute> registered = new ArrayList<>();
 	
-	private static void changeRegistryLock(boolean isLocked) {
-		DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        MappedRegistry<net.minecraft.world.entity.ai.attributes.Attribute> materials = (MappedRegistry<net.minecraft.world.entity.ai.attributes.Attribute>) server.registryAccess().ownedRegistryOrThrow(Registry.ATTRIBUTE_REGISTRY);
+	private static <T> void changeRegistryLock(boolean isLocked, ResourceKey<Registry<T>> registry) {
+		DedicatedServer server = getServer();
+        MappedRegistry<T> materials = (MappedRegistry<T>) server.registryAccess().ownedRegistryOrThrow(registry);
         try {
 	        Field isFrozen = materials.getClass().getDeclaredField("bL");
 	        isFrozen.setAccessible(true);
@@ -134,15 +150,23 @@ public final class ChipRegistry {
         }
 	}
 	
+	private static DedicatedServer getServer() {
+		try {
+			return (DedicatedServer) Bukkit.getServer().getClass().getMethod("getServer").invoke(Bukkit.getServer());
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
 	private static <T> WritableRegistry<T> getRegistry(ResourceKey<Registry<T>> key) {
-		return (WritableRegistry<T>) ((CraftServer) Bukkit.getServer()).getServer().registryAccess().ownedRegistryOrThrow(key);
+		return (WritableRegistry<T>) getServer().registryAccess().ownedRegistryOrThrow(key);
 	}
 	
 	/**
-	 * Registeres an Attribute to the Registry.
-	 * @param a Attribute to register.
-	 * @throws IllegalArgumentException if Attribute is null
-	 * @throws UnsupportedOperationException if Attribute already exists
+	 * Registers an Attribute to the Server Registry.
+	 * @param a Attribute to Register
+	 * @throws IllegalArgumentException if attribute is null
+	 * @throws UnsupportedOperationException if already exists
 	 */
 	public static void registerAttribute(@NotNull Attribute a) throws IllegalArgumentException, UnsupportedOperationException {
 		if (a == null) throw new IllegalArgumentException("Null attribute");
@@ -154,7 +178,7 @@ public final class ChipRegistry {
 		}
 		
 		// Registry
-		changeRegistryLock(false);
+		changeRegistryLock(false, Registry.ATTRIBUTE_REGISTRY);
 		registered.add(a);
 		
 		WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> registry = getRegistry(Registry.ATTRIBUTE_REGISTRY);
@@ -164,7 +188,7 @@ public final class ChipRegistry {
 		
 		registry.register(ResourceKey.create(Registry.ATTRIBUTE_REGISTRY, a.getId().toResourceLocation()), nmsAttribute, Lifecycle.stable());
 		
-		changeRegistryLock(true);
+		changeRegistryLock(true, Registry.ATTRIBUTE_REGISTRY);
 	}
 	
 }
