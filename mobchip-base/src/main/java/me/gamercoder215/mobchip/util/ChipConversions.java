@@ -2,6 +2,8 @@ package me.gamercoder215.mobchip.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
@@ -11,7 +13,9 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -20,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -54,6 +59,14 @@ public final class ChipConversions {
 		}
 	}
 	
+	public static ServerPlayer convertType(Player p) {
+		try {
+			return ChipConversions.<ServerPlayer>getHandle(p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private static <T> T getHandle(Object o) {
 		try {
@@ -71,9 +84,29 @@ public final class ChipConversions {
 		}
 	}
 	
+	public static List<net.minecraft.world.entity.LivingEntity> convertType(List<LivingEntity> list) {
+		List<net.minecraft.world.entity.LivingEntity> l = new ArrayList<>();
+		
+		for (LivingEntity en : list) l.add(ChipConversions.convertType(en));
+		
+		return l;
+	}
+	
+	public static LivingEntity convertType(net.minecraft.world.entity.LivingEntity en) {
+		return (LivingEntity) en.getBukkitEntity();
+	}
+	
 	public static net.minecraft.world.entity.Entity convertType(Entity en) {
 		try {
 			return ChipConversions.<net.minecraft.world.entity.Entity>getHandle(en);
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+	
+	public static net.minecraft.world.entity.LivingEntity convertType(LivingEntity en) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.LivingEntity>getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
