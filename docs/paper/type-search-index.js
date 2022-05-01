@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"me.gamercoder215.mobchip.paper","l":"PaperBrain"},{"p":"me.gamercoder215.mobchip.paper","l":"PaperPath"}];updateSearchResults();
