@@ -81,6 +81,7 @@
 						<link>https://gamercoder215.github.io/MobChip/base/</link>
 						<link>https://jd.adventure.kyori.net/api/4.10.1/</link>
                     </links>
+					<excludePackageNames>*.util</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
