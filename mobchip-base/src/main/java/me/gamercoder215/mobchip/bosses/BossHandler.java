@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -23,7 +24,7 @@ public final class BossHandler {
     private final List<Boss<?>> bosses = new ArrayList<>();
 
     BossHandler(Boss<?> boss, Plugin p) {
-        new BossEvents(p, this);
+        new BossEvents(this);
         this.plugin = p;
         this.boss = boss;
 
@@ -50,9 +51,9 @@ public final class BossHandler {
 
         private BossHandler handler;
 
-        private BossEvents(Plugin p, BossHandler handler) {
+        private BossEvents(BossHandler handler) {
             this.handler = handler;
-            Bukkit.getPluginManager().registerEvents(this, p);
+            Bukkit.getPluginManager().registerEvents(this, handler.plugin);
         }
 
         @EventHandler
@@ -84,6 +85,8 @@ public final class BossHandler {
             for (Boss<? extends Mob> boss : handler.bosses) {
                 if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
                     boss.onDeath(e);
+                    for (ItemStack i : boss.getDrops()) m.getWorld().dropItemNaturally(m.getLocation(), i);
+                    if (boss.getDeathSound() != null) m.getWorld().playSound(m, boss.getDeathSound(), 3F, 1F);
                 }
             }
         }

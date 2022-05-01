@@ -16,16 +16,19 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 import me.gamercoder215.mobchip.bosses.annotations.Repeatable;
 
 /**
  * Represents a Boss Entity.
+ * @param <T> The entity type of this Boss.
  */
 public abstract class Boss<T extends Mob> {
     
@@ -40,6 +43,13 @@ public abstract class Boss<T extends Mob> {
 
     private Sound deathSound;
     private Sound spawnSound;
+    private float volume;
+    private float pitch;
+    
+	private double health = 20;
+	private Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
+	
+	private Map<ChipAttributeInstance, Double> attributes = new HashMap<>();
 
     private final EntityType type;
     private final Plugin plugin;
@@ -47,13 +57,14 @@ public abstract class Boss<T extends Mob> {
     private final BossHandler handler;
 
     /**
-     * The ID of this Boss.
+     * The Numerical ID of this Boss.
      */
     protected final long id;
 
     /**
      * Creates a New Boss.
      * @param t EntityType of Boss
+     * @param plugin Plugin that owns this boss
      * @throws IllegalArgumentException if not a valid Mob EntityType or if Plugin is null
      */
     @SuppressWarnings("unchecked")
@@ -171,6 +182,11 @@ public abstract class Boss<T extends Mob> {
     public final void spawn(@NotNull Location l) {
         T mob = l.getWorld().spawn(l, this.getEntityClass());
         this.mob = mob;
+        
+        for (ChipAttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
+        for (EquipmentSlot s : equipment.keySet()) mob.getEquipment().setItem(s, equipment.get(s));
+        
+        if (spawnSound != null) l.getWorld().playSound(l, deathSound, 3F, 1F);
 
         final Boss<T> inst = this;
 
@@ -233,7 +249,7 @@ public abstract class Boss<T extends Mob> {
     public final Sound getSpawnSound() {
         return this.spawnSound;
     }
-
+    
     /**
      * Sets the Death Sound.
      * @param s New Death Sound, or Null to reset
@@ -242,15 +258,160 @@ public abstract class Boss<T extends Mob> {
     public final void setSpawnSound(@Nullable Sound s) {
         if (s == null) this.spawnSound = s; else this.spawnSound = Sound.ENTITY_WITHER_SPAWN;
     }
+    
+    /**
+     * Fetches the current sound pitch.
+     * @return Current Sound Pitch
+     */
+    public final float getSoundPitch() {
+    	return this.pitch;
+    }
+    
+    /**
+     * Fetches the current sound volume.
+     * @return Current Sound Volume
+     */
+    public final float getSoundVolume() {
+    	return this.volume;
+    }
+    
+    /**
+     * Sets the Sound's Pitch.
+     * @param pitch Pitch to set
+     * @throws IllegalArgumentException if pitch is less than -2F or greater than 2F
+     */
+    public final void setSoundPitch(float pitch) throws IllegalArgumentException {
+    	if (pitch < 2 || pitch > 2) throw new IllegalArgumentException("Pitch must be between -2F and 2F");
+    	this.pitch = pitch;
+    }
+    
+    /**
+     * Sets the Sound's Volume.
+     * @param volume Volume to set
+     * @throws IllegalArgumentException if volume is less than 0F
+     */
+    public final void setSoundVolume(float volume) throws IllegalArgumentException {
+    	if (volume < 0) throw new IllegalArgumentException("Volume must be more than or equal to 0");
+    	this.volume = volume;
+    }
 
     /**
      * Fetch the Entity. Can be null if not spawned yet.
      * @return Entity found
      */
     @Nullable
-    public T getMob() {
+    public final T getMob() {
         return this.mob;
     }
+    
+	/**
+	 * Fetch this Entity's Attributes.
+	 * @return Entity Attributes
+	 */
+	@NotNull
+	public final Map<ChipAttributeInstance, Double> getAttributes() {
+		return this.attributes;
+	}
+	
+	/**
+	 * Get the health that this Boss will spawn with.
+	 * @return Health spawned with
+	 */
+	public final double getHealth() {
+		return this.health;
+	}
+	
+	/**
+	 * Sets the health that this Boss will spawn with.
+	 * @param health Health to spawn with
+	 */
+	public final void setHealth(double health) {
+		this.health = health;
+	}
+	
+	/**
+	 * Adds an Attribute that this Boss will spawn with.
+	 * @param inst Attribute Instance
+	 * @param value Value to set
+	 */
+	public final void addAttribute(@NotNull ChipAttributeInstance inst, double value) {
+		this.attributes.put(inst, value);
+	}
+	
+	/**
+	 * Removes an Attribute that this Boss will spawn with.
+	 * @param inst Attribute Instance
+	 */
+	public final void removeAttribute(@NotNull ChipAttributeInstance inst) {
+		this.attributes.remove(inst);
+	}
+	
+	/**
+	 * Fetch the Boss's Equipment.
+	 * @return Equipment that the Boss will spawn with
+	 */
+	@NotNull
+	public final Map<EquipmentSlot, ItemStack> getEquipment() {
+		return this.equipment;
+	}
+	
+	/**
+	 * Sets an item on this Boss's Equipment that it will spawn with.
+	 * @param slot EquipmentSlot to spawn
+	 * @param item ItemStack to set, can be null
+	 */
+	public final void setItem(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
+		if (item == null) return;
+		this.equipment.put(slot, item);
+	}
+	
+	/**
+	 * Sets this Boss's Helmet.
+	 * @param item Helmet Item to set, can be null
+	 */
+	public final void setHelmet(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.HEAD, item);
+	}
+	
+	/**
+	 * Sets this Boss's Chestplate.
+	 * @param item Chestplate Item to set, can be null
+	 */
+	public final void setChestplate(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.CHEST, item);
+	}
+	
+	/**
+	 * Sets this Boss's Leggings.
+	 * @param item Leggings Item to set, can be null
+	 */
+	public final void setLeggings(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.LEGS, item);
+	}
+	
+	/**
+	 * Sets this Boss's Boots.
+	 * @param item Boots Item to set, can be null
+	 */
+	public final void setBoots(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.FEET, item);
+	}
+	
+	/**
+	 * Sets this Boss's Mainhand.
+	 * @param item Mainhand Item to change, can be null
+	 */
+	public final void setMainhand(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.HAND, item);
+	}
+	
+	/**
+	 * Sets this Boss's Offhand.
+	 * @param item Offhand Item to change, can be null
+	 */
+	public final void setOffhand(@Nullable ItemStack item) {
+		setItem(EquipmentSlot.OFF_HAND, item);
+	}
 
     // Implementation & Other
 
