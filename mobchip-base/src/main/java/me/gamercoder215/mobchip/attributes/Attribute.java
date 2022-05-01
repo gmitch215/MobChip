@@ -1,13 +1,69 @@
 package me.gamercoder215.mobchip.attributes;
 
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
-import me.gamercoder215.mobchip.util.ChipRegistry.RegistryKey;
+import me.gamercoder215.mobchip.registry.ChipRegistry.RegistryKey;
+import me.gamercoder215.mobchip.util.ChipConversions;
+import net.minecraft.core.Registry;
 
 /**
  * Represents an extendible Attribute
  */
 public abstract class Attribute {
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_MAX_HEALTH
+	 */
+	public static final Attribute GENERIC_MAX_HEALTH = new Attribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_ARMOR
+	 */
+	public static final Attribute GENERIC_ARMOR = new Attribute(org.bukkit.attribute.Attribute.GENERIC_ARMOR) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_ARMOR_TOUGHNESS
+	 */
+	public static final Attribute GENERIC_ARMOR_TOUGHNESS = new Attribute(org.bukkit.attribute.Attribute.GENERIC_ARMOR_TOUGHNESS) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_ATTACK_DAMAGE
+	 */
+	public static final Attribute GENERIC_ATTACK_DAMAGE = new Attribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_ATTACK_KNOCKBACK
+	 */
+	public static final Attribute GENERIC_ATTACK_KNOCKBACK = new Attribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_KNOCKBACK) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_ATTACK_SPEED
+	 */
+	public static final Attribute GENERIC_ATTACK_SPEED = new Attribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_FLYING_SPEED
+	 */
+	public static final Attribute GENERIC_FLYING_SPEED = new Attribute(org.bukkit.attribute.Attribute.GENERIC_FLYING_SPEED) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_FOLLOW_RANGE
+	 */
+	public static final Attribute GENERIC_FOLLOW_RANGE = new Attribute(org.bukkit.attribute.Attribute.GENERIC_FOLLOW_RANGE) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_KNOCKBACK_RESISTANCE
+	 */
+	public static final Attribute GENERIC_KNOCKBACK_RESISTANCE = new Attribute(org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_LUCK
+	 */
+	public static final Attribute GENERIC_LUCK = new Attribute(org.bukkit.attribute.Attribute.GENERIC_LUCK) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#GENERIC_MOVEMENT_SPEED
+	 */
+	public static final Attribute GENERIC_MOVEMENT_SPEED = new Attribute(org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#ZOMBIE_SPAWN_REINFORCEMENTS
+	 */
+	public static final Attribute ZOMBIE_SPAWN_REINFORCEMENTS = new Attribute(org.bukkit.attribute.Attribute.ZOMBIE_SPAWN_REINFORCEMENTS) {};
+	/**
+	 * @see org.bukkit.attribute.Attribute#HORSE_JUMP_STRENGTH
+	 */
+	public static final Attribute HORSE_JUMP_STRENGTH = new Attribute(org.bukkit.attribute.Attribute.HORSE_JUMP_STRENGTH) {};
+	
 	
 	/**
 	 * Maximum Name Length
@@ -19,6 +75,10 @@ public abstract class Attribute {
 	private double defaultValue;
 	private double min;
 	private double max;
+	
+	private Attribute(org.bukkit.attribute.Attribute att) {
+		this(new RegistryKey(Registry.ATTRIBUTE.getKey(ChipConversions.convertType(att))), ChipConversions.convertType(att).getDefaultValue(), ChipConversions.convertType(att).getMinValue(), ChipConversions.convertType(att).getMaxValue());
+	}
 	
 	/**
 	 * Constructs an Attribute, with min, max, and default all being 1.
@@ -70,6 +130,15 @@ public abstract class Attribute {
 	@NotNull
 	public final RegistryKey getId() {
 		return this.id;
+	}
+	
+	/**
+	 * Converts this Attribute to a Bukkit Attribute.
+	 * <p>
+	 * <strong>This will only work for normal attributes, such as {@link #GENERIC_ARMOR}. Any custom attributes will return null.</strong>
+	 */
+	public final org.bukkit.attribute.Attribute toBukkit() {
+		return org.bukkit.Registry.ATTRIBUTE.get(NamespacedKey.minecraft(getId().getValue()));
 	}
 	
 	/**
