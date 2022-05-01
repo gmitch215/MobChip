@@ -2,10 +2,10 @@ package me.gamercoder215.mobchip.ai.goal;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
+import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -16,10 +16,30 @@ import net.minecraft.world.entity.ai.goal.Goal;
  */
 public abstract class Pathfinder implements PathfinderInfo {
 
-	static PathfinderMob getEntity(Goal g, String fieldName) {
+	static net.minecraft.world.entity.Mob getEntity(Goal g, String fieldName) {
 		try {
+			
 			Field f = g.getClass().getDeclaredField(fieldName);
 			f.setAccessible(true);
+			
+			Object o = f.get(g);
+			if (o == null && g.getClass().getSuperclass().isAssignableFrom(Goal.class)) o = getEntity((Goal) g.getClass().getSuperclass().cast(g), fieldName);
+			
+			return (net.minecraft.world.entity.Mob) f.get(g);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	static PathfinderMob getCreature(Goal g, String fieldName) {
+		try {
+			
+			Field f = g.getClass().getDeclaredField(fieldName);
+			f.setAccessible(true);
+			
+			Object o = f.get(g);
+			if (o == null && g.getClass().getSuperclass().isAssignableFrom(Goal.class)) o = getEntity((Goal) g.getClass().getSuperclass().cast(g), fieldName);
+			
 			return (PathfinderMob) f.get(g);
 		} catch (Exception e) {
 			return null;
@@ -31,7 +51,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 	
 	protected Pathfinder(@NotNull Mob entity) {
 		this.entity = entity;
-		this.nmsEntity = ((CraftMob) entity).getHandle();
+		this.nmsEntity = ChipConversions.convertType(entity);
 	}
 	
 	protected Pathfinder(@NotNull net.minecraft.world.entity.Mob entity) {

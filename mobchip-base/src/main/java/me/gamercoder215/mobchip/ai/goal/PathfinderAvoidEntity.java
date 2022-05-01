@@ -2,7 +2,6 @@ package me.gamercoder215.mobchip.ai.goal;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftCreature;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	 */
 	@SuppressWarnings("unchecked")
 	public PathfinderAvoidEntity(AvoidEntityGoal<?> nmsGoal) {
-		super(Pathfinder.getEntity(nmsGoal, "mob"));
+		super(Pathfinder.getEntity(nmsGoal, "a"));
 		
 		try {
 			Field a = AvoidEntityGoal.class.getDeclaredField("i");
@@ -66,7 +65,7 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter) {
 		super(entity);
 		this.filter = filter;
-		this.nmsEntity = ((CraftCreature) entity).getHandle();
+		this.nmsEntity = ChipConversions.convertType(entity);
 	}
 	
 	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) {
