@@ -138,7 +138,7 @@ public interface EntityBrain {
 
 		return contains;
     }
-
+    
     /**
      * Adds a Sensor to this Entity Brain.
      * @param s Sensor to use

@@ -2,8 +2,6 @@ package me.gamercoder215.mobchip.paper;
 
 import java.util.NoSuchElementException;
 
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,12 +15,13 @@ import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.attributes.Attribute;
 import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
-import me.gamercoder215.mobchip.util.ChipGetter;
+import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.core.Registry;
 
 /**
  * Represents Paper/Purpur Implementation of the MobChip API
  */
+@SuppressWarnings({"unchecked", "deprecation"})
 public final class PaperBrain implements EntityBrain {
 
 	private final Mob m;
@@ -30,7 +29,7 @@ public final class PaperBrain implements EntityBrain {
 
 	private PaperBrain(@NotNull Mob m) {
 		this.m = m;
-		this.nmsMob = ((CraftMob) m).getHandle();
+		this.nmsMob = ChipConversions.convertType(m);
 	}
 
 	/**
@@ -61,10 +60,9 @@ public final class PaperBrain implements EntityBrain {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean addBehavior(@NotNull Behavior b) {
-		return b.getHandle().tryStart(ChipGetter.getLevel(m.getWorld()), nmsMob, 0L);
+		return b.getHandle().tryStart(ChipConversions.convertType(m.getWorld()), nmsMob, 0L);
 	}
 	
 	/**
@@ -87,7 +85,6 @@ public final class PaperBrain implements EntityBrain {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setMemory(EntityMemory memory, Object value) {
 		if (value == null) {
 			nmsMob.getBrain().eraseMemory(memory.getHandle());
@@ -103,7 +100,6 @@ public final class PaperBrain implements EntityBrain {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setMemory(EntityMemory memory, Object value, long expire) {
 		if (expire < 0) throw new IllegalArgumentException("Invalid ticks number " + expire);
 
@@ -114,7 +110,6 @@ public final class PaperBrain implements EntityBrain {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public @Nullable Object getMemory(EntityMemory memory) {
 		try {
 			return nmsMob.getBrain().getMemory(memory.getHandle()).get();
@@ -128,7 +123,6 @@ public final class PaperBrain implements EntityBrain {
 	 */
 	@Override
 	@Nullable
-	@SuppressWarnings("unchecked")
 	public <T> T getMemory(EntityMemory memory, Class<T> clazz) {
 		try {
 			Object obj = nmsMob.getBrain().getMemory(memory.getHandle()).get();
@@ -144,7 +138,6 @@ public final class PaperBrain implements EntityBrain {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public long getExpiration(EntityMemory memory) {
 		return nmsMob.getBrain().getTimeUntilExpiry(memory.getHandle());
 	}
@@ -161,9 +154,8 @@ public final class PaperBrain implements EntityBrain {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void addSensor(@NotNull Sensor s) {
-		s.getHandle().create().tick(((CraftWorld) m.getWorld()).getHandle(), nmsMob);	
+		s.getHandle().create().tick(ChipConversions.convertType(m.getWorld()), nmsMob);	
 	}
 	
 	/**
