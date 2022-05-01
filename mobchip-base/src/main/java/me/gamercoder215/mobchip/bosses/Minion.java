@@ -53,7 +53,7 @@ public final class Minion<T extends Mob> {
 	 * Creates a Minion with no equipment.
 	 * @param clazz Entity Class
 	 * @param health Health of Entity
-	 * @param attributes Entity Attribute Map of Attribute to Value
+	 * @param equipment Entity Equipment Map of EquipmentSlot to ItemStack
 	 * @throws IllegalArgumentException if health is less than 0 or if class is null
 	 */
 	public Minion(@NotNull Class<T> clazz, double health, @Nullable Map<EquipmentSlot, ItemStack> equipment) throws IllegalArgumentException {
