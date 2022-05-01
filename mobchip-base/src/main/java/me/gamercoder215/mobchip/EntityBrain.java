@@ -14,6 +14,10 @@ import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.attributes.Attribute;
 import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 
+/**
+ * Represents an Entire Entity Brain
+ */
+@SuppressWarnings({ "rawtypes", "unchecked"})
 public interface EntityBrain {
     
     /**
@@ -55,7 +59,7 @@ public interface EntityBrain {
      * @param value Value of new memory, null to remove
      * @throws IllegalArgumentException if the value is not suitable for this memory
      */
-    void setMemory(@NotNull EntityMemory memory, @Nullable Object value) throws IllegalArgumentException;
+    <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value) throws IllegalArgumentException;
     
     /**
      * Sets a temporary memory into this entity's brain.
@@ -66,7 +70,7 @@ public interface EntityBrain {
      * @param expire How many ticks until this memory will be forgotten/removed
      * @throws IllegalArgumentException if the value is not suitable for this memory / ticks amount is invalid
      */
-    void setMemory(@NotNull EntityMemory memory, @NotNull Object value, long expire) throws IllegalArgumentException;
+    <T> void setMemory(@NotNull EntityMemory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException;
 
     /**
      * Sets multilple permanent memories into this Entity's Brain. 
@@ -95,38 +99,28 @@ public interface EntityBrain {
      * @return Found value as an object, null if not present
      */
     @Nullable
-    Object getMemory(@NotNull EntityMemory memory);
-
-    /**
-     * Fetch the Memory that is stored in this Entity's Brain.
-     * @param <T> Type of Object to cast to
-     * @param memory Memory to fetch
-     * @param clazz Class Object used to cast
-     * @return Found value as the class represents, null if type is invalid or not present
-     */
-    @Nullable
-    <T> T getMemory(@NotNull EntityMemory memory, @NotNull Class<T> clazz);
+    <T> T getMemory(@NotNull EntityMemory<T> memory);
 
     /**
      * Get the expiration date of this Memory.
      * @param memory Memory to fetch
      * @return Found expiration date, or 0 if not found
      */
-    long getExpiration(@NotNull EntityMemory memory);
+    long getExpiration(@NotNull EntityMemory<?> memory);
 
     /**
      * Whether or not this Brain contains this memory.
      * @param memory Memory to fetch
      * @return true if contains, else false
      */
-    boolean containsMemory(@NotNull EntityMemory memory);
+    boolean containsMemory(@NotNull EntityMemory<?> memory);
 
     /**
      * Whether or not this Brain contains all of these memories.
      * @param memories Group of memories to query
      * @return true if they <strong>all</strong> are contained, else false
      */
-    default boolean containsAllMemories(@NotNull EntityMemory... memories) {
+    default boolean containsAllMemories(@NotNull EntityMemory<?>... memories) {
 		boolean contains = true;
 
 		for (EntityMemory m : memories) {
