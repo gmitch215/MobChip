@@ -2,6 +2,8 @@ package me.gamercoder215.mobchip.ai.behavior;
 
 /**
  * Represents a temporary one-time behavior
+ * <p>
+ * A behavior contains a set of memories and their values.
  */
 public abstract class Behavior implements Cloneable {
 
