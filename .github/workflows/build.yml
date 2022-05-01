@@ -27,3 +27,5 @@ jobs:
       - name: Build Project
         run: mvn package clean install
           
+      - name: Build JavaDocs
+        run: bash javadoc.sh
