@@ -4,17 +4,24 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.pathfinder.Node;
 
@@ -25,11 +32,7 @@ public final class ChipConversions {
 
 	private ChipConversions() {};
 		
-	/**
-	 * Converts a Bukkit Class into a NMS Class.
-	 * @param clazz Bukkit class
-	 * @return Converted NMS Class
-	 */
+	
 	public static Class<? extends net.minecraft.world.entity.Entity> toNMSClass(Class<? extends Entity> clazz) {
 		try {
 			return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.Entity.class);
@@ -50,29 +53,90 @@ public final class ChipConversions {
 			return null;
 		}
 	}
-
-	/**
-	 * Converts a Bukkit EntityType to a NMS EntityType.
-	 * @param type EntityType to convert
-	 * @return NMS EntityType
-	 */
-	public static EntityType<?> convertType(org.bukkit.entity.EntityType type) {
-		return Registry.ENTITY_TYPE.get(CraftNamespacedKey.toMinecraft(type.getKey()));
+	
+	@SuppressWarnings("unchecked")
+	private static <T> T getHandle(Object o) {
+		try {
+			return (T) o.getClass().getMethod("getHandle").invoke(o);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static ServerLevel convertType(World w) {
+		try {
+			return ChipConversions.<ServerLevel>getHandle(w);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static net.minecraft.world.entity.Entity convertType(Entity en) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.Entity>getHandle(en);
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+	
+	public static net.minecraft.world.entity.Mob convertType(Mob en) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.Mob>getHandle(en);
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+	
+	public static net.minecraft.world.entity.PathfinderMob convertType(Creature en) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.PathfinderMob>getHandle(en);
+		} catch (Exception e) {
+			return null;
+		}	
 	}
 
-	/**
-	 * Converts a Bukkit Location to a NMS Block Position.
-	 * @param loc Location to convert
-	 * @return NMS Block Position
-	 */
-	public static BlockPos convertType(@NotNull Location loc) {
+	public static EntityType<?> convertType(org.bukkit.entity.EntityType type) {
+		return Registry.ENTITY_TYPE.get(convertType(type.getKey()));
+	}
+	
+	public static ResourceLocation convertType(NamespacedKey key) {
+		try {
+			return (ResourceLocation) craftClass("util.CraftNamespacedKey").getMethod("toMinecraft", NamespacedKey.class).invoke(null, key);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static RangedAttribute convertType(Attribute att) {
+		try {
+			return (RangedAttribute) craftClass("attribute.CraftAttributeMap").getMethod("toMinecraft", Attribute.class).invoke(null, att);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	private static Class<?> craftClass(String suffix) {
+		try {
+			String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+			return Class.forName("org.bukkit.craftbukkit." + version + "." + suffix);
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+
+	public static BlockPos convertType(Location loc) {
 		return new BlockPos(loc.getX(), loc.getY(), loc.getZ());
 	}
 
-	/**
-	 * Converts a NMS Goal into a MobChip Pathfinder.
-	 */
-	public static Pathfinder wrapGoal(@NotNull Goal g) {
+	public static net.minecraft.world.Difficulty convertType(Difficulty d) {
+		return net.minecraft.world.Difficulty.byName(d.name().toLowerCase());
+	}
+	
+	public static Difficulty convertType(net.minecraft.world.Difficulty d) {
+		return Difficulty.valueOf(d.getKey().toUpperCase());
+	}
+	
+	public static Pathfinder wrapGoal(Goal g) {
 		try {
 			Constructor<? extends Pathfinder> constr = wrapGoal(g.getClass()).getConstructor(g.getClass()); 
 			constr.setAccessible(true);
