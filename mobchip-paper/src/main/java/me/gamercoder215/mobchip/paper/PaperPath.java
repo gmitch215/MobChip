@@ -10,7 +10,7 @@ public final class PaperPath extends NavigationPath {
     
     private Component name;
 
-    protected PaperPath(@NotNull Path nms) {
+    PaperPath(@NotNull Path nms) {
         super(nms);
 
         this.name = Component.translatable("paperpath");

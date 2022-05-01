@@ -57,7 +57,7 @@ public final class BukkitBrain implements EntityBrain {
 	}
 
 	@Override
-	public void setMemory(EntityMemory memory, Object value) {
+	public <T> void setMemory(EntityMemory<T> memory, T value) {
 		if (value == null) {
 			nmsMob.getBrain().eraseMemory(memory.getHandle());
 			return;
@@ -69,29 +69,16 @@ public final class BukkitBrain implements EntityBrain {
 	}
 
 	@Override
-	public void setMemory(EntityMemory memory, Object value, long expire) {
+	public <T> void setMemory(EntityMemory<T> memory, T value, long expire) {
 		if (expire < 0) throw new IllegalArgumentException("Invalid ticks number " + expire);
 
 		nmsMob.getBrain().setMemoryWithExpiry(memory.getHandle(), memory.convert(value), expire);
 	}
 
 	@Override
-	public @Nullable Object getMemory(EntityMemory memory) {
+	public <T> @Nullable T getMemory(EntityMemory<T> memory) {
 		try {
-			return nmsMob.getBrain().getMemory(memory.getHandle()).get();
-		} catch (NoSuchElementException e) {
-			return null;
-		}
-	}
-
-	@Override
-	@Nullable
-	public <T> T getMemory(EntityMemory memory, Class<T> clazz) {
-		try {
-			Object obj = nmsMob.getBrain().getMemory(memory.getHandle()).get();
-			if (!(clazz.isInstance(obj))) return null;
-
-			return (T) obj;
+			return (T) nmsMob.getBrain().getMemory(memory.getHandle()).get();
 		} catch (NoSuchElementException e) {
 			return null;
 		}
@@ -99,12 +86,12 @@ public final class BukkitBrain implements EntityBrain {
 
 	@Override
 
-	public long getExpiration(EntityMemory memory) {
+	public long getExpiration(EntityMemory<?> memory) {
 		return nmsMob.getBrain().getTimeUntilExpiry(memory.getHandle());
 	}
 
 	@Override
-	public boolean containsMemory(EntityMemory memory) {
+	public boolean containsMemory(EntityMemory<?> memory) {
 		return nmsMob.getBrain().hasMemoryValue(memory.getHandle());
 	}
 

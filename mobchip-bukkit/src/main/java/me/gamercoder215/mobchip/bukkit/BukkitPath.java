@@ -12,7 +12,7 @@ public final class BukkitPath extends NavigationPath {
     
     private String name;
 
-    protected BukkitPath(@NotNull Path nms) {
+    BukkitPath(@NotNull Path nms) {
         super(nms);
 
         this.name = "bukkitpath";
