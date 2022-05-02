@@ -11,11 +11,13 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -25,6 +27,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -64,6 +68,40 @@ public final class ChipConversions {
 			return ChipConversions.<ServerPlayer>getHandle(p);
 		} catch (Exception e) {
 			return null;
+		}
+	}
+	
+	public static AgeableMob convertType(Ageable a) {
+		try {
+			return ChipConversions.<AgeableMob>getHandle(a);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static DamageSource convertType(DamageCause c) {
+		switch (c) {
+			case FIRE: return DamageSource.IN_FIRE;
+			case LIGHTNING: return DamageSource.LIGHTNING_BOLT;
+			case FIRE_TICK: return DamageSource.ON_FIRE;
+			case SUFFOCATION: return DamageSource.IN_WALL;
+			case LAVA: return DamageSource.LAVA;
+			case HOT_FLOOR: return DamageSource.HOT_FLOOR;
+			case CRAMMING: return DamageSource.CRAMMING;
+			case DROWNING: return DamageSource.DROWN;
+			case STARVATION: return DamageSource.STARVE;
+			case CONTACT: return DamageSource.CACTUS;
+			case MAGIC: return DamageSource.MAGIC;
+			case FALL: return DamageSource.FALL;
+			case FLY_INTO_WALL: return DamageSource.FLY_INTO_WALL;
+			case VOID: return DamageSource.OUT_OF_WORLD;
+			case CUSTOM: return DamageSource.GENERIC;
+			case WITHER: return DamageSource.WITHER;
+			case FALLING_BLOCK: return DamageSource.FALLING_BLOCK;
+			case DRAGON_BREATH: return DamageSource.DRAGON_BREATH;
+			case FREEZE: return DamageSource.FREEZE;
+			case DRYOUT: return DamageSource.DRY_OUT;
+			default: return DamageSource.GENERIC;
 		}
 	}
 	

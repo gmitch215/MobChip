@@ -26,7 +26,6 @@
 	<modules>
 		<module>mobchip-base</module>
 		<module>mobchip-bukkit</module>
-		<module>mobchip-paper</module>
 	</modules>
 
 	<repositories>
@@ -79,7 +78,6 @@
                         <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
 						<link>https://papermc.io/javadocs/paper/1.18/</link>
 						<link>https://gamercoder215.github.io/MobChip/base/</link>
-						<link>https://jd.adventure.kyori.net/api/4.10.1/</link>
                     </links>
 					<excludePackageNames>*.util</excludePackageNames>
                 </configuration>
