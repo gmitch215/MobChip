@@ -8,13 +8,4 @@ java -jar BuildTools.jar --disable-java-check --rev 1.18.2 --remapped
 
 cd ..
 
-echo Installing Paper...
-
-git clone https://github.com/PaperMC/Paper.git
-cd Paper
-./gradlew applyPatches
-./gradlew publishToMavenLocal
-
-cd ..
-
 echo Done
