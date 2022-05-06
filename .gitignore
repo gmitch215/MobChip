@@ -5,11 +5,9 @@ bin/
 .gitpod.yml
 /mobchip-base/target/
 /mobchip-bukkit/target/
-/mobchip-paper/target/
 /target/
 /mobchip-base/dependency-reduced-pom.xml
 /mobchip-paper/dependency-reduced-pom.xml
-/mobchip-bukkit/dependency-reduced-pom.xml
 
 .vscode/
 *.class
