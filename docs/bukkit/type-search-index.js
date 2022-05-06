@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"me.gamercoder215.mobchip.bukkit","l":"BukkitBrain"},{"p":"me.gamercoder215.mobchip.bukkit","l":"BukkitPath"}];updateSearchResults();
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"me.gamercoder215.mobchip.bukkit.events","l":"BrainEvent"},{"p":"me.gamercoder215.mobchip.bukkit","l":"BukkitBrain"},{"p":"me.gamercoder215.mobchip.bukkit","l":"BukkitPath"},{"p":"me.gamercoder215.mobchip.bukkit.events.memory","l":"MemoryEvent"}];updateSearchResults();
