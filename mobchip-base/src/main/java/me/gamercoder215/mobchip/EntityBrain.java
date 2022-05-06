@@ -2,6 +2,8 @@ package me.gamercoder215.mobchip;
 
 import java.util.Map;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,17 +21,26 @@ import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
  */
 @SuppressWarnings({ "rawtypes", "unchecked"})
 public interface EntityBrain {
-    
+
+    /**
+     * Get the Entity that this Brain relates to.
+     * @return Entity of this brain 
+     */
+    @NotNull
+    Mob getEntity();
+
     /**
      * Get the Entity AI associated with this Brain.
      * @return Entity AI
      */
+    @NotNull
     EntityAI getGoalAI();
 
     /**
      * Get the Entity Target AI associated with this Brain.
      * @return Entity Target AI
      */
+    @NotNull
     EntityAI getTargetAI();
 
     /**
@@ -146,6 +157,36 @@ public interface EntityBrain {
      */
     @Nullable
     ChipAttributeInstance getAttribute(@NotNull Attribute a);
-    
+
+    /**
+     * Whether or not this Entity is in its restriction area.
+     * @return true if inside, else false
+     */
+    boolean isInRestriction();
+
+    /**
+     * Sets the Restriction Area for this Entity.
+     * @param center Location center
+     * @param radius Radius of restriction center
+     */
+    void setRestrictionArea(Location center, int radius);
+
+    /**
+     * Gets the current restriction area.
+     * @return Restriction Area
+     */
+    Location getRestrictionArea();
+
+    /**
+     * Whether or not this entity has a restriction area.
+     * @return true if has area, else false
+     */
+    boolean hasRestriction();
+
+    /**
+     * Fetch the current restriction radius for this entity.
+     * @return Restriction Radius
+     */
+    int getRestrictionRadius();
     
 }
