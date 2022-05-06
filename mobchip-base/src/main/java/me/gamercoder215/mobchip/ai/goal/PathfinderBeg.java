@@ -6,7 +6,6 @@ import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.world.entity.ai.goal.BegGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Represents a Pathfinder for Wolf Begging
@@ -14,11 +13,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 public final class PathfinderBeg extends Pathfinder implements Ranged {
 	
 	private float lookRange = DEFAULT_LOOK_RANGE;
-	
-	@SuppressWarnings("unused")
-	private PathfinderBeg(Goal goal) {
-		this((BegGoal) goal);
-	}
 	
 	/**
 	 * Constructs a PathfinderBeg from a NMS Goal.

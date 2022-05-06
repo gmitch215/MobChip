@@ -4,15 +4,16 @@ import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a Pathfinder that filters in a class
+ * Represents a Pathfinder that filters in an entity class
  */
 public interface Filtering<T extends LivingEntity> {
     
     /**
      * Set the Filter that this Pathfinder is looking for. 
      * @param clazz Filter to set
+     * @throws IllegalArgumentException if clazz is null
      */
-    void setFilter(@NotNull Class<T> clazz);
+    void setFilter(@NotNull Class<T> clazz) throws IllegalArgumentException ;
 
     /**
      * Get the filter that this Pathfinder is looking for.

@@ -5,17 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.BreathAirGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Represents a Pathfinder to Breath Air
  */
 public final class PathfinderBreathAir extends Pathfinder {
-	
-	@SuppressWarnings("unused")
-	private PathfinderBreathAir(Goal g) {
-		this((BreathAirGoal) g);
-	}
 	
 	/**
 	 * Constructs a PathfinderBreathAir with a NMS Goal.

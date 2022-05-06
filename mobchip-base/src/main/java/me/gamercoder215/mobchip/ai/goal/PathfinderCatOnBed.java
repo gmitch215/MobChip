@@ -1,5 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal;
 
+import java.lang.reflect.Field;
+
 import org.bukkit.entity.Cat;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +15,27 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 
 	private double speedMod;
 	private int range;
-	
-	// TODO Create NMS Constructor
-	
+
+	/**
+	 * Constructs a PathfinderCatOnBed from a NMS CatLieOnBedGoal.
+	 * @param g NMS Goal
+	 */
+	public PathfinderCatOnBed(@NotNull CatLieOnBedGoal g) {
+		super(Pathfinder.getEntity(g, "g"));
+
+		try {
+			Field a = CatLieOnBedGoal.class.getSuperclass().getDeclaredField("b");
+			a.setAccessible(true);
+			this.speedMod = a.getDouble(g);
+
+			Field b = CatLieOnBedGoal.class.getSuperclass().getDeclaredField("l");
+			b.setAccessible(true);
+			this.range = b.getInt(g);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Constructs a PathfinderCatOnBed with a range of 4.
 	 * @param cat Cat to use

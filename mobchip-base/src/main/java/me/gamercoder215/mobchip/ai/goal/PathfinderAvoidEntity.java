@@ -11,7 +11,6 @@ import me.gamercoder215.mobchip.ai.goal.target.Filtering;
 import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Pathfinder to avoid a LivingEntity
@@ -24,39 +23,23 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	private float maxDistance;
 	private double sprintModifier = DEFAULT_SPEED_MODIFIER;
 	private Class<T> filter;
-	
-	private PathfinderMob nmsEntity;
-	
-	@SuppressWarnings("unused")
-	private PathfinderAvoidEntity(Goal goal) {
-		this((AvoidEntityGoal<?>) goal);
-	}
 
 	/**
 	 * Constructs a PathfinderAvoidEntity from a NMS Pathfinder Goal
-	 * @param nmsGoal NMS Pathfinder Goal
+	 * @param g Goal to use
 	 */
 	@SuppressWarnings("unchecked")
-	public PathfinderAvoidEntity(AvoidEntityGoal<?> nmsGoal) {
-		super(Pathfinder.getEntity(nmsGoal, "a"));
+	public PathfinderAvoidEntity(AvoidEntityGoal<?> g) {
+		super(Pathfinder.getEntity(g, "a"));
 		
+		this.speedModifier = Pathfinder.getDouble(g, "i");
+		this.sprintModifier = Pathfinder.getDouble(g, "j");
+		this.maxDistance = Pathfinder.getFloat(g, "c");
+
 		try {
-			Field a = AvoidEntityGoal.class.getDeclaredField("i");
-			a.setAccessible(true);
-			this.speedModifier = a.getDouble(nmsGoal);
-			
-			Field b = AvoidEntityGoal.class.getDeclaredField("j");
-			b.setAccessible(true);
-			this.sprintModifier = b.getDouble(nmsGoal);
-			
-			Field c = AvoidEntityGoal.class.getDeclaredField("c");
-			c.setAccessible(true);
-			this.maxDistance = c.getFloat(nmsGoal);
-			
 			Field d = AvoidEntityGoal.class.getDeclaredField("f");
 			d.setAccessible(true);
 			this.filter = (Class<T>) ChipConversions.toBukkitClass(LivingEntity.class, d.getType().asSubclass(net.minecraft.world.entity.Entity.class));
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,7 +48,6 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter) {
 		super(entity);
 		this.filter = filter;
-		this.nmsEntity = ChipConversions.convertType(entity);
 	}
 	
 	public PathfinderAvoidEntity(@NotNull Creature entity, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) {
@@ -104,7 +86,7 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	@SuppressWarnings("unchecked")
 	@Override
 	public AvoidEntityGoal<?> getHandle() {
-		return new AvoidEntityGoal<net.minecraft.world.entity.LivingEntity>(nmsEntity, (Class<net.minecraft.world.entity.LivingEntity>) ChipConversions.toNMSClass(getFilter()), maxDistance, speedModifier, sprintModifier);
+		return new AvoidEntityGoal<net.minecraft.world.entity.LivingEntity>((PathfinderMob) nmsEntity, (Class<net.minecraft.world.entity.LivingEntity>) ChipConversions.toNMSClass(getFilter()), maxDistance, speedModifier, sprintModifier);
 	}
 
 	@Override

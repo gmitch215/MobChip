@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.ai.goal.BreakDoorGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Represents a Pathfinder that has a Mob break a door
@@ -26,11 +25,6 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	
 	private int breakTime;
 	private Predicate<net.minecraft.world.Difficulty> validDiffs;
-	
-	@SuppressWarnings("unused")
-	private PathfinderBreakDoor(Goal g) {
-		this((BreakDoorGoal) g);
-	}
 	
 	/**
 	 * Convert a NMS BreakDoorGoal to a PathfinderBreakDoor.

@@ -13,6 +13,10 @@ import net.minecraft.world.entity.ai.goal.Goal.Flag;
  */
 public abstract class CustomPathfinder extends Pathfinder {
 
+    /**
+     * Constructs a CustomPathfinder.
+     * @param m Mob to use
+     */
     protected CustomPathfinder(@NotNull Mob m) {
         super(m);
     }
@@ -118,6 +122,14 @@ public abstract class CustomPathfinder extends Pathfinder {
      */
     public boolean updateEveryTick() { return false; };
 
+    /**
+     * Whether or not this Pathfinder Goal will continue to be used.
+     * <p>
+     * Override this method if you have additional checks after the Pathfinder has started. By default, it will call {@link #canStart()}.
+     * @return true if can continue to use, else false
+     */
+    public boolean canContinueToUse() { return canStart(); };
+
     public final Goal getHandle() {
         CustomPathfinder inst = this;
 
@@ -143,6 +155,10 @@ public abstract class CustomPathfinder extends Pathfinder {
             @Override
             public boolean requiresUpdateEveryTick() {
                 return inst.updateEveryTick();
+            }
+
+            public boolean canContinueToUse() {
+                return inst.canContinueToUse();
             }
 
             @Override
