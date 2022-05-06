@@ -1,23 +1,31 @@
 package me.gamercoder215.mobchip.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -27,11 +35,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Node;
 
 /**
@@ -41,10 +51,18 @@ public final class ChipConversions {
 
 	private ChipConversions() {};
 		
-	
 	public static Class<? extends net.minecraft.world.entity.Entity> toNMSClass(Class<? extends Entity> clazz) {
 		try {
 			return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.Entity.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static Class<? extends net.minecraft.world.entity.LivingEntity> toLivingNMSClass(Class<? extends LivingEntity> clazz) {
+		try {
+			return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.LivingEntity.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -63,9 +81,65 @@ public final class ChipConversions {
 		}
 	}
 	
+	public static net.minecraft.world.item.ItemStack convertType(ItemStack p) {
+		try {
+			Class<?> craftStack = craftClass("inventory.CraftItemStack");
+
+			return (net.minecraft.world.item.ItemStack) craftStack.getDeclaredMethod("asNMSCopy", ItemStack.class).invoke(null, p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static ItemStack convertType(net.minecraft.world.item.ItemStack p) {
+		try {
+			Class<?> craftStack = craftClass("inventory.CraftItemStack");
+
+			return (ItemStack) craftStack.getDeclaredMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class).invoke(null, p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static SoundEvent convertType(Sound p) {
+		try {
+			Class<?> craftStack = craftClass("CraftSound");
+
+			return (SoundEvent) craftStack.getDeclaredMethod("getSoundEffect", Sound.class).invoke(null, p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static Sound convertType(SoundEvent p) {
+		try {
+			Class<?> craftStack = craftClass("CraftSound");
+
+			return (Sound) craftStack.getDeclaredMethod("getBukkit", SoundEvent.class).invoke(null, p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public static ServerPlayer convertType(Player p) {
 		try {
 			return ChipConversions.<ServerPlayer>getHandle(p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static net.minecraft.world.entity.monster.hoglin.Hoglin convertType(Hoglin p) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.monster.hoglin.Hoglin>getHandle(p);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static net.minecraft.world.entity.monster.piglin.Piglin convertType(Piglin p) {
+		try {
+			return ChipConversions.<net.minecraft.world.entity.monster.piglin.Piglin>getHandle(p);
 		} catch (Exception e) {
 			return null;
 		}
@@ -140,6 +214,10 @@ public final class ChipConversions {
 		} catch (Exception e) {
 			return null;
 		}	
+	}
+
+	public static Mob convertType(net.minecraft.world.entity.Mob m) {
+		return (Mob) m.getBukkitEntity();
 	}
 	
 	public static net.minecraft.world.entity.LivingEntity convertType(LivingEntity en) {
@@ -220,13 +298,11 @@ public final class ChipConversions {
 		}
 	}
 
-	/**
-	 * Converts a Block Position to a Location.
-	 * @param w World to use
-	 * @param pos Block Position to convert
-	 * @return Converted Location
-	 */
-	public static Location toBukkit(World w, BlockPos pos) {
+	public static World convertType(Level l) {
+		return l.getWorld();
+	}
+
+	public static Location convertType(World w, BlockPos pos) {
 		return new Location(w, pos.getX(), pos.getY(), pos.getZ());
 	}
 
@@ -234,20 +310,69 @@ public final class ChipConversions {
 		return new NavigationNode(node.x, node.y, node.z);
 	}
 
+    private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+    	ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		String path = packageName.replace('.', '/');
+		Enumeration<URL> resources = classLoader.getResources(path);
+		List<File> dirs = new ArrayList<File>();
+		while (resources.hasMoreElements()) {
+			URL resource = resources.nextElement();
+			dirs.add(new File(resource.getFile()));
+		}
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		for (File directory : dirs) {
+			classes.addAll(findClasses(directory, packageName));
+		}
+    	return classes.toArray(new Class[classes.size()]);
+    }
+
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith(".class")) {
+                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+            }
+        }
+        return classes;
+    }
+
+	public static List<Class<? extends Pathfinder>> getPathfinders() {
+		try {
+			Class<?>[] arr1 = getClasses("me.gamercoder215.mobchip.ai.goal");
+			Class<?>[] arr2 = getClasses("me.gamercoder215.mobchip.ai.goal.target");
+
+			List<Class<? extends Pathfinder>> list = new ArrayList<>();
+			for (Class<?> clazz : arr1) try {
+				list.add(clazz.asSubclass(Pathfinder.class));
+			} catch (ClassCastException e) { continue; }
+			for (Class<?> clazz : arr2) try {
+				list.add(clazz.asSubclass(Pathfinder.class));
+			} catch (ClassCastException e) { continue; }
+
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+
 	public static Class<? extends Pathfinder> wrapGoal(Class<? extends Goal> class1) {
 		try {
-			String className = class1.getSimpleName().replace("Goal", "");
+			if (class1.equals(Goal.class)) return Pathfinder.class;
 
-			if (class1.getPackageName().contains("ai.goal.target")) {
-				return Class.forName("me.gamercoder215.mobchip.ai.goal.target." + className).asSubclass(Pathfinder.class);
-			} else {
-				return Class.forName("me.gamercoder215.mobchip.ai.goal." + className).asSubclass(Pathfinder.class);
+			for (Class<? extends Pathfinder> clazz : getPathfinders()) {
+				if (clazz.getDeclaredMethod("getHandle").getReturnType().getCanonicalName().equals(class1.getCanonicalName())) return clazz;				
 			}
-		} catch (ClassNotFoundException e) {
+
 			return null;
-	 	} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (Exception e) {
+			return Pathfinder.class;
 		}
 	}
 

@@ -73,7 +73,7 @@ final class BukkitAI implements EntityAI {
 		return value;
 	}
 
-	public void putNoAI(Integer key, Pathfinder value) {
+	private void putNoAI(Integer key, Pathfinder value) {
 		goals.put(key, value.getHandle());
 	}
 

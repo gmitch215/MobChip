@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip.bukkit;
 
 import java.util.NoSuchElementException;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +17,7 @@ import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.attributes.Attribute;
 import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 import me.gamercoder215.mobchip.util.ChipConversions;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 
 @SuppressWarnings({"unchecked", "deprecation"})
@@ -112,5 +114,36 @@ public final class BukkitBrain implements EntityBrain {
 		} catch (NoSuchElementException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public boolean isInRestriction() {
+		return nmsMob.isWithinRestriction();
+	}
+
+	@Override
+	public void setRestrictionArea(Location center, int radius) {
+		nmsMob.restrictTo(new BlockPos(center.getX(), center.getY(), center.getZ()), radius);
+	}
+
+	@Override
+	public Location getRestrictionArea() {
+		BlockPos center = nmsMob.getRestrictCenter();
+		return new Location(m.getWorld(), center.getX(), center.getY(), center.getZ());
+	}
+
+	@Override
+	public boolean hasRestriction() {
+		return nmsMob.hasRestriction();
+	}
+
+	@Override
+	public int getRestrictionRadius() {
+		return Math.min((int) Math.floor(nmsMob.getRestrictRadius()), Integer.MAX_VALUE);
+	}
+
+	@Override
+	public @NotNull Mob getEntity() {
+		return this.m;
 	}
 }

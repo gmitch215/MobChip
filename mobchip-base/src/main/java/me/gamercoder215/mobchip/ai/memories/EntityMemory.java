@@ -12,7 +12,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -229,8 +231,111 @@ public final class EntityMemory<T> {
      * Whether or not this Mob is being tempted.
      */
     public static final EntityMemory<Boolean> IS_TEMPTED = new EntityMemory<>(Boolean.class, MemoryModuleType.IS_TEMPTED, SELF());
-    
-    
+    /**
+     * The Entity's Long Jump Cooldown, in ticks
+     */
+    public static final EntityMemory<Integer> LONG_JUMP_COOLDOWN = new EntityMemory<>(Integer.class, MemoryModuleType.LONG_JUMP_COOLDOWN_TICKS, SELF());
+    /**
+     * Whether or not this Entity is currently doing its Long Jump.
+     */
+    public static final EntityMemory<Boolean> IS_LONG_JUMP = new EntityMemory<>(Boolean.class, MemoryModuleType.LONG_JUMP_MID_JUMP, SELF());
+    /**
+     * Whether or not this Entity has a HUnting Cooldown
+     */
+    public static final EntityMemory<Boolean> HUNTING_COOLDOWN = new EntityMemory<>(Boolean.class, MemoryModuleType.HAS_HUNTING_COOLDOWN, SELF());
+    /**
+     * This entity's Ram Cooldown (Typically for Ravagers).
+     */
+    public static final EntityMemory<Integer> RAM_COOLDOWN = new EntityMemory<>(Integer.class, MemoryModuleType.RAM_COOLDOWN_TICKS, SELF());
+    /**
+     * The Entity that this Entity is angry at.
+     */
+    public static final EntityMemory<Entity> ANGRY_AT = new EntityMemory<>(Entity.class, MemoryModuleType.ANGRY_AT, u -> { return u.getUniqueId(); });
+    /**
+     * Whether or not this Entity is universally angry.
+     */
+    public static final EntityMemory<Boolean> UNIVERSAL_ANGER = new EntityMemory<>(Boolean.class, MemoryModuleType.UNIVERSAL_ANGER, SELF());
+    /**
+     * Whether or not this Entity is admiring an Item.
+     */
+    public static final EntityMemory<Boolean> IS_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, MemoryModuleType.ADMIRING_ITEM, SELF());
+    /**
+     * How much time, in ticks, left to reach the Admiring Item.
+     */
+    public static final EntityMemory<Integer> TIME_TO_REACH_ADMIRING_ITEM = new EntityMemory<>(Integer.class, MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, SELF());
+    /**
+     * Whether or not this Entity should walk to its admiring item.
+     */
+    public static final EntityMemory<Boolean> WALKING_TO_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, b -> { return !b; });
+    /**
+     * Whether or not Admiring is Disabled.
+     */
+    public static final EntityMemory<Boolean> ADMIRING_DISABLED = new EntityMemory<>(Boolean.class, MemoryModuleType.ADMIRING_DISABLED, SELF());
+    /**
+     * Whether or not this Entity has hunted recently.
+     */
+    public static final EntityMemory<Boolean> HAS_HUNTED_RECENTLY = new EntityMemory<>(Boolean.class, MemoryModuleType.HUNTED_RECENTLY, SELF());
+    /**
+     * This Entity's Celebration Location.
+     */
+    public static final EntityMemory<Location> CELEBRATION_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, ChipConversions::convertType);
+    /**
+     * Whether or not this entity is dancing.
+     */
+    public static final EntityMemory<Boolean> DANCING = new EntityMemory<>(Boolean.class, MemoryModuleType.DANCING, SELF());
+    /**
+     * The Nearest Huntable Hoglin for this Entity (Used for Piglins).
+     */
+    public static final EntityMemory<Hoglin> NEAREST_HUNTABLE_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, ChipConversions::convertType);
+    /**
+     * The Nearest Baby Hoglin for this Entity (Used for Piglins)
+     */
+    public static final EntityMemory<Hoglin> NEAREST_BABY_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, ChipConversions::convertType);
+    /**
+     * The Nearest Player that is not wearing Golden Armor (Used for Piglins)
+     */
+    public static final EntityMemory<Player> NEAREST_NONGOLD_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, ChipConversions::convertType);
+    /**
+     * An Array of Nearby adult Piglins.
+     */
+    public static final EntityMemory<Piglin[]> NEARBY_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEARBY_ADULT_PIGLINS, LIST(ChipConversions::convertType));
+    /**
+     * An Array of Nearby and Visible adult Piglins.
+     */
+    public static final EntityMemory<Piglin[]> NEARBY_VISIBLE_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, LIST(ChipConversions::convertType));
+    /**
+     * The Nearest Adult Piglin.
+     */
+    public static final EntityMemory<Piglin> NEAREST_ADULT_PIGLIN = new EntityMemory<>(Piglin.class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, ChipConversions::convertType);
+    /**
+     * The Nearest Zombified LivingEntity.
+     */
+    public static final EntityMemory<LivingEntity> NEAREST_ZOMBIFIED = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, ChipConversions::convertType);
+    /**
+     * The amount of Visible Adult Piglins.
+     */
+    public static final EntityMemory<Integer> ADULT_PIGLIN_COUNT = new EntityMemory<>(Integer.class, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, SELF());
+    /**
+     * The amount of Visible Adult Hoglins.
+     */
+    public static final EntityMemory<Integer> ADULT_HOGLIN_COUNT = new EntityMemory<>(Integer.class, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, SELF());
+    /**
+     * The amount of Visible Adult Piglins.
+     */
+    public static final EntityMemory<Player> NEAREST_TEMPTED_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, ChipConversions::convertType);
+    /**
+     * The nearest Repelled for this Entity.
+     */
+    public static final EntityMemory<Location> NEAREST_REPELLENT = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_REPELLENT, ChipConversions::convertType);
+    /**
+     * Whether or not this Entity has Eaten Recently.
+     */
+    public static final EntityMemory<Boolean> ATE_RECENTLY = new EntityMemory<>(Boolean.class, MemoryModuleType.ATE_RECENTLY, SELF());
+    /**
+     * Whether or not this Entity is Pacified.
+     */
+    public static final EntityMemory<Boolean> PACIFIED = new EntityMemory<>(Boolean.class, MemoryModuleType.PACIFIED, SELF());
+
 	@SuppressWarnings("unchecked")
 	private static <T> T getHandle(Object o) {
 		try {
