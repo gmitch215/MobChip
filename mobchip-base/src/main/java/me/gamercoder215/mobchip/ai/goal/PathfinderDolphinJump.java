@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.world.entity.ai.goal.DolphinJumpGoal;
 
 /**
- * Represets a Pathfinder that makes Dolphins Jump
+ * Represents a Pathfinder that makes Dolphins Jump
  */
 public final class PathfinderDolphinJump extends Pathfinder {
 
@@ -36,8 +36,8 @@ public final class PathfinderDolphinJump extends Pathfinder {
     }
 
     /**
-     * Get the current interval
-     * @return
+     * Get the current interval of jump time
+     * @return current interval of jump time
      */
     public int getInterval() {
         return this.interval;

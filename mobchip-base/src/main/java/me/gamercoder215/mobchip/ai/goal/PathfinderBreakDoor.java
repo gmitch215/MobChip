@@ -50,6 +50,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	/**
 	 * Constructs a PathfinderBreakDoor with the default  break time.
 	 * @param m Mob to use
+     * @param validDifficulties Difficulties that this Pathfinder will work on
 	 */
 	public PathfinderBreakDoor(@NotNull Mob m, Difficulty... validDifficulties) {
 		this(m, DEFAULT_DOOR_BREAK_TIME, validDifficulties);
@@ -59,7 +60,8 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	 * Constructs a PathfinderBreakDoor.
 	 * @param m Mob to use
 	 * @param breakTime How many ticks it takes to break a door
-	 * @throws IllegalArgumentException if time is less than or equal to 0
+	 * @param validDifficulties Difficulties that this Pathfinder will work on
+     * @throws IllegalArgumentException if time is less than or equal to 0
 	 */
 	public PathfinderBreakDoor(@NotNull Mob m, int breakTime, Difficulty... validDifficulties) throws IllegalArgumentException {
 		super(m);
@@ -81,7 +83,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	}
 	
 	@Override
-	public Predicate<Difficulty> getCondition() {
+	public @NotNull Predicate<Difficulty> getCondition() {
 		return d -> validDiffs.test(ChipConversions.convertType(d));
 	}
 	
@@ -101,7 +103,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	}
 
 	@Override
-	public void setCondition(Predicate<Difficulty> condition) {
+	public void setCondition(@NotNull Predicate<Difficulty> condition) {
 		this.validDiffs = d -> condition.test(ChipConversions.convertType(d));
 	}
 

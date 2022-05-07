@@ -17,6 +17,9 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
  */
 public final class PathfinderLookAtEntity<T extends LivingEntity> extends Pathfinder implements Filtering<T>, Probable, Ranged {
 
+    /**
+     * Default Probability to look at an Entity (0.02F)
+     */
     public static final float DEFAULT_PROBABILITY = 0.02F;
 
     private float lookRange;

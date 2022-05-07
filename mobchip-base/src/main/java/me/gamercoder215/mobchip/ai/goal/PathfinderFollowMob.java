@@ -14,12 +14,11 @@ import net.minecraft.world.entity.ai.goal.Goal;
 /**
  * Represents a Pathfinder for a Mob to follow another Mob
  */
-public final class PathfinderFollowMob extends Pathfinder implements SpeedModifier, Ranged {
+public final class PathfinderFollowMob extends Pathfinder implements SpeedModifier, Ranged, Conditional<Mob> {
 
     private float range;
     private double speedMod;
     private float stopDistance;
-
     private Predicate<Mob> followPredicate;
 
     @SuppressWarnings("unused")
@@ -52,7 +51,7 @@ public final class PathfinderFollowMob extends Pathfinder implements SpeedModifi
     /**
      * Constructs a PathfinderFollowMob with a stop distance of 1.
      * @param m Mob to use
-     * @param follow Preidcate to use when detecting a mob to follow
+     * @param follow Predicate to use when detecting a mob to follow
      * @throws IllegalArgumentException if follow predicate is null
      */
     public PathfinderFollowMob(@NotNull Mob m, @NotNull Predicate<Mob> follow) throws IllegalArgumentException{
@@ -137,20 +136,11 @@ public final class PathfinderFollowMob extends Pathfinder implements SpeedModifi
         this.speedMod = mod;
     }
 
-    /**
-     * Fetches the follow predicate used when looking for a Mob to follow.
-     * @return Mob Predicate
-     */
-    public @NotNull Predicate<Mob> getFollowFilter() {
+    public @NotNull Predicate<Mob> getCondition() {
         return this.followPredicate;
     }
 
-    /**
-     * Sets the follow predicate used when looking for a Mob to follow.
-     * @param follow Follow predicate to use
-     * @throws IllegalArgumentException if follow predicate is null
-     */
-    public void setFolowFilter(@NotNull Predicate<Mob> follow) throws IllegalArgumentException {
+    public void setCondition(@NotNull Predicate<Mob> follow) throws IllegalArgumentException {
         if (follow == null) throw new IllegalArgumentException("Follow cannot be null");
 
         this.followPredicate = follow;

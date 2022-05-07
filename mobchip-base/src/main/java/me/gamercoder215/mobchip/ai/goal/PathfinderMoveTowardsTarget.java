@@ -20,6 +20,10 @@ public final class PathfinderMoveTowardsTarget extends Pathfinder implements Spe
     private float range;
     private double speedMod;
 
+    /**
+     * Constructs a PathfinderMoveTowardsTarget from a NMS MoveTowardsTargetGoal.
+     * @param g Goal to use
+     */
     public PathfinderMoveTowardsTarget(@NotNull MoveTowardsTargetGoal g) {
         super(Pathfinder.getCreature(g, "a"));
 

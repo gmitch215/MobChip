@@ -21,7 +21,7 @@ public final class PathfinderSit extends Pathfinder {
 
     /**
      * Constructs a PathfinderSit.
-     * @param m Tameable Animal to use
+     * @param m Tamable Animal to use
      */
     public PathfinderSit(@NotNull Tameable m) {
         super(m);

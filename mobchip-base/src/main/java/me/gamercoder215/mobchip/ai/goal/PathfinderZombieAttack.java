@@ -48,7 +48,7 @@ public final class PathfinderZombieAttack extends Pathfinder implements SpeedMod
      * Constructs a PathfinderZombieAttack.
      * @param m Zombie to use
      * @param speedMod Speed Modifier while attacking
-     * @param see Whether or not the Zombie has to see to attack
+     * @param see Whether the Zombie has to see to attack
      */
     public PathfinderZombieAttack(@NotNull Zombie m, double speedMod, boolean see) {
         super(m);

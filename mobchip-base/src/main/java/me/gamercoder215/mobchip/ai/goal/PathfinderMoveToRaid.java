@@ -28,7 +28,7 @@ public final class PathfinderMoveToRaid extends Pathfinder {
 
     @Override
     public PathfindToRaidGoal<?> getHandle() {
-        return new PathfindToRaidGoal<net.minecraft.world.entity.raid.Raider>((net.minecraft.world.entity.raid.Raider) nmsEntity);
+        return new PathfindToRaidGoal<>((net.minecraft.world.entity.raid.Raider) nmsEntity);
     }
     
 

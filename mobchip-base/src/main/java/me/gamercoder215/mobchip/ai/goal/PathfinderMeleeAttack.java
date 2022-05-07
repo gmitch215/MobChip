@@ -17,6 +17,9 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
  */
 public final class PathfinderMeleeAttack extends Pathfinder implements SpeedModifier, Targeting {
 
+    /**
+     * Default Attack Interval, in ticks (20)
+     */
     public static final int DEFAULT_ATTACK_INTERVAL = 20;
 
     private double speedMod;
@@ -68,7 +71,7 @@ public final class PathfinderMeleeAttack extends Pathfinder implements SpeedModi
      * @param c Creature to use
      * @param speedMod Speed Modifier while attacking
      * @param attackInterval Attack Interval, in ticks
-     * @param see Whether or not the Creature must see the target in order to attack
+     * @param see Whether the Creature must see the target in order to attack
      * @throws IllegalArgumentException if attack interval is less than 1
      */
     public PathfinderMeleeAttack(@NotNull Creature c, double speedMod, int attackInterval, boolean see) throws IllegalArgumentException {

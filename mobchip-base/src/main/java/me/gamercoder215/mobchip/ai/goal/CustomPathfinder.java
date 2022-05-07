@@ -9,7 +9,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 /**
- * Represents an extendible Pathfinder for creating Custom Pathfinders.
+ * Represents an extendable Pathfinder for creating Custom Pathfinders.
  */
 public abstract class CustomPathfinder extends Pathfinder {
 
@@ -24,19 +24,35 @@ public abstract class CustomPathfinder extends Pathfinder {
     /**
      * Pathfinder Flags for this Custom Pathfinder
      */
-    public static enum PathfinderFlag {
+    public enum PathfinderFlag {
+        /**
+         * Flag representing that the Pathfinder will move the entity
+         */
         MOVEMENT(Flag.MOVE),
+        /**
+         * Flag representing that the Pathfinder will target something/someone
+         */
         TARGETING(Flag.TARGET),
+        /**
+         * Flag representing that the Pathfinder will make the entity look at something/someone
+         */
         LOOKING(Flag.LOOK),
+        /**
+         * Flag representing that the Pathfinder involves making the entity jump
+         */
         JUMPING(Flag.JUMP)
         ;
 
         private final Flag type;
 
-        private PathfinderFlag(Flag type) {
+        PathfinderFlag(Flag type) {
             this.type = type;
-        }  
+        }
 
+        /**
+         * Get the NMS Enum of this PathfinderFlag.
+         * @return Handle
+         */
         public final Flag getHandle() {
             return this.type;
         }
@@ -54,11 +70,12 @@ public abstract class CustomPathfinder extends Pathfinder {
      *    return new PathfinderFlag[] { PathfinderFlag.MOVEMENT, PathfinderFlag.JUMPING; }
      * }
      * </pre>
+     * @return Flags
      */
     public abstract PathfinderFlag[] getFlags();
 
     /**
-     * Whether or not this Custom Pathfinder can start.
+     * Whether this Custom Pathfinder can start.
      * <p>
      * Any assignments to fields or checks should be in here. Return true for {@link #start()} to automatically run. 
      * <p>
@@ -72,6 +89,7 @@ public abstract class CustomPathfinder extends Pathfinder {
      * } 
      *
      * </pre>
+     * @return true if Pathfinder can start, else false
      */
     public abstract boolean canStart();
 
@@ -109,26 +127,26 @@ public abstract class CustomPathfinder extends Pathfinder {
     public abstract void tick();
 
     /**
-     * Whether or not this Pathfinder Goal is interruptable. Default: true
-     * @return true if interruptable, else false
+     * Whether this Pathfinder Goal can be interrupted. Default: true
+     * @return true if Pathfinder can be interrupted, else false
      */
-    public boolean canInterrupt() { return true; };
+    public boolean canInterrupt() { return true; }
 
     /**
-     * Whether or not this Pathfinder Goal will update every tick. Default: false
+     * Whether this Pathfinder Goal will update every tick. Default: false
      * <p>
      * The Goal will usually update every 2-5 ticks. Returning true is not recommended.
      * @return true if updating every tick, else false
      */
-    public boolean updateEveryTick() { return false; };
+    public boolean updateEveryTick() { return false; }
 
     /**
-     * Whether or not this Pathfinder Goal will continue to be used.
+     * Whether this Pathfinder Goal will continue to be used.
      * <p>
      * Override this method if you have additional checks after the Pathfinder has started. By default, it will call {@link #canStart()}.
-     * @return true if can continue to use, else false
+     * @return true if Pathfinder can continue to use, else false
      */
-    public boolean canContinueToUse() { return canStart(); };
+    public boolean canContinueToUse() { return canStart(); }
 
     public final Goal getHandle() {
         CustomPathfinder inst = this;

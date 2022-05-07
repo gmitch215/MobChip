@@ -19,6 +19,10 @@ public final class PathfinderRandomStrollLand extends PathfinderRandomStroll imp
 
     private float probability;
 
+    /**
+     * Constructs a PathfinderRandomStrollLand from a NMS WaterAvoidingRandomStrollGoal.
+     * @param g Goal to use
+     */
     public PathfinderRandomStrollLand(@NotNull WaterAvoidingRandomStrollGoal g) {
         super(g);
 

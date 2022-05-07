@@ -8,7 +8,7 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 
 /**
- * Represents a Pathfinder for a Tameable Animal to follow its owner
+ * Represents a Pathfinder for a Tamable Animal to follow its owner
  */
 public final class PathfinderFollowOwner extends Pathfinder implements SpeedModifier {
 
@@ -32,7 +32,7 @@ public final class PathfinderFollowOwner extends Pathfinder implements SpeedModi
     
     /**
      * Creates a PathfinderFollowOwner with no speed modifier.
-     * @param t Tameable Entity
+     * @param t Tamable Entity
      * @param startDistance How far away from owner to start walking towards
      * @param stopDistance How far away from owner to stop walking towards
      */
@@ -42,7 +42,7 @@ public final class PathfinderFollowOwner extends Pathfinder implements SpeedModi
 
     /**
      * Creates a PathfinderFollowOwner with flying set to true.
-     * @param t Tameable to use
+     * @param t Tamable to use
      * @param speedMod Speed Modifier while following
      * @param startDistance How far away from owner to start walking towards
      * @param stopDistance How far away from owner to stop walking towards
@@ -53,11 +53,11 @@ public final class PathfinderFollowOwner extends Pathfinder implements SpeedModi
 
     /**
      * Creates a PathfinderFollowOwner.
-     * @param t Tameable to use
+     * @param t Tamable to use
      * @param speedMod Speed Modifier while following
      * @param startDistance How far away from owner to start walking towards
      * @param stopDistance How far away from owner to stop walking towards
-     * @param fly Whether or not this Tamable can fly to its owner, if able at all
+     * @param fly Whether this Tamable can fly to its owner, if able at all
      */
     public PathfinderFollowOwner(@NotNull Tameable t, double speedMod, float startDistance, float stopDistance, boolean fly) {
         super(t);
@@ -101,16 +101,16 @@ public final class PathfinderFollowOwner extends Pathfinder implements SpeedModi
     }
 
     /**
-     * Whether or not this Tamebale can fly to their owner.
-     * @return true if can fly, else false
+     * Whether this Tame bale can fly to their owner.
+     * @return true if tamable can fly, else false
      */
     public boolean canFly() {
         return this.canFly;
     }
 
     /**
-     * Set whether or not this Tameable should fly to their owner.
-     * @param fly true if can fly, else false
+     * Set whether this Tamable should fly to their owner.
+     * @param fly true if tamable can fly, else false
      */
     public void setCanFly(boolean fly) {
         this.canFly = fly;

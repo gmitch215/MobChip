@@ -17,6 +17,10 @@ public final class PathfinderRangedBowAttack extends Pathfinder implements Speed
     private float range;
     private int aInv;
 
+    /**
+     * Constructs a PathfinderRangedBowAttack from a NMS RangedBowAttackGoal.
+     * @param g Goal to use
+     */
     public PathfinderRangedBowAttack(@NotNull RangedBowAttackGoal<?> g) {
         super(Pathfinder.getEntity(g, "a"));
 
@@ -144,6 +148,22 @@ public final class PathfinderRangedBowAttack extends Pathfinder implements Speed
     @Override
     public void setSpeedModifier(double mod) {
         this.speedMod = mod;
+    }
+
+    /**
+     * Gets the current interval of attack, in ticks.
+     * @return Interval of attack, in ticks
+     */
+    public int getInterval() {
+        return this.aInv;
+    }
+
+    /**
+     * Sets the current interval of attack, in ticks
+     * @param interval Interval of attack
+     */
+    public void setInterval(int interval) {
+        this.aInv = interval;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

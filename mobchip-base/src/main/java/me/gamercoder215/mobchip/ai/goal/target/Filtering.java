@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a Pathfinder that filters in an entity class
+ * @param <T> Type of Entity to filter
  */
 public interface Filtering<T extends LivingEntity> {
     

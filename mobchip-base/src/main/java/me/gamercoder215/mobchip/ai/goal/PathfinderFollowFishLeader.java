@@ -39,7 +39,7 @@ public final class PathfinderFollowFishLeader extends Pathfinder {
 
     /**
      * Constructs a PathfinderFollowFishLeader.
-     * @param f TropicalFish instnace
+     * @param f TropicalFish instance
      */
     public PathfinderFollowFishLeader(@NotNull TropicalFish f) {
         super(f);

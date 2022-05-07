@@ -7,12 +7,12 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 
 /**
- * Represents a Pathfinder for a Tameable to attack the Target if its owner is hurt
+ * Represents a Pathfinder for a Tamable to attack the Target if its owner is hurt
  */
 public final class PathfinderOwnerHurtByTarget extends TargetPathfinder {
 
     /**
-     * COnstructs a PathfinderOwnerHurtByTarget from a NMS OwnerHurtByTarget.
+     * Constructs a PathfinderOwnerHurtByTarget from a NMS OwnerHurtByTarget.
      * @param g Goal to use
      */
     public PathfinderOwnerHurtByTarget(@NotNull OwnerHurtByTargetGoal g) {
@@ -21,7 +21,7 @@ public final class PathfinderOwnerHurtByTarget extends TargetPathfinder {
     
     /**
      * Constructs a PathfinderOwnerHurtByTarget.
-     * @param m Tameable to use
+     * @param m Tamable to use
      */
     public PathfinderOwnerHurtByTarget(@NotNull Tameable m) {
         super(m);

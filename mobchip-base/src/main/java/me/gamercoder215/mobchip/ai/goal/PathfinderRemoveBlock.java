@@ -36,24 +36,23 @@ public final class PathfinderRemoveBlock extends Pathfinder implements SpeedModi
 
             net.minecraft.world.level.block.Block b = Pathfinder.getField(g, "g", net.minecraft.world.level.block.Block.class);
             BlockPos p = getPosWithBlock(b, nmsEntity.blockPosition(), nmsEntity.level);
-            this.toRemove = entity.getWorld().getBlockAt(p.getX(), p.getY(), p.getZ());
+            if (p != null)
+                this.toRemove = entity.getWorld().getBlockAt(p.getX(), p.getY(), p.getZ());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private BlockPos getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPos blockposition, BlockGetter iblockaccess) {
-        if (iblockaccess.getBlockState(blockposition).is(block)) {
-            return blockposition;
+    private BlockPos getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPos bp, BlockGetter g) {
+        if (g.getBlockState(bp).is(block)) {
+            return bp;
         } else {
-            BlockPos[] ablockposition = new BlockPos[]{blockposition.below(), blockposition.west(), blockposition.east(), blockposition.north(), blockposition.south(), blockposition.below().below()};
-            BlockPos[] ablockposition1 = ablockposition;
-            int i = ablockposition.length;
- 
-            for(int j = 0; j < i; ++j) {
-                BlockPos blockposition1 = ablockposition1[j];
-                if (iblockaccess.getBlockState(blockposition1).is(block)) {
-                    return blockposition1;
+            BlockPos[] bp1 = new BlockPos[]{bp.below(), bp.west(), bp.east(), bp.north(), bp.south(), bp.below().below()};
+            int i = bp1.length;
+
+            for (BlockPos bps : bp1) {
+                if (g.getBlockState(bps).is(block)) {
+                    return bps;
                 }
             }
  
@@ -63,8 +62,8 @@ public final class PathfinderRemoveBlock extends Pathfinder implements SpeedModi
 
     /**
      * Constructs a PathfinderRemoveBlock
-     * @param c
-     * @param remove
+     * @param c Creature to use
+     * @param remove Block to remove
      * @throws IllegalArgumentException if block is null or differing worlds
      */
     public PathfinderRemoveBlock(@NotNull Creature c, @NotNull Block remove) throws IllegalArgumentException {

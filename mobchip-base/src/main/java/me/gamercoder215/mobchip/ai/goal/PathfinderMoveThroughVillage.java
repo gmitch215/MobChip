@@ -52,20 +52,41 @@ public final class PathfinderMoveThroughVillage extends Pathfinder implements Sp
     /**
      * Constructs a PathfinderMoveThroughVillage with no speed modifier.
      * @param c Creature to use
-     * @param useDoors Suppier called if the entity can use doors
+     * @param useDoors Supplier called if the entity can use doors
      */
     public PathfinderMoveThroughVillage(@NotNull Creature c, @NotNull BooleanSupplier useDoors) {
         this(c, useDoors, 1);
     }
 
+    /**
+     * Constructs a PathfinderMoveThroughVillage with {@link #DEFAULT_MIN_DISTANCE}.
+     * @param c Creature to use
+     * @param useDoors Supplier called if the entity can use doors
+     * @param speedMod Speed Modifier while moving
+     */
     public PathfinderMoveThroughVillage(@NotNull Creature c, @NotNull BooleanSupplier useDoors, double speedMod) {
         this(c, useDoors, speedMod, DEFAULT_MIN_DISTANCE);
     }
-    
+
+    /**
+     * Constructs a PathfinderMoveThroughVillage with onlyAtNight set to false
+     * @param c Creature to use
+     * @param useDoors Supplier called if the entity can use doors
+     * @param speedMod Speed Modifier while moving
+     * @param minDistance Minimum distance from a village
+     */
     public PathfinderMoveThroughVillage(@NotNull Creature c, @NotNull BooleanSupplier useDoors, double speedMod, int minDistance) {
         this(c, useDoors, speedMod, minDistance, false);
     }
 
+    /**
+     * Constructs a PathfinderMoveThroughVillage.
+     * @param c Creature to use
+     * @param useDoors Supplier called if the entity can use doors
+     * @param speedMod Speed Modifier while moving
+     * @param minDistance Minimum distance from a village
+     * @param onlyAtNight Whether Creature can only move through village at night
+     */
     public PathfinderMoveThroughVillage(@NotNull Creature c, @NotNull BooleanSupplier useDoors, double speedMod, int minDistance, boolean onlyAtNight) {
         super(c);
 
@@ -76,7 +97,7 @@ public final class PathfinderMoveThroughVillage extends Pathfinder implements Sp
     }
 
     /**
-     * Fetches the Function used in whether or not this entity can use doors throughout the Village.
+     * Fetches the Function used in whether this entity can use doors throughout the Village.
      * @return Function of using doors
      */
     public BooleanSupplier canUseDoors() {
@@ -84,7 +105,7 @@ public final class PathfinderMoveThroughVillage extends Pathfinder implements Sp
     }
 
     /**
-     * Sets the Function used in whether or not this entity can use doors throughout the Village.
+     * Sets the Function used in whether this entity can use doors throughout the Village.
      * @param b Function to use
      */
     public void setCanUseDoors(BooleanSupplier b) {
@@ -92,24 +113,24 @@ public final class PathfinderMoveThroughVillage extends Pathfinder implements Sp
     }
 
     /**
-     * Sets whether or not this entity can use doors throughout the Village.
-     * @param use true if can use, else false
+     * Sets whether this entity can use doors throughout the Village.
+     * @param use true if entity can use, else false
      */
     public void setCanUseDoors(boolean use) {
         this.canUseDoors = () -> use;
     }
 
     /**
-     * Whether or not it has to be nighttime to roam the Village.
-     * @return true if must be night, else false
+     * Whether it has to be nighttime to roam the Village.
+     * @return true if time must be night, else false
      */
     public boolean mustBeNight() {
         return this.atNight;
     }
 
     /**
-     * Sets whether or not it has to be nighttime to roam the Village.
-     * @param night true if must be night, else false
+     * Sets whether it has to be nighttime to roam the Village.
+     * @param night true if time must be night, else false
      */
     public void setMustBeNight(boolean night) {
         this.atNight = night;

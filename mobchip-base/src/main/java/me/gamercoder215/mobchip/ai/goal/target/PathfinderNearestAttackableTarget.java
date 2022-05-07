@@ -67,8 +67,8 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
      * @param m Mob to use
      * @param filter Class of entity to find
      * @param interval Interval of attack, in ticks 
-     * @param mustSee Whether or not entity must see target
-     * @param reach Whether or not entity must reach target
+     * @param mustSee Whether entity must see target
+     * @param reach Whether entity must reach target
      * @throws IllegalArgumentException if class is null
      */
     public PathfinderNearestAttackableTarget(@NotNull Mob m, @NotNull Class<T> filter, int interval, boolean mustSee, boolean reach) throws IllegalArgumentException {
@@ -80,14 +80,14 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
      * @param m Mob to use
      * @param filter Class of entity to find
      * @param interval Interval of attack, in ticks
-     * @param mustSee Whether or not entity must see target
-     * @param reach Whether or not entity must reach target
+     * @param mustSee Whether entity must see target
+     * @param reach Whether entity must reach target
      * @param conditions Conditions needed to attack
      * @throws IllegalArgumentException if filter is null
      */
     public PathfinderNearestAttackableTarget(@NotNull Mob m, @NotNull Class<T> filter, int interval, boolean mustSee, boolean reach, @Nullable Predicate<LivingEntity> conditions) throws IllegalArgumentException {
         super(m);
-        if (filter == null) throw new IllegalArgumentException("Filte rcannot be null");
+        if (filter == null) throw new IllegalArgumentException("Filter cannot be null");
 
         this.filter = filter;
         this.interval = interval;
@@ -119,18 +119,35 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
         this.mustSee = see;
     }
 
+    /**
+     * Whether this entity must reach the target.
+     * @return true if entity must reach target, else false
+     */
     public boolean mustReach() {
         return this.reach;
     }
 
+    /**
+     * Sets whether this entity must reach the target.
+     * @param reach true if entity must reach target, else false
+     */
     public void setReach(boolean reach) {
         this.reach = reach;
     }
 
+    /**
+     * Gets the current attack interval, in ticks.
+     * @return Attack Interval
+     */
     public int getInterval() {
         return this.interval;
     }
 
+    /**
+     * Sets the current attack interval, in ticks.
+     * @param interval Attack interval to set
+     * @throws IllegalArgumentException if less than 0
+     */
     public void setInterval(int interval) throws IllegalArgumentException {
         if (interval < 1) throw new IllegalArgumentException("Must be greater than 0");
         this.interval = interval;

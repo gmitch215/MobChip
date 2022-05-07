@@ -51,7 +51,7 @@ public final class PathfinderClimbPowderedSnow extends Pathfinder implements Wor
     }
 
     @Override
-    public World getWorld() {
+    public @NotNull World getWorld() {
         return this.w;
     }
 

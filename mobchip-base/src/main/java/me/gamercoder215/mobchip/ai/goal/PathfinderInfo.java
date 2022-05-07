@@ -1,7 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal;
 
 /**
- * Represents information about a Pathfider
+ * Represents information about a Pathfinder
  */
 public interface PathfinderInfo {
     

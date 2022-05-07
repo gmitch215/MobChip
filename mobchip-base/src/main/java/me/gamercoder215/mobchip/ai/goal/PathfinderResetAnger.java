@@ -13,6 +13,10 @@ public final class PathfinderResetAnger extends Pathfinder {
     
     private boolean alertOthers;
 
+    /**
+     * Constructs a PathfinderResetAnger from a NMS ResetUniversalAngerTargetGoal.
+     * @param g Goal to use
+     */
     public PathfinderResetAnger(@NotNull ResetUniversalAngerTargetGoal<?> g) {
         super(Pathfinder.getEntity(g, "b"));
 
@@ -31,7 +35,7 @@ public final class PathfinderResetAnger extends Pathfinder {
     /**
      * Constructs a PathfinderResetAnger.
      * @param m Mob to use
-     * @param alertOthers Whether or not to alert other mobs of this type
+     * @param alertOthers Whether to alert other mobs of this type
      * @throws IllegalArgumentException if mob is not neutral
      */
     public PathfinderResetAnger(@NotNull Mob m, boolean alertOthers) throws IllegalArgumentException {
@@ -43,7 +47,7 @@ public final class PathfinderResetAnger extends Pathfinder {
     }
 
     /**
-     * Whether or not the Mob will alert other entities of this type.
+     * Whether the Mob will alert other entities of this type.
      * @return true if alerting others, else false
      */
     public boolean isAlertingOthers() {
@@ -51,7 +55,7 @@ public final class PathfinderResetAnger extends Pathfinder {
     }
 
     /**
-     * Sets whether or not the Mob will alert other entities of this type.
+     * Sets whether the Mob will alert other entities of this type.
      * @param alert true if alerting others, else false
      */
     public void setAlertOthers(boolean alert) {

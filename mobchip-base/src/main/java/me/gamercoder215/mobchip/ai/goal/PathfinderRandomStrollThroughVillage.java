@@ -13,6 +13,10 @@ public final class PathfinderRandomStrollThroughVillage extends Pathfinder {
     
     private int interval;
 
+    /**
+     * Constructs a PathfinderRandomStrollThroughVillage from a NMS StrollThroughVillageGoal.
+     * @param g Goal to use
+     */
     public PathfinderRandomStrollThroughVillage(@NotNull StrollThroughVillageGoal g) {
         super(Pathfinder.getEntity(g, "b"));
 

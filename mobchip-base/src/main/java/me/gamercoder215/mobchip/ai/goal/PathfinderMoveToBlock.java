@@ -19,7 +19,10 @@ import net.minecraft.world.level.LevelReader;
  * Represents a Pathfinder for an Entity to move to another block
  */
 public final class PathfinderMoveToBlock extends Pathfinder implements SpeedModifier, Ranged {
-    
+
+    /**
+     * Default Range to find Block (25)
+     */
     public static final int DEFAULT_RANGE = 25;
 
     private int range;
@@ -79,7 +82,7 @@ public final class PathfinderMoveToBlock extends Pathfinder implements SpeedModi
      * Constructs a PathfinderMoveToBlock.
      * @param c Creature to use
      * @param validBlock Function to check if the location is valid
-     * @param speedMod Speed MOdifier while moving
+     * @param speedMod Speed Modifier while moving
      * @param range Range of blocks to look
      */
     public PathfinderMoveToBlock(@NotNull Creature c, @Nullable Predicate<Location> validBlock, double speedMod, int range) {

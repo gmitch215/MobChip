@@ -17,7 +17,7 @@ public class PathfinderRandomStroll extends Pathfinder implements SpeedModifier 
     private double speedMod;
 
     /**
-     * Consructs a PathfinderRandomStroll from a NMS RandomStrollGoal.
+     * Constructs a PathfinderRandomStroll from a NMS RandomStrollGoal.
      * @param g NMS Goal to use
      */
     public PathfinderRandomStroll(@NotNull RandomStrollGoal g) {

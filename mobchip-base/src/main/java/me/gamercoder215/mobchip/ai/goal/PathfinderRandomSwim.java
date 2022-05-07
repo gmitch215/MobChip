@@ -10,7 +10,10 @@ import net.minecraft.world.entity.ai.goal.RandomSwimmingGoal;
  * Represents a Pathfinder for a Mob to randomly swim
  */
 public final class PathfinderRandomSwim extends PathfinderRandomStroll {
-    
+
+    /**
+     * The Default Interval to swim, in ticks
+     */
     public static final int DEFAULT_INTERVAL = 120;
     
     private int interval;

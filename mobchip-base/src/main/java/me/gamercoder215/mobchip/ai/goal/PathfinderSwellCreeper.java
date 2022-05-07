@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.world.entity.ai.goal.SwellGoal;
 
 /**
- * Represents the Pathfiner for the logic of a Creeper to swell before exploding
+ * Represents the Pathfinder for the logic of a Creeper to swell before exploding
  */
 public final class PathfinderSwellCreeper extends Pathfinder {
 

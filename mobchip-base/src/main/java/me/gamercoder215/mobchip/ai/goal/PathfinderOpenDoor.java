@@ -23,7 +23,7 @@ public final class PathfinderOpenDoor extends Pathfinder {
     }
 
     /**
-     * Constructs a PathfinderOpenDoor with must close set to true.
+     * Constructs a PathfinderOpenDoor that allows closing doors.
      * @param m Mob to use
      */
     public PathfinderOpenDoor(@NotNull Mob m) {
@@ -33,7 +33,7 @@ public final class PathfinderOpenDoor extends Pathfinder {
     /**
      * Constructs a PathfinderOpenDoor.
      * @param m Mob to use
-     * @param close Whether or not this entity should close the door
+     * @param close Whether this entity should close the door
      */
     public PathfinderOpenDoor(@NotNull Mob m, boolean close) {
         super(m);
@@ -42,7 +42,7 @@ public final class PathfinderOpenDoor extends Pathfinder {
     }
 
     /**
-     * Whether or not this entity should close the door.
+     * Whether this entity should close the door.
      * @return true if close, else false
      */
     public boolean mustClose() {
@@ -50,7 +50,7 @@ public final class PathfinderOpenDoor extends Pathfinder {
     }
 
     /**
-     * Sets whether or not this entity should close the door.
+     * Sets whether this entity should close the door.
      * @param close true if close, else false
      */
     public void setMustClose(boolean close) {

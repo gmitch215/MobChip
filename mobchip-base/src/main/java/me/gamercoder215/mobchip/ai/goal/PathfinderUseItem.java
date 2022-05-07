@@ -124,7 +124,7 @@ public final class PathfinderUseItem extends Pathfinder implements Conditional<M
 
     @Override
     public UseItemGoal<?> getHandle() {
-        return new UseItemGoal<net.minecraft.world.entity.Mob>(nmsEntity, ChipConversions.convertType(item), ChipConversions.convertType(finishSound), m -> requirements.test(ChipConversions.convertType(m)));
+        return new UseItemGoal<>(nmsEntity, ChipConversions.convertType(item), ChipConversions.convertType(finishSound), m -> requirements.test(ChipConversions.convertType(m)));
     }
 
 }

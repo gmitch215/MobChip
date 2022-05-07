@@ -16,6 +16,10 @@ public final class PathfinderMoveTowardsRestriction extends Pathfinder implement
     
     private double speedMod;
 
+    /**
+     * Constructs a PathfinderMoveTowardsRestriction from a NMS MoveTowardsRestrictionGoal.
+     * @param g Goal to use
+     */
     public PathfinderMoveTowardsRestriction(@NotNull MoveTowardsRestrictionGoal g) {
         super(Pathfinder.getCreature(g, "a"));
 

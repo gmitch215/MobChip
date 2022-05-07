@@ -18,10 +18,10 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
  */
 public final class PathfinderHurtByTarget extends TargetPathfinder {
     
-    private List<EntityType> ignoring;
+    private final List<EntityType> ignoring;
 
     /**
-     * Constructs a PathfinderHurtByTarget from a NMS HurtBytargetGoal.
+     * Constructs a PathfinderHurtByTarget from a NMS HurtByTargetGoal.
      * @param g Goal to use
      */
     public PathfinderHurtByTarget(@NotNull HurtByTargetGoal g) {
@@ -33,7 +33,8 @@ public final class PathfinderHurtByTarget extends TargetPathfinder {
             for (EntityType type : EntityType.values()) {
                 try {
                     if (ChipConversions.toBukkitClass(Entity.class, clazz.asSubclass(net.minecraft.world.entity.Entity.class)).equals(type.getEntityClass())) t.add(type);
-                } catch (ClassCastException e) { continue; }
+                } catch (ClassCastException ignored) {
+                }
             }
         }
 

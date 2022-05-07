@@ -23,10 +23,19 @@ public final class PathfinderLlamaFollowCaravan extends Pathfinder implements Sp
         this.speedMod = Pathfinder.getDouble(g, "b");
     }
 
+    /**
+     * Constructs a PathfinderLlamaFollowCaravan with no speed modifier.
+     * @param m Llama to use
+     */
     public PathfinderLlamaFollowCaravan(@NotNull Llama m) {
         this(m, 1);
     }
 
+    /**
+     * Constructs a PathfinderLlamaFollowCaravan.
+     * @param m Llama to use
+     * @param speedMod Speed Modifier while following
+     */
     public PathfinderLlamaFollowCaravan(@NotNull Llama m, double speedMod) {
         super(m);
 
