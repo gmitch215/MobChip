@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.bukkit.events;
 
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.EntityBrain;
@@ -10,7 +11,8 @@ import me.gamercoder215.mobchip.EntityBrain;
  */
 public abstract class BrainEvent extends Event {
 
-    private EntityBrain brain;
+    private final EntityBrain brain;
+    private static final HandlerList HANDLERS = new HandlerList();
 
     /**
      * Construct a BrainEvent
@@ -32,8 +34,24 @@ public abstract class BrainEvent extends Event {
     }
 
     /**
+     * Gets this BrainEvent's Handlers.
+     * @return Handlers
+     */
+    public HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    /**
+     * Gets this BrainEvent's Handlers.
+     * @return Handlers
+     */
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
+    /**
      * Gets the EntityBrain involved in this event.
-     * @return EntityBrai involved
+     * @return EntityBrain involved
      */
     public final EntityBrain getBrain() {
         return this.brain;
