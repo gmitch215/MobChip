@@ -14,7 +14,6 @@ import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 
 /**
  * Represents a Pathfinder to avoid a LivingEntity
- *
  * @param <T> Class of Entities to avoid
  */
 public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfinder implements Filtering<T>, SpeedModifier {
