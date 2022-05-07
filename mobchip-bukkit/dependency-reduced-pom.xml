@@ -23,6 +23,39 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>net.md-5</groupId>
+        <artifactId>specialsource-maven-plugin</artifactId>
+        <version>1.2.2</version>
+        <executions>
+          <execution>
+            <id>remap-obf</id>
+            <phase>package</phase>
+            <goals>
+              <goal>remap</goal>
+            </goals>
+            <configuration>
+              <srgIn>org.spigotmc:minecraft-server:${minecraft.version}:txt:maps-mojang</srgIn>
+              <reverse>true</reverse>
+              <remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar:remapped-mojang</remappedDependencies>
+              <remappedArtifactAttached>true</remappedArtifactAttached>
+              <remappedClassifierName>remapped-obf</remappedClassifierName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>remap-spigot</id>
+            <phase>package</phase>
+            <goals>
+              <goal>remap</goal>
+            </goals>
+            <configuration>
+              <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
+              <srgIn>org.spigotmc:minecraft-server:${minecraft.version}:csrg:maps-spigot</srgIn>
+              <remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar:remapped-obf</remappedDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a Conditional State for this Pathfinder to work
- * @param <T>
+ * @param <T> Type of Condition to resolve
  */
 public interface Conditional<T> {
 	

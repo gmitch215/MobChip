@@ -84,7 +84,7 @@ public interface EntityNavigation extends SpeedModifier {
      */
     default EntityNavigation addPoint(int index, @NotNull Entity en) {
         return addPoint(index, en.getLocation());
-    }; 
+    }
 
 
     /**
@@ -99,7 +99,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @param index Index of Point
      * @return this class, for chaining
      */
-    EntityNavigation removePoint(@NotNull int index);
+    EntityNavigation removePoint(int index);
 
     /**
      * Removes a Point from Location
@@ -123,6 +123,7 @@ public interface EntityNavigation extends SpeedModifier {
 
     /**
      * Sets the final point of this EntityNavigation.
+     * @param node NavigationNode to set
      * @return this class, for chaining
      */
     EntityNavigation setFinalPoint(@NotNull NavigationNode node);

@@ -32,11 +32,12 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Represents a Memory of an entity
+ * @param <T> Type of Memory
  */
 public final class EntityMemory<T> {
 	
 	/**
-	 * Whether or not this Entity is not admiring another entity.
+	 * Whether this Entity is not admiring another entity.
 	 */
     public static final EntityMemory<Boolean> NOT_ADMIRING = new EntityMemory<>(Boolean.class, MemoryModuleType.ADMIRING_DISABLED, SELF());
     /**
@@ -70,7 +71,7 @@ public final class EntityMemory<T> {
     /**
      * An Array of Nearby Visible Living Entities.
      */
-    public static final EntityMemory<NearestVisibleEntities> NEAREST_VISIBLE_LIVING_ENTITIES = new EntityMemory<>(NearestVisibleEntities.class, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, o -> { return o.getHandle();});
+    public static final EntityMemory<NearestVisibleEntities> NEAREST_VISIBLE_LIVING_ENTITIES = new EntityMemory<>(NearestVisibleEntities.class, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, NearestVisibleEntities::getHandle);
     /**
      * An Array of Visible Villager Babies.
      */
@@ -95,11 +96,11 @@ public final class EntityMemory<T> {
     /**
      * The Entity's Walking Target. See {@link WalkingTarget} for more information on how to set up.
      */
-    public static final EntityMemory<WalkingTarget> WALKING_TARGET = new EntityMemory<>(WalkingTarget.class, MemoryModuleType.WALK_TARGET, o -> { return o.getHandle(); });
+    public static final EntityMemory<WalkingTarget> WALKING_TARGET = new EntityMemory<>(WalkingTarget.class, MemoryModuleType.WALK_TARGET, WalkingTarget::getHandle);
     /**
      * The Entity's Looking Target.
      */
-    public static final EntityMemory<Location> LOOKING_TARGET = new EntityMemory<>(Location.class, MemoryModuleType.LOOK_TARGET, loc -> { return new PositionTracker() {
+    public static final EntityMemory<Location> LOOKING_TARGET = new EntityMemory<>(Location.class, MemoryModuleType.LOOK_TARGET, loc -> new PositionTracker() {
 		@Override
 		public BlockPos currentBlockPosition() {
 			return new BlockPos(loc.getX(), loc.getY(), loc.getZ());
@@ -112,13 +113,13 @@ public final class EntityMemory<T> {
 		public boolean isVisibleBy(net.minecraft.world.entity.LivingEntity arg0) {
 			return true;
 		}
-	}; });
+	});
     /**
      * The Entity's Attack Target.
      */
     public static final EntityMemory<LivingEntity> ATTACK_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.ATTACK_TARGET, ChipConversions::convertType);
     /**
-     * Whether or not this Entity's Attack is cooling down.
+     * Whether this Entity's Attack is cooling down.
      */
     public static final EntityMemory<Boolean> ATTACK_COOLING_DOWN = new EntityMemory<>(Boolean.class, MemoryModuleType.ATTACK_COOLING_DOWN, SELF());
     /**
@@ -164,7 +165,7 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<LivingEntity> LAST_HURT_ENTITY = new EntityMemory<>(LivingEntity.class, MemoryModuleType.HURT_BY_ENTITY, ChipConversions::convertType);
     /**
-     * The Avoid Target of this Entity.
+     * The Entity to avoid.
      */
     public static final EntityMemory<LivingEntity> AVOID_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.AVOID_TARGET, ChipConversions::convertType);
     /**
@@ -190,7 +191,7 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Long> LAST_FAILURE_WALK_TARGET = new EntityMemory<>(Long.class, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, SELF());
     /**
-     * Whether or not a Golem has been <strong>recently</strong> detected.
+     * Whether a Golem has been <strong>recently</strong> detected.
      */
     public static final EntityMemory<Boolean> DETECTED_GOLEM = new EntityMemory<>(Boolean.class, MemoryModuleType.GOLEM_DETECTED_RECENTLY, SELF());
     /**
@@ -228,7 +229,7 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Integer> TEMPING_COOLDOWN = new EntityMemory<>(Integer.class, MemoryModuleType.TEMPTATION_COOLDOWN_TICKS, SELF());
     /**
-     * Whether or not this Mob is being tempted.
+     * Whether this Mob is being tempted.
      */
     public static final EntityMemory<Boolean> IS_TEMPTED = new EntityMemory<>(Boolean.class, MemoryModuleType.IS_TEMPTED, SELF());
     /**
@@ -236,11 +237,11 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Integer> LONG_JUMP_COOLDOWN = new EntityMemory<>(Integer.class, MemoryModuleType.LONG_JUMP_COOLDOWN_TICKS, SELF());
     /**
-     * Whether or not this Entity is currently doing its Long Jump.
+     * Whether this Entity is currently doing its Long Jump.
      */
     public static final EntityMemory<Boolean> IS_LONG_JUMP = new EntityMemory<>(Boolean.class, MemoryModuleType.LONG_JUMP_MID_JUMP, SELF());
     /**
-     * Whether or not this Entity has a HUnting Cooldown
+     * Whether this Entity has a HUntying Cooldown
      */
     public static final EntityMemory<Boolean> HUNTING_COOLDOWN = new EntityMemory<>(Boolean.class, MemoryModuleType.HAS_HUNTING_COOLDOWN, SELF());
     /**
@@ -250,13 +251,13 @@ public final class EntityMemory<T> {
     /**
      * The Entity that this Entity is angry at.
      */
-    public static final EntityMemory<Entity> ANGRY_AT = new EntityMemory<>(Entity.class, MemoryModuleType.ANGRY_AT, u -> { return u.getUniqueId(); });
+    public static final EntityMemory<Entity> ANGRY_AT = new EntityMemory<>(Entity.class, MemoryModuleType.ANGRY_AT, Entity::getUniqueId);
     /**
-     * Whether or not this Entity is universally angry.
+     * Whether this Entity is universally angry.
      */
     public static final EntityMemory<Boolean> UNIVERSAL_ANGER = new EntityMemory<>(Boolean.class, MemoryModuleType.UNIVERSAL_ANGER, SELF());
     /**
-     * Whether or not this Entity is admiring an Item.
+     * Whether this Entity is admiring an Item.
      */
     public static final EntityMemory<Boolean> IS_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, MemoryModuleType.ADMIRING_ITEM, SELF());
     /**
@@ -264,15 +265,15 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Integer> TIME_TO_REACH_ADMIRING_ITEM = new EntityMemory<>(Integer.class, MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, SELF());
     /**
-     * Whether or not this Entity should walk to its admiring item.
+     * Whether this Entity should walk to its admiring item.
      */
-    public static final EntityMemory<Boolean> WALKING_TO_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, b -> { return !b; });
+    public static final EntityMemory<Boolean> WALKING_TO_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, b -> !b);
     /**
-     * Whether or not Admiring is Disabled.
+     * Whether Admiring is Disabled.
      */
     public static final EntityMemory<Boolean> ADMIRING_DISABLED = new EntityMemory<>(Boolean.class, MemoryModuleType.ADMIRING_DISABLED, SELF());
     /**
-     * Whether or not this Entity has hunted recently.
+     * Whether this Entity has hunted recently.
      */
     public static final EntityMemory<Boolean> HAS_HUNTED_RECENTLY = new EntityMemory<>(Boolean.class, MemoryModuleType.HUNTED_RECENTLY, SELF());
     /**
@@ -280,7 +281,7 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Location> CELEBRATION_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, ChipConversions::convertType);
     /**
-     * Whether or not this entity is dancing.
+     * Whether this entity is dancing.
      */
     public static final EntityMemory<Boolean> DANCING = new EntityMemory<>(Boolean.class, MemoryModuleType.DANCING, SELF());
     /**
@@ -328,11 +329,11 @@ public final class EntityMemory<T> {
      */
     public static final EntityMemory<Location> NEAREST_REPELLENT = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_REPELLENT, ChipConversions::convertType);
     /**
-     * Whether or not this Entity has Eaten Recently.
+     * Whether this Entity has Eaten Recently.
      */
     public static final EntityMemory<Boolean> ATE_RECENTLY = new EntityMemory<>(Boolean.class, MemoryModuleType.ATE_RECENTLY, SELF());
     /**
-     * Whether or not this Entity is Pacified.
+     * Whether this Entity is Pacified.
      */
     public static final EntityMemory<Boolean> PACIFIED = new EntityMemory<>(Boolean.class, MemoryModuleType.PACIFIED, SELF());
 
@@ -348,7 +349,7 @@ public final class EntityMemory<T> {
 	/**
 	 * Represents a Memory Type that has a complex construction
 	 */
-	public static interface ComplexMemoryType {
+	public interface ComplexMemoryType {
 		
 		/**
 		 * Get the Handle of this ComplexMemoryType.
@@ -380,14 +381,14 @@ public final class EntityMemory<T> {
     	 * Get the Handle of this NearestVisibleEntities.
     	 */
     	@NotNull
-    	public final NearestVisibleLivingEntities getHandle() {
+    	public NearestVisibleLivingEntities getHandle() {
     	 	return new NearestVisibleLivingEntities(ChipConversions.convertType(entity), ChipConversions.convertType(nearest));
     	}
     	
     }
     
     /**
-     * Represents a Memory Type of a Walking Target
+     * Represents a Memory Type of Walking Target
      *
      */
     public static final class WalkingTarget implements SpeedModifier, ComplexMemoryType {
@@ -396,22 +397,34 @@ public final class EntityMemory<T> {
     	
     	private float speedMod;
     	private int distance;
-    	
+
+        /**
+         * Constructs a WalkingTarget.
+         * @param loc Location of target
+         * @param speedMod Speed Modifier
+         * @param distance Distance needed to stop walking
+         */
     	public WalkingTarget(@NotNull Location loc, float speedMod, int distance) {
     		this.loc = loc;
     		this.speedMod = speedMod;
     		this.distance = distance;
     	}
+
+        /**
+         * Constructs a WalkingTarget with the default speed modifier.
+         * @param loc Location of target
+         * @param distance Distance needed to stop walking
+         */
     	public WalkingTarget(@NotNull Location loc, int distance) {
     		this(loc, DEFAULT_SPEED_MODIFIER, distance);
     	}
     	
     	/**
     	 * Get the Location that this WalkingTarget is looking for.
-    	 * @return
+    	 * @return Location looking for
     	 */
     	@NotNull
-    	public final Location getLocation() {
+    	public Location getLocation() {
     		return this.loc;
     	}
     	
@@ -445,29 +458,28 @@ public final class EntityMemory<T> {
 			this.speedMod = (float) mod;
 		}
 		
-		public WalkTarget getHandle() {
+		public @NotNull WalkTarget getHandle() {
 			return new WalkTarget(ChipConversions.convertType(loc), speedMod, distance);
 		}
     	
     }
     
-	private static final <T, E> Function<T[], List<E>> LIST(Function<T, E> converter) {
+	private static <T, E> Function<T[], List<E>> LIST(Function<T, E> converter) {
     	return o -> {
     		List<E> tList = new ArrayList<>();
-    		for (T e : o) try { tList.add(converter.apply(e)); } catch (ClassCastException err) { continue; };
-    		
-    		return tList;
+    		for (T e : o) try { tList.add(converter.apply(e)); } catch (ClassCastException ignored) {
+            }
+
+            return tList;
     	};
     }
     
-    private static final Function<Location, GlobalPos> GLOCATION() {
-        return l -> {
-            return GlobalPos.of(ChipConversions.convertType(l.getWorld()).dimension(), ChipConversions.convertType(l));
-        };
+    private static Function<Location, GlobalPos> GLOCATION() {
+        return l -> GlobalPos.of(ChipConversions.convertType(l.getWorld()).dimension(), ChipConversions.convertType(l));
     }
     
-    private static final <T> Function<T, T> SELF() {
-    	return o -> { return o; };
+    private static <T> Function<T, T> SELF() {
+    	return o -> o;
     }
 
     private final Class<T> bukkit;
@@ -485,7 +497,7 @@ public final class EntityMemory<T> {
      * @return EntityMemory handle
      */
     @SuppressWarnings("rawtypes")
-    public final MemoryModuleType getHandle() {
+    public MemoryModuleType getHandle() {
         return this.handle;
     }
     
@@ -493,12 +505,17 @@ public final class EntityMemory<T> {
      * Get the Bukkit Class of this EntityMemory.
      * @return Bukkit Class
      */
-    public final Class<T> getBukkitClass() {
+    public Class<T> getBukkitClass() {
     	return this.bukkit;
     }
     
     /**
+     * Converts a Bukkit type to a NMS Type.
+     * @param obj Object to convert
+     * @param clazz NMS Class
      * @deprecated Internal use only
+     * @param <E> NMS Type
+     * @return Converted NMS Object
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -509,8 +526,12 @@ public final class EntityMemory<T> {
     }
     
     /**
+     * Converts a Bukkit type to a NMS Type
+     * @param obj Object to convert
      * @deprecated Internal use only
+     * @return Converted Object
      */
+    @Deprecated
     public Object convert(T obj) {
         return convert.apply(obj);
     }

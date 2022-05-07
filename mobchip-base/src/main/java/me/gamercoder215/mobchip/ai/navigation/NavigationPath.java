@@ -1,37 +1,45 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
+import net.minecraft.world.level.pathfinder.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.world.level.pathfinder.Path;
+import java.util.*;
 
 /**
  * Represents an Immutable List of Nodes
  */
-public abstract class NavigationPath implements Cloneable, Iterable<NavigationNode> {
-
+public abstract class NavigationPath implements Iterable<NavigationNode> {
     private final Path handle;
     private final List<NavigationNode> nodes;
 
+
+    /**
+     * Creates a NavigationPath from a NMS Path.
+     * @param nms Path to use
+     */
     protected NavigationPath(@NotNull Path nms) {
        this.handle = nms; 
        this.nodes = new ArrayList<>();
     }
 
+    /**
+     * Gets the current NMS Path represented by this NavigationPath.
+     * @return Path Handle
+     */
     public final Path getHandle() {
         return this.handle;
     }
 
-    public void advance() {
-        this.handle.advance();
-    }
+    /**
+     * Advances this path.
+     */
+    public abstract void advance();
 
+    /**
+     * Whether this NavigationPath is complete.
+     * @return true if complete, else false
+     */
     public boolean isDone() {
         return this.handle.isDone();
     }
@@ -45,7 +53,7 @@ public abstract class NavigationPath implements Cloneable, Iterable<NavigationNo
     }
 
     /**
-     * Whether or not this NavigationPath is empty.
+     * Whether this NavigationPath is empty.
      * @return true if empty, else false
      */
     public boolean isEmpty() {
@@ -53,7 +61,7 @@ public abstract class NavigationPath implements Cloneable, Iterable<NavigationNo
     }
 
     /**
-     * Whether or not this Path contains this Navigation Node.
+     * Whether this Path contains this Navigation Node.
      * @param o NavigationNode
      * @return true if contains, else false
      */
@@ -77,16 +85,17 @@ public abstract class NavigationPath implements Cloneable, Iterable<NavigationNo
     }
 
     /**
-     * Whether or not this NavigationPath contains all of these Navigation Nodes.
+     * Whether this NavigationPath contains all of these Navigation Nodes.
      * @param c Collection to test
      * @return true if contains, else false
      */
     public boolean containsAll(@Nullable Collection<NavigationNode> c) {
-        return nodes.containsAll(c);
+        if (c == null) return false;
+        return new HashSet<>(nodes).containsAll(c);
     }
 
     /**
-     * Whether or not this NavigationPath contains all of these Navigation Nodes.
+     * Whether this NavigationPath contains all of these Navigation Nodes.
      * @param nodes Nodes to test
      * @return true if contains, else false
      */

@@ -6,14 +6,14 @@ package me.gamercoder215.mobchip.ai.goal.target;
 public interface Targeting {
     
     /**
-     * Whether or not the entity must see the target.
-     * @return true if must see, else false
+     * Whether the entity must see the target.
+     * @return true if entity must see, else false
      */
     boolean mustSee();
 
     /**
-     * Sets whether or not the entity must see the target.
-     * @param see true if must see, else false
+     * Sets whether the entity must see the target.
+     * @param see true if entity must see, else false
      */
     void setSee(boolean see);
 

@@ -1,14 +1,9 @@
 package me.gamercoder215.mobchip.bosses;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import me.gamercoder215.mobchip.bosses.annotations.Repeatable;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -23,15 +18,23 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
-import me.gamercoder215.mobchip.bosses.annotations.Repeatable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents a Boss Entity.
  * @param <T> The entity type of this Boss.
  */
 public abstract class Boss<T extends Mob> {
-    
+
+    /**
+     * Default health for Boss (20)
+     */
+    public static final int DEFAULT_HEALTH = 20;
     /**
      * This Entity, can be null.
      */
@@ -39,17 +42,17 @@ public abstract class Boss<T extends Mob> {
     protected T mob;
 
     private static long idCounter = 0;
-    private static Map<Long, Boss<?>> bosses = new HashMap<>();
+    private static final Map<Long, Boss<?>> bosses = new HashMap<>();
 
     private Sound deathSound;
     private Sound spawnSound;
     private float volume;
     private float pitch;
     
-	private double health = 20;
-	private Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
-	
-	private Map<ChipAttributeInstance, Double> attributes = new HashMap<>();
+	private double health = DEFAULT_HEALTH;
+	private final Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
+
+	private final Map<AttributeInstance, Double> attributes = new HashMap<>();
 
     private final EntityType type;
     private final Plugin plugin;
@@ -183,7 +186,7 @@ public abstract class Boss<T extends Mob> {
         T mob = l.getWorld().spawn(l, this.getEntityClass());
         this.mob = mob;
         
-        for (ChipAttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
+        for (AttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
         for (EquipmentSlot s : equipment.keySet()) mob.getEquipment().setItem(s, equipment.get(s));
         
         if (spawnSound != null) l.getWorld().playSound(l, deathSound, 3F, 1F);
@@ -225,7 +228,7 @@ public abstract class Boss<T extends Mob> {
 
     /**
      * Gets the Death Sound, or {@link Sound#ENTITY_WITHER_DEATH} if not set
-     * @return Foudn Death Sound
+     * @return Found Death Sound
      */
     @NotNull
     public final Sound getDeathSound() {
@@ -236,14 +239,13 @@ public abstract class Boss<T extends Mob> {
      * Sets the Death Sound.
      * @param s New Death Sound, or Null to reset
      */
-    @NotNull
     public final void setDeathSound(@Nullable Sound s) {
-        if (s == null) this.deathSound = s; else this.deathSound = Sound.ENTITY_WITHER_DEATH;
+        this.deathSound = s == null ? Sound.ENTITY_WITHER_DEATH : s;
     }
 
     /**
      * Gets the Spawn Sound, or {@link Sound#ENTITY_WITHER_SPAWN} if not set
-     * @return Foudn Spawn Sound
+     * @return Found Spawn Sound
      */
     @NotNull
     public final Sound getSpawnSound() {
@@ -309,7 +311,7 @@ public abstract class Boss<T extends Mob> {
 	 * @return Entity Attributes
 	 */
 	@NotNull
-	public final Map<ChipAttributeInstance, Double> getAttributes() {
+	public final Map<AttributeInstance, Double> getAttributes() {
 		return this.attributes;
 	}
 	
@@ -334,7 +336,7 @@ public abstract class Boss<T extends Mob> {
 	 * @param inst Attribute Instance
 	 * @param value Value to set
 	 */
-	public final void addAttribute(@NotNull ChipAttributeInstance inst, double value) {
+	public final void addAttribute(@NotNull AttributeInstance inst, double value) {
 		this.attributes.put(inst, value);
 	}
 	
@@ -342,7 +344,7 @@ public abstract class Boss<T extends Mob> {
 	 * Removes an Attribute that this Boss will spawn with.
 	 * @param inst Attribute Instance
 	 */
-	public final void removeAttribute(@NotNull ChipAttributeInstance inst) {
+	public final void removeAttribute(@NotNull AttributeInstance inst) {
 		this.attributes.remove(inst);
 	}
 	
@@ -425,23 +427,23 @@ public abstract class Boss<T extends Mob> {
      * Called when the Entity Spawns
      * @param e Event called when it spawns
      */
-    public void onSpawn(CreatureSpawnEvent e) {};
+    public void onSpawn(CreatureSpawnEvent e) {}
 
     /**
      * Called when the Entity Dies
      * @param death Event called when it dies
      */
-    public void onDeath(EntityDeathEvent death) {};
+    public void onDeath(EntityDeathEvent death) {}
 
     /**
      * Called when this Entity receives damage
      * @param e Event called when it is damaged
      */
-    public void onDamageDefensive(EntityDamageEvent e) {};
+    public void onDamageDefensive(EntityDamageEvent e) {}
 
     /**
      * Called when this Entity damages another Entity
      * @param e Event called when it damages another entity
      */
-    public void onDamageOffensive(EntityDamageByEntityEvent e) {};
+    public void onDamageOffensive(EntityDamageByEntityEvent e) {}
 }

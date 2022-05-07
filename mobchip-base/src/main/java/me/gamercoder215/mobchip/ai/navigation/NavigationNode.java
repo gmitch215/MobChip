@@ -12,7 +12,7 @@ import net.minecraft.world.level.pathfinder.Node;
 /**
  * Represents a Navigation Point, also known as a Node.
  */
-public final class NavigationNode implements Cloneable {
+public final class NavigationNode {
     
     private int x;
     private int y;
@@ -147,7 +147,7 @@ public final class NavigationNode implements Cloneable {
     }
 
     /**
-     * Removes a amount to each coordinate.
+     * Removes an amount to each coordinate.
      * @param x Amount of X to remove
      * @param y Amount of Y to remove
      * @param z Amount of Z to remove

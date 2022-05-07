@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EquipmentSlot;
@@ -11,21 +12,19 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
-
 /**
  * Represents a Boss Minion
  * <p>
- * Any methods that calls a class update (i.e. {@link #setHealth(double)}) will not update the actual entity if spawned. Call updates directly from the entity received at {@link #spawn(Location)}.
+ * Any methods that will call a class update (i.e. {@link #setHealth(double)}) will not update the actual entity if spawned. Call updates directly from the entity received at {@link #spawn(Location)}.
+ * @param <T> Type of Minion
  */
 public final class Minion<T extends Mob> {
-	
+
 	private final Class<T> entityClazz;
-	
 	private double health;
 	private Map<EquipmentSlot, ItemStack> equipment;
 	
-	private Map<ChipAttributeInstance, Double> attributes;
+	private Map<AttributeInstance, Double> attributes;
 
 	/**
 	 * Creates a Minion.
@@ -35,7 +34,7 @@ public final class Minion<T extends Mob> {
 	 * @param equipment Entity Equipment Map of EquipmentSlot to ItemStack
 	 * @throws IllegalArgumentException if health is less than 0 or if class is null
 	 */
-	public Minion(@NotNull Class<T> clazz, double health, @Nullable Map<EquipmentSlot, ItemStack> equipment, @Nullable Map<ChipAttributeInstance, Double> attributes) throws IllegalArgumentException {
+	public Minion(@NotNull Class<T> clazz, double health, @Nullable Map<EquipmentSlot, ItemStack> equipment, @Nullable Map<AttributeInstance, Double> attributes) throws IllegalArgumentException {
 		if (clazz == null) throw new IllegalArgumentException("Class type cannot be null");
 		if (health <= 0) throw new IllegalArgumentException("Health cannot be less than or equal to 0");
 		
@@ -72,8 +71,8 @@ public final class Minion<T extends Mob> {
 	
 	/**
 	 * Creates a Minion with a health of 20.
-	 * @param clazz
-	 * @throws IllegalArgumentException
+	 * @param clazz Class of minion
+	 * @throws IllegalArgumentException if health less than 0 or if class is null
 	 */
 	public Minion(@NotNull Class<T> clazz) throws IllegalArgumentException {
 		this(clazz, 20);
@@ -83,7 +82,7 @@ public final class Minion<T extends Mob> {
 	 * Get the Entity Class of this Minion.
 	 * @return Entity Class
 	 */
-	public final Class<T> getEntityClass() {
+	public Class<T> getEntityClass() {
 		return this.entityClazz;
 	}
 	
@@ -93,7 +92,7 @@ public final class Minion<T extends Mob> {
 	 * @return Spawned minion, or null if location is null
 	 */
 	@Nullable
-	public final T spawn(@Nullable Location loc) {
+	public T spawn(@Nullable Location loc) {
 		if (loc == null) return null;
 		
 		T entity = loc.getWorld().spawn(loc, entityClazz);
@@ -101,7 +100,7 @@ public final class Minion<T extends Mob> {
 		entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
 		for (EquipmentSlot s : equipment.keySet()) entity.getEquipment().setItem(s, equipment.get(s), true);
 		
-		for (ChipAttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
+		for (AttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
 		
 		return entity;
 	}
@@ -112,7 +111,7 @@ public final class Minion<T extends Mob> {
 	 * @return Spawned minion, or null if boss is null / not spawned yet
 	 */
 	@Nullable
-	public final T spawn(@Nullable Boss<?> b) {
+	public T spawn(@Nullable Boss<?> b) {
 		if (b == null) return null;
 		if (b.getMob() == null) return null;
 		
@@ -125,7 +124,7 @@ public final class Minion<T extends Mob> {
 	 * @return Spawned minion, or null if entity is null
 	 */
 	@Nullable
-	public final T spawn(@Nullable Entity en) {
+	public T spawn(@Nullable Entity en) {
 		if (en == null) return null;
 		return spawn(en.getLocation());
 	}
@@ -135,7 +134,7 @@ public final class Minion<T extends Mob> {
 	 * @return Entity Attributes
 	 */
 	@NotNull
-	public final Map<ChipAttributeInstance, Double> getAttributes() {
+	public Map<AttributeInstance, Double> getAttributes() {
 		return this.attributes;
 	}
 	
@@ -143,7 +142,7 @@ public final class Minion<T extends Mob> {
 	 * Get the health that this Minion will spawn with.
 	 * @return Health
 	 */
-	public final double getHealth() {
+	public double getHealth() {
 		return this.health;
 	}
 	
@@ -151,7 +150,7 @@ public final class Minion<T extends Mob> {
 	 * Sets the health that this Minion will spawn with.
 	 * @param health Health to spawn with
 	 */
-	public final void setHealth(double health) {
+	public void setHealth(double health) {
 		this.health = health;
 	}
 	
@@ -160,7 +159,7 @@ public final class Minion<T extends Mob> {
 	 * @param inst Attribute Instance
 	 * @param value Value to set
 	 */
-	public final void addAttribute(@NotNull ChipAttributeInstance inst, double value) {
+	public void addAttribute(@NotNull AttributeInstance inst, double value) {
 		this.attributes.put(inst, value);
 	}
 	
@@ -168,7 +167,7 @@ public final class Minion<T extends Mob> {
 	 * Removes an Attribute that this Minion will spawn with.
 	 * @param inst Attribute Instance
 	 */
-	public final void removeAttribute(@NotNull ChipAttributeInstance inst) {
+	public void removeAttribute(@NotNull AttributeInstance inst) {
 		this.attributes.remove(inst);
 	}
 	
@@ -177,7 +176,7 @@ public final class Minion<T extends Mob> {
 	 * @return Equipment that the Minion will spawn with
 	 */
 	@NotNull
-	public final Map<EquipmentSlot, ItemStack> getEquipment() {
+	public Map<EquipmentSlot, ItemStack> getEquipment() {
 		return this.equipment;
 	}
 	
@@ -186,7 +185,7 @@ public final class Minion<T extends Mob> {
 	 * @param slot EquipmentSlot to spawn
 	 * @param item ItemStack to set, can be null
 	 */
-	public final void setItem(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
+	public void setItem(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
 		if (item == null) return;
 		this.equipment.put(slot, item);
 	}
@@ -195,7 +194,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Helmet.
 	 * @param item Helmet Item to set, can be null
 	 */
-	public final void setHelmet(@Nullable ItemStack item) {
+	public void setHelmet(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.HEAD, item);
 	}
 	
@@ -203,7 +202,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Chestplate.
 	 * @param item Chestplate Item to set, can be null
 	 */
-	public final void setChestplate(@Nullable ItemStack item) {
+	public void setChestplate(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.CHEST, item);
 	}
 	
@@ -211,7 +210,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Leggings.
 	 * @param item Leggings Item to set, can be null
 	 */
-	public final void setLeggings(@Nullable ItemStack item) {
+	public void setLeggings(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.LEGS, item);
 	}
 	
@@ -219,7 +218,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Boots.
 	 * @param item Boots Item to set, can be null
 	 */
-	public final void setBoots(@Nullable ItemStack item) {
+	public void setBoots(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.FEET, item);
 	}
 	
@@ -227,7 +226,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Mainhand.
 	 * @param item Mainhand Item to change, can be null
 	 */
-	public final void setMainhand(@Nullable ItemStack item) {
+	public void setMainhand(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.HAND, item);
 	}
 	
@@ -235,7 +234,7 @@ public final class Minion<T extends Mob> {
 	 * Sets this Minion's Offhand.
 	 * @param item Offhand Item to change, can be null
 	 */
-	public final void setOffhand(@Nullable ItemStack item) {
+	public void setOffhand(@Nullable ItemStack item) {
 		setItem(EquipmentSlot.OFF_HAND, item);
 	}
 

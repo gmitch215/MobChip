@@ -29,7 +29,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			Object o = f.get(g);
 			if (o == null && g.getClass().getSuperclass().isAssignableFrom(Goal.class)) o = getEntity((Goal) g.getClass().getSuperclass().cast(g), fieldName);
 			
-			return (net.minecraft.world.entity.Mob) f.get(g);
+			return (net.minecraft.world.entity.Mob) o;
 		} catch (Exception e) {
 			return null;
 		}
@@ -114,7 +114,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			Object o = f.get(g);
 			if (o == null && g.getClass().getSuperclass().isAssignableFrom(Goal.class)) o = getEntity((Goal) g.getClass().getSuperclass().cast(g), fieldName);
 			
-			return (PathfinderMob) f.get(g);
+			return (PathfinderMob) o;
 		} catch (Exception e) {
 			return null;
 		}

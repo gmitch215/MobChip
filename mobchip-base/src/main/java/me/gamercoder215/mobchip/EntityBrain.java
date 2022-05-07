@@ -8,13 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import me.gamercoder215.mobchip.ai.EntityAI;
-import me.gamercoder215.mobchip.ai.behavior.Behavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
-import me.gamercoder215.mobchip.ai.sensing.Sensor;
-import me.gamercoder215.mobchip.attributes.Attribute;
-import me.gamercoder215.mobchip.attributes.ChipAttributeInstance;
 
 /**
  * Represents an Entire Entity Brain
@@ -44,18 +40,11 @@ public interface EntityBrain {
     EntityAI getTargetAI();
 
     /**
-     * Adds a Temporary Behavior to this Brain.
-     * @param b Behavior to add
-     * @return true if addition was successful, else false
-     */
-    boolean addBehavior(@NotNull Behavior b);
-
-    /**
-     * Get the Entity Navigation associated with this Brain.
-     * @return Entity Navigation
+     * Creates new Entity Navigation associated with this Brain.
+     * @return Created Entity Navigation
      */
     @NotNull
-    EntityNavigation getNavigation();
+    EntityNavigation createNavigation();
 
     /**
      * Get the Entity Controller associated with this Brain.
@@ -69,6 +58,7 @@ public interface EntityBrain {
      * @param memory Memory to change
      * @param value Value of new memory, null to remove
      * @throws IllegalArgumentException if the value is not suitable for this memory
+     * @param <T> Memory Type
      */
     <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value) throws IllegalArgumentException;
     
@@ -80,26 +70,27 @@ public interface EntityBrain {
      * @param value Value of new memory
      * @param expire How many ticks until this memory will be forgotten/removed
      * @throws IllegalArgumentException if the value is not suitable for this memory / ticks amount is invalid
+     * @param <T> Memory Type
      */
-    <T> void setMemory(@NotNull EntityMemory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException;
+    <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value, long expire) throws IllegalArgumentException;
 
     /**
-     * Sets multilple permanent memories into this Entity's Brain. 
+     * Sets multiple permanent memories into this Entity's Brain.
      * @param map Map of Memories to their values
      */
-    default void setMemories(@NotNull Map<EntityMemory, ? extends Object> map) {
-        for (Map.Entry<EntityMemory, ? extends Object> entry : map.entrySet()) {
+    default void setMemories(@NotNull Map<EntityMemory, ?> map) {
+        for (Map.Entry<EntityMemory, ?> entry : map.entrySet()) {
             setMemory(entry.getKey(), entry.getValue());
         }
     }
 
     /**
-     * Sets multilple temporary memories into this Entity's Brain. 
+     * Sets multiple temporary memories into this Entity's Brain.
      * @param map Map of Memories to their values
      * @param expire How many ticks until this memory is forgotten/removed
      */
-    default void setMemories(@NotNull Map<EntityMemory, ? extends Object> map, long expire) {
-        for (Map.Entry<EntityMemory, ? extends Object> entry : map.entrySet()) {
+    default void setMemories(@NotNull Map<EntityMemory, ?> map, long expire) {
+        for (Map.Entry<EntityMemory, ?> entry : map.entrySet()) {
             setMemory(entry.getKey(), entry.getValue(), expire);
         }
     }
@@ -108,6 +99,7 @@ public interface EntityBrain {
      * Fetch the Memory that is stored in this Entity's Brain.
      * @param memory Memory to fetch
      * @return Found value as an object, null if not present
+     * @param <T> Memory Type
      */
     @Nullable
     <T> T getMemory(@NotNull EntityMemory<T> memory);
@@ -115,19 +107,19 @@ public interface EntityBrain {
     /**
      * Get the expiration date of this Memory.
      * @param memory Memory to fetch
-     * @return Found expiration date, or 0 if not found
+     * @return Found expiration date, or 0 if no expiration or not found
      */
     long getExpiration(@NotNull EntityMemory<?> memory);
 
     /**
-     * Whether or not this Brain contains this memory.
+     * Whether this Brain contains this memory.
      * @param memory Memory to fetch
      * @return true if contains, else false
      */
     boolean containsMemory(@NotNull EntityMemory<?> memory);
 
     /**
-     * Whether or not this Brain contains all of these memories.
+     * Whether this Brain contains all of these memories.
      * @param memories Group of memories to query
      * @return true if they <strong>all</strong> are contained, else false
      */
@@ -143,23 +135,9 @@ public interface EntityBrain {
 
 		return contains;
     }
-    
-    /**
-     * Adds a Sensor to this Entity Brain.
-     * @param s Sensor to use
-     */
-    void addSensor(@NotNull Sensor s);
-    
-    /**
-     * Get the Attribute Instance associated with this Attribute.
-     * @param a Attribute to get
-     * @return Found Attribute Instance, can be null if not registered
-     */
-    @Nullable
-    ChipAttributeInstance getAttribute(@NotNull Attribute a);
 
     /**
-     * Whether or not this Entity is in its restriction area.
+     * Whether this Entity is in its restriction area.
      * @return true if inside, else false
      */
     boolean isInRestriction();
@@ -178,8 +156,8 @@ public interface EntityBrain {
     Location getRestrictionArea();
 
     /**
-     * Whether or not this entity has a restriction area.
-     * @return true if has area, else false
+     * Whether this entity has a restriction area.
+     * @return true if it has a restriction area, else false
      */
     boolean hasRestriction();
 

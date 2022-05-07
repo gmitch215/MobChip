@@ -76,7 +76,7 @@ public interface EntityController {
     
     /**
      * Moves an Entity to the specified Location.
-     * @param loc Locatino to move to
+     * @param loc Location to move to
      * @param speedMod Speed Modifier
      * @return this controller, for chaining
      */

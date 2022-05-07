@@ -47,10 +47,11 @@ import net.minecraft.world.level.pathfinder.Node;
 /**
  * Utility class for Converting Bukkit Classes to NMS Classes and vice-versa
  */
+@SuppressWarnings("ALL")
 public final class ChipConversions {
 
-	private ChipConversions() {};
-		
+	private ChipConversions() {}
+
 	public static Class<? extends net.minecraft.world.entity.Entity> toNMSClass(Class<? extends Entity> clazz) {
 		try {
 			return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.Entity.class);
@@ -123,7 +124,7 @@ public final class ChipConversions {
 
 	public static ServerPlayer convertType(Player p) {
 		try {
-			return ChipConversions.<ServerPlayer>getHandle(p);
+			return ChipConversions.getHandle(p);
 		} catch (Exception e) {
 			return null;
 		}
@@ -131,7 +132,7 @@ public final class ChipConversions {
 
 	public static net.minecraft.world.entity.monster.hoglin.Hoglin convertType(Hoglin p) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.monster.hoglin.Hoglin>getHandle(p);
+			return ChipConversions.getHandle(p);
 		} catch (Exception e) {
 			return null;
 		}
@@ -139,7 +140,7 @@ public final class ChipConversions {
 
 	public static net.minecraft.world.entity.monster.piglin.Piglin convertType(Piglin p) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.monster.piglin.Piglin>getHandle(p);
+			return ChipConversions.getHandle(p);
 		} catch (Exception e) {
 			return null;
 		}
@@ -147,36 +148,35 @@ public final class ChipConversions {
 	
 	public static AgeableMob convertType(Ageable a) {
 		try {
-			return ChipConversions.<AgeableMob>getHandle(a);
+			return ChipConversions.getHandle(a);
 		} catch (Exception e) {
 			return null;
 		}
 	}
 	
 	public static DamageSource convertType(DamageCause c) {
-		switch (c) {
-			case FIRE: return DamageSource.IN_FIRE;
-			case LIGHTNING: return DamageSource.LIGHTNING_BOLT;
-			case FIRE_TICK: return DamageSource.ON_FIRE;
-			case SUFFOCATION: return DamageSource.IN_WALL;
-			case LAVA: return DamageSource.LAVA;
-			case HOT_FLOOR: return DamageSource.HOT_FLOOR;
-			case CRAMMING: return DamageSource.CRAMMING;
-			case DROWNING: return DamageSource.DROWN;
-			case STARVATION: return DamageSource.STARVE;
-			case CONTACT: return DamageSource.CACTUS;
-			case MAGIC: return DamageSource.MAGIC;
-			case FALL: return DamageSource.FALL;
-			case FLY_INTO_WALL: return DamageSource.FLY_INTO_WALL;
-			case VOID: return DamageSource.OUT_OF_WORLD;
-			case CUSTOM: return DamageSource.GENERIC;
-			case WITHER: return DamageSource.WITHER;
-			case FALLING_BLOCK: return DamageSource.FALLING_BLOCK;
-			case DRAGON_BREATH: return DamageSource.DRAGON_BREATH;
-			case FREEZE: return DamageSource.FREEZE;
-			case DRYOUT: return DamageSource.DRY_OUT;
-			default: return DamageSource.GENERIC;
-		}
+		return switch (c) {
+			case FIRE -> DamageSource.IN_FIRE;
+			case LIGHTNING -> DamageSource.LIGHTNING_BOLT;
+			case FIRE_TICK -> DamageSource.ON_FIRE;
+			case SUFFOCATION -> DamageSource.IN_WALL;
+			case LAVA -> DamageSource.LAVA;
+			case HOT_FLOOR -> DamageSource.HOT_FLOOR;
+			case CRAMMING -> DamageSource.CRAMMING;
+			case DROWNING -> DamageSource.DROWN;
+			case STARVATION -> DamageSource.STARVE;
+			case CONTACT -> DamageSource.CACTUS;
+			case MAGIC -> DamageSource.MAGIC;
+			case FALL -> DamageSource.FALL;
+			case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
+			case VOID -> DamageSource.OUT_OF_WORLD;
+			case WITHER -> DamageSource.WITHER;
+			case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
+			case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
+			case FREEZE -> DamageSource.FREEZE;
+			case DRYOUT -> DamageSource.DRY_OUT;
+			default -> DamageSource.GENERIC;
+		};
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -190,7 +190,7 @@ public final class ChipConversions {
 	
 	public static ServerLevel convertType(World w) {
 		try {
-			return ChipConversions.<ServerLevel>getHandle(w);
+			return ChipConversions.getHandle(w);
 		} catch (Exception e) {
 			return null;
 		}
@@ -210,7 +210,7 @@ public final class ChipConversions {
 	
 	public static net.minecraft.world.entity.Entity convertType(Entity en) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.Entity>getHandle(en);
+			return ChipConversions.getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
@@ -222,7 +222,7 @@ public final class ChipConversions {
 	
 	public static net.minecraft.world.entity.LivingEntity convertType(LivingEntity en) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.LivingEntity>getHandle(en);
+			return ChipConversions.getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
@@ -230,7 +230,7 @@ public final class ChipConversions {
 	
 	public static net.minecraft.world.entity.Mob convertType(Mob en) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.Mob>getHandle(en);
+			return ChipConversions.getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
@@ -238,7 +238,7 @@ public final class ChipConversions {
 	
 	public static net.minecraft.world.entity.PathfinderMob convertType(Creature en) {
 		try {
-			return ChipConversions.<net.minecraft.world.entity.PathfinderMob>getHandle(en);
+			return ChipConversions.getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
@@ -314,20 +314,20 @@ public final class ChipConversions {
     	ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		String path = packageName.replace('.', '/');
 		Enumeration<URL> resources = classLoader.getResources(path);
-		List<File> dirs = new ArrayList<File>();
+		List<File> dirs = new ArrayList<>();
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
-    	return classes.toArray(new Class[classes.size()]);
+    	return classes.toArray(new Class[0]);
     }
 
     private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        List<Class<?>> classes = new ArrayList<Class<?>>();
+        List<Class<?>> classes = new ArrayList<>();
         if (!directory.exists()) {
             return classes;
         }
@@ -350,10 +350,12 @@ public final class ChipConversions {
 			List<Class<? extends Pathfinder>> list = new ArrayList<>();
 			for (Class<?> clazz : arr1) try {
 				list.add(clazz.asSubclass(Pathfinder.class));
-			} catch (ClassCastException e) { continue; }
+			} catch (ClassCastException ignored) {
+			}
 			for (Class<?> clazz : arr2) try {
 				list.add(clazz.asSubclass(Pathfinder.class));
-			} catch (ClassCastException e) { continue; }
+			} catch (ClassCastException ignored) {
+			}
 
 			return list;
 		} catch (Exception e) {

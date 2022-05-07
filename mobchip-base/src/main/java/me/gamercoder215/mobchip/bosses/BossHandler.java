@@ -1,8 +1,5 @@
 package me.gamercoder215.mobchip.bosses;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.EventHandler;
@@ -21,14 +18,10 @@ public final class BossHandler {
     private final Plugin plugin;
     private final Boss<?> boss;
 
-    private final List<Boss<?>> bosses = new ArrayList<>();
-
     BossHandler(Boss<?> boss, Plugin p) {
         new BossEvents(this);
         this.plugin = p;
         this.boss = boss;
-
-        this.bosses.add(boss);
     }
 
     /**
@@ -47,12 +40,12 @@ public final class BossHandler {
         return this.boss;
     }
 
-    private static class BossEvents implements Listener {
+    private static final class BossEvents implements Listener {
 
-        private BossHandler handler;
+        private final Boss<?> boss;
 
         private BossEvents(BossHandler handler) {
-            this.handler = handler;
+            this.boss = handler.boss;
             Bukkit.getPluginManager().registerEvents(this, handler.plugin);
         }
 
@@ -60,10 +53,8 @@ public final class BossHandler {
         public void onDamageDefensive(EntityDamageEvent e) {
             if (!(e.getEntity() instanceof Mob m)) return;
 
-            for (Boss<? extends Mob> boss : handler.bosses) {
-                if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
-                    boss.onDamageDefensive(e);
-                }
+            if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
+                boss.onDamageDefensive(e);
             }
         }
 
@@ -71,10 +62,8 @@ public final class BossHandler {
         public void onDamageOffensive(EntityDamageByEntityEvent e) {
             if (!(e.getDamager() instanceof Mob m)) return;
 
-            for (Boss<? extends Mob> boss : handler.bosses) {
-                if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
-                    boss.onDamageOffensive(e);
-                }
+            if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
+                boss.onDamageOffensive(e);
             }
         }
 
@@ -82,12 +71,10 @@ public final class BossHandler {
         public void onDeath(EntityDeathEvent e) {
             if (!(e.getEntity() instanceof Mob m)) return;
 
-            for (Boss<? extends Mob> boss : handler.bosses) {
-                if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
-                    boss.onDeath(e);
-                    for (ItemStack i : boss.getDrops()) m.getWorld().dropItemNaturally(m.getLocation(), i);
-                    if (boss.getDeathSound() != null) m.getWorld().playSound(m, boss.getDeathSound(), 3F, 1F);
-                }
+            if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
+                boss.onDeath(e);
+                for (ItemStack i : boss.getDrops()) m.getWorld().dropItemNaturally(m.getLocation(), i);
+                if (boss.getDeathSound() != null) m.getWorld().playSound(m, boss.getDeathSound(), 3F, 1F);
             }
         }
 
