@@ -1,15 +1,15 @@
 package me.gamercoder215.mobchip.bukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jetbrains.annotations.NotNull;
-
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import org.bukkit.entity.Mob;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 final class BukkitNavigation implements EntityNavigation {
     
@@ -17,15 +17,18 @@ final class BukkitNavigation implements EntityNavigation {
     
     private int speedMod;
     private int range;
-    private List<NavigationNode> points;
+    private final List<NavigationNode> points;
     private BlockPos finalPos;
 
-    protected BukkitNavigation(PathNavigation handle) {
+    private final Mob m;
+
+    BukkitNavigation(PathNavigation handle, Mob m) {
         this.handle = handle;
         this.points = new ArrayList<>();
 
         this.speedMod = 1;
         this.range = Integer.MAX_VALUE;
+        this.m = m;
     }
 
     @Override
@@ -64,7 +67,7 @@ final class BukkitNavigation implements EntityNavigation {
     }
 
     @Override
-    public EntityNavigation removePoint(@NotNull int index) {
+    public EntityNavigation removePoint(int index) {
         this.points.remove(index);
         return this;
     }
@@ -72,7 +75,7 @@ final class BukkitNavigation implements EntityNavigation {
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new BukkitPath(handle.createPath(finalPos, range, speedMod));
+        return new BukkitPath(handle.createPath(finalPos, range, speedMod), m);
     }
 
     @Override

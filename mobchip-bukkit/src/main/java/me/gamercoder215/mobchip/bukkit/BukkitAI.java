@@ -10,18 +10,25 @@ import java.util.Set;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.PathfinderInfo;
+import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderAddEvent;
+import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderClearEvent;
+import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderRemoveEvent;
 import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 final class BukkitAI implements EntityAI {
 	
-	private Map<Integer, Goal> goals = new HashMap<>();
-	private GoalSelector sel;
+	private final Map<Integer, Goal> goals = new HashMap<>();
+	private final GoalSelector sel;
+	private final boolean target;
 	
-	protected BukkitAI(GoalSelector sel) {
+	protected BukkitAI(GoalSelector sel, boolean target) {
 		this.sel = sel;
+		this.target = target;
 		updateMap();
 	}
 	
@@ -68,8 +75,13 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public Pathfinder put(Integer key, Pathfinder value) {
-		goals.put(key, value.getHandle());
-		updateAI();
+		if (value == null) return value;
+		PathfinderAddEvent event = new PathfinderAddEvent(this, value, this.target, key);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!(event.isCancelled())) {
+			goals.put(key, value.getHandle());
+			updateAI();
+		}
 		return value;
 	}
 
@@ -81,13 +93,20 @@ final class BukkitAI implements EntityAI {
 	public Pathfinder remove(Object key) {
 		Goal g = goals.remove(key);
 		updateAI();
-		return ChipConversions.wrapGoal(g);
+		Pathfinder p = ChipConversions.wrapGoal(g);
+		PathfinderRemoveEvent event = new PathfinderRemoveEvent(this, p, this.target);
+		Bukkit.getPluginManager().callEvent(event);
+		return p;
 	}
 
 	@Override
 	public void putAll(Map<? extends Integer, ? extends Pathfinder> m) {
 		for (Map.Entry<? extends Integer, ? extends Pathfinder> entry : m.entrySet()) {
-			putNoAI(entry.getKey(), entry.getValue());
+			PathfinderAddEvent event = new PathfinderAddEvent(this, entry.getValue(), this.target, entry.getKey());
+			Bukkit.getPluginManager().callEvent(event);
+			if (!(event.isCancelled())) {
+				putNoAI(entry.getKey(), entry.getValue());
+			}
 		}
 		updateAI();
 	}
@@ -96,15 +115,17 @@ final class BukkitAI implements EntityAI {
 	public void clear() {
 		goals.clear();
 		updateAI();
+		PathfinderClearEvent event = new PathfinderClearEvent(this, this.target);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	@Override
-	public Set<Integer> keySet() {
+	public @NotNull Set<Integer> keySet() {
 		return goals.keySet();
 	}
 
 	@Override
-	public List<Pathfinder> values() {
+	public @NotNull List<Pathfinder> values() {
 		List<Pathfinder> values = new ArrayList<>();
 		for (WrappedGoal g : sel.getAvailableGoals()) {
 			values.add(ChipConversions.wrapGoal(g.getGoal()));	
@@ -114,7 +135,7 @@ final class BukkitAI implements EntityAI {
 	}
 
 	@Override
-	public Set<Entry<Integer, Pathfinder>> entrySet() {
+	public @NotNull Set<Entry<Integer, Pathfinder>> entrySet() {
 		Set<Entry<Integer, Pathfinder>> entries = new HashSet<>();
 
 		for (WrappedGoal g : sel.getAvailableGoals()) {

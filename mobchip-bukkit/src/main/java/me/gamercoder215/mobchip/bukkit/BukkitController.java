@@ -15,7 +15,7 @@ final class BukkitController implements EntityController {
     private final MoveControl moveC;
     private final World w;
 
-    protected BukkitController(World w, JumpControl jump, LookControl look, MoveControl move) {
+    BukkitController(World w, JumpControl jump, LookControl look, MoveControl move) {
         this.jumpC = jump;
         this.lookC = look;
         this.moveC = move;
