@@ -6,8 +6,8 @@
     <summary>Click to Expand</summary>
     
 Accessing Entity AI has been widely thought and used over the life of SpigotMC. 
-With many imporovements, from Mojang Mappings to tutorials, there were many options. This libarary aims to help
-improve the hassle of playing around with NMS and learning how to import it with a simple wrapper.
+With many improvements, from Mojang Mappings to tutorials, there were many options. This library aims to help
+improve the hassle of playing around with NMS and learning how to import and use it with a simple wrapper.
 </details>
 
 ## Why?
@@ -21,8 +21,6 @@ improve the hassle of playing around with NMS and learning how to import it with
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/GamerCoder215/MobChip/master)
 [![](https://jitpack.io/v/GamerCoder215/MobChip.svg)](https://jitpack.io/#GamerCoder215/MobChip)
 [![](https://jitci.com/gh/GamerCoder215/MobChip/svg)](https://jitci.com/gh/GamerCoder215/MobChip)
-
-Use `master-SNAPSHOT` for latest version on Master Branch, a releases number, or a commit hash.
 
 <details>
     <summary>Maven</summary>
@@ -48,7 +46,7 @@ Use `master-SNAPSHOT` for latest version on Master Branch, a releases number, or
     <dependency>
         <groupId>com.github.GamerCoder215.MobChip</groupId>
         <artifactId>mobchip-bukkit</artifactId>
-        <version>[VERSION]</version>
+        <version>[VERSION]</version> <!-- Example: 1.0.0 -->
     </dependency>
 </dependencies>
 ```
@@ -63,7 +61,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.GamerCoder215.MobChip:mobchip-base:master-SNAPSHOT'
+    implementation 'com.github.GamerCoder215.MobChip:mobchip-base:[VERSION]'
 }
 ```
 </details>
