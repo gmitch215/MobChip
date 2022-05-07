@@ -13,13 +13,15 @@
 	<properties>
 		<minecraft.version>1.18.2-R0.1-SNAPSHOT</minecraft.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.release>17</maven.compiler.release>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<java.version>17</java.version>
+		<github>GamerCoder215/MobChip</github>
 	</properties>
 
 	<scm>
 	    <connection>scm:git:${project.url}.git</connection>
-	    <developerConnection>scm:git:git@github.com:GamerCoder215/MobChip.git</developerConnection>
+	    <developerConnection>scm:git:git@github.com:${github}.git</developerConnection>
 	    <url>${project.url}</url>
 	</scm>
 	
@@ -48,51 +50,51 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.name}-${buildNumber}</finalName>
+		<finalName>${project.name}-b${buildNumber}</finalName>
 		<defaultGoal>package clean install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
-              </plugin>
-		      <plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>buildnumber-maven-plugin</artifactId>
-		        <version>3.0.0</version>
-		        <executions>
-		          <execution>
-		            <phase>validate</phase>
-		            <goals>
-		              <goal>create</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		        <configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
 					<shortRevisionLength>6</shortRevisionLength>
-		        </configuration>
-		      </plugin>
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <links>
-                        <link>https://hub.spigotmc.org/javadocs/spigot/</link>
-                        <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
-						<link>https://gamercoder215.github.io/MobChip/base/</link>
-                    </links>
-					<excludePackageNames>*.util</excludePackageNames>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>javadoc-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+				</configuration>
+			</plugin>
+              	<plugin>
+                	<groupId>org.apache.maven.plugins</groupId>
+                	<artifactId>maven-javadoc-plugin</artifactId>
+                	<version>3.4.0</version>
+                	<configuration>
+                	    <links>
+            	            <link>https://hub.spigotmc.org/javadocs/spigot/</link>
+        	                <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
+							<link>https://gamercoder215.github.io/MobChip/base/</link>
+	                    </links>
+						<excludePackageNames>*.util</excludePackageNames>
+                	</configuration>
+                	<executions>
+                    	<execution>
+                        	<id>javadoc-jar</id>
+                        	<phase>package</phase>
+                        	<goals>
+								<goal>jar</goal>
+                        	</goals>
+                    	</execution>
+                	</executions>
               </plugin>
         </plugins>
 	</build>
