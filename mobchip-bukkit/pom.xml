@@ -8,22 +8,6 @@
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>mobchip-base</artifactId>
-			<version>${project.parent.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot</artifactId>
-			<version>${minecraft.version}</version>
-			<scope>provided</scope>
-			<classifier>remapped-mojang</classifier>
-		</dependency>
-	</dependencies>	
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
@@ -75,5 +59,21 @@
 			</plugin>
 		</plugins>
     </build>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-base</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot</artifactId>
+			<version>${minecraft.version}</version>
+			<scope>provided</scope>
+			<classifier>remapped-mojang</classifier>
+		</dependency>
+	</dependencies>
 
 </project>
