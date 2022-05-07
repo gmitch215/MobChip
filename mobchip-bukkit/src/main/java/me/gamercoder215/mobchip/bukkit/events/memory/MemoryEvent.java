@@ -15,6 +15,11 @@ public abstract class MemoryEvent extends BrainEvent implements Cancellable {
     private EntityMemory<?> memory;
     private boolean cancel;
 
+    /**
+     * Constructs a MemoryEvent.
+     * @param brain EntityBrain Involved
+     * @param memory EntityMemory involved
+     */
     public MemoryEvent(@NotNull EntityBrain brain, EntityMemory<?> memory) {
         super(brain);
 
@@ -30,10 +35,18 @@ public abstract class MemoryEvent extends BrainEvent implements Cancellable {
         this.cancel = cancel;
     }
 
+    /**
+     * Gets the memory involved in this MemoryEvent.
+     * @return memory involved
+     */
     public EntityMemory<?> getMemory() {
         return this.memory;
     }
 
+    /**
+     * Sets the memory involved in this MemoryEvent.
+     * @param memory memory involved
+     */
     public void setMemory(EntityMemory<?> memory) {
         this.memory = memory;
     }
