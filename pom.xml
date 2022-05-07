@@ -33,6 +33,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+		<repository>
+			<id>nms-repo</id>
+			<url>https://repo.codemc.org/repository/nms/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -76,7 +80,6 @@
                     <links>
                         <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                         <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
-						<link>https://papermc.io/javadocs/paper/1.18/</link>
 						<link>https://gamercoder215.github.io/MobChip/base/</link>
                     </links>
 					<excludePackageNames>*.util</excludePackageNames>
