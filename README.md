@@ -26,29 +26,36 @@ improve the hassle of playing around with NMS and learning how to import and use
     <summary>Maven</summary>
 
 ```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-
-<!-- Base Module - Used for Base Classes -->
-
-<dependencies>
-    <dependency>
-        <groupId>com.github.GamerCoder215.MobChip</groupId>
-        <artifactId>mobchip-base</artifactId>
-        <version>[VERSION]</version>
-    </dependency>
+<project>
     
-    <!-- Bukkit Module - Used for Development & Events - Contains Base -->
-    <dependency>
-        <groupId>com.github.GamerCoder215.MobChip</groupId>
-        <artifactId>mobchip-bukkit</artifactId>
-        <version>[VERSION]</version> <!-- Example: 1.0.0 -->
-    </dependency>
-</dependencies>
+    <!-- ... -->
+    
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+    
+    <!-- Base Module - Used for Base Classes -->
+    
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.github.GamerCoder215.MobChip</groupId>
+            <artifactId>mobchip-base</artifactId>
+            <version>[VERSION]</version>
+        </dependency>
+        
+        <!-- Bukkit Module - Used for Development & Events - Contains Base -->
+        <dependency>
+            <groupId>com.github.GamerCoder215.MobChip</groupId>
+            <artifactId>mobchip-bukkit</artifactId>
+            <version>[VERSION]</version> <!-- Example: 1.0.0 -->
+        </dependency>
+    </dependencies>
+    
+</project>
 ```
 </details>
 
@@ -82,7 +89,6 @@ import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 
-@SuppressWarnings("ALL")
 public class MyPlugin extends JavaPlugin {
 
     public Pathfinder getPathfinder(Mob m) {
@@ -124,7 +130,6 @@ import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 
 // Bukkit Imports...
 
-@SuppressWarnings("ALL")
 public class MyPlugin extends JavaPlugin {
 
     public void addGoal(Mob m) {
@@ -226,7 +231,6 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 
 // Bukkit Imports...
 
-@SuppressWarnings("ALL")
 public class MyPlugin extends JavaPlugin {
 
     public void doActions(Mob m) {
@@ -264,7 +268,6 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 
-@SuppressWarnings("ALL")
 public class MyPlugin extends JavaPlugin {
 
     public NavigationPath createPath(Mob m) {
@@ -318,7 +321,6 @@ import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 
 // Bukkit imports...
 
-@SuppressWarnings("ALL")
 public class MyPlugin extends JavaPlugin {
 
     public void setMemories(Mob m) {
