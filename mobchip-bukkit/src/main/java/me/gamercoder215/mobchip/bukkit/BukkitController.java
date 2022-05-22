@@ -14,7 +14,6 @@ final class BukkitController implements EntityController {
     private final LookControl lookC;
     private final MoveControl moveC;
     private final World w;
-
     BukkitController(World w, JumpControl jump, LookControl look, MoveControl move) {
         this.jumpC = jump;
         this.lookC = look;
@@ -25,18 +24,21 @@ final class BukkitController implements EntityController {
     @Override
     public EntityController jump() {
         jumpC.jump();
+        jumpC.tick();
         return this;
     }
 
     @Override
     public EntityController moveTo(double x, double y, double z, double speedMod) {
         moveC.setWantedPosition(x, y, z, speedMod);
+        moveC.tick();
         return this;
     }
 
     @Override
     public EntityController strafe(float fwd, float right) {
         moveC.strafe(fwd, right);
+        moveC.tick();
         return this;
     }
 
@@ -58,6 +60,7 @@ final class BukkitController implements EntityController {
     @Override
     public EntityController lookAt(double x, double y, double z) {
         lookC.setLookAt(x, y, z);
+        lookC.tick();
         return this;
     }
     
