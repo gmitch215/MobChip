@@ -151,6 +151,11 @@ public interface EntityBrain {
     void setRestrictionArea(Location center, int radius);
 
     /**
+     * Clears this Entity's Restriction Area.
+     */
+    void clearRestrictionArea();
+
+    /**
      * Gets the current restriction area.
      * @return Restriction Area
      */
