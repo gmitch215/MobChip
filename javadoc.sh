@@ -6,9 +6,11 @@ git fetch origin gh-pages
 
 echo "[MobChip JavaDoc Builder] Starting..."
 
+rm -rf docs/
 rm -rf docs/bukkit
 rm -rf docs/base
 
+mkdir ./docs
 mkdir ./docs/base
 mkdir ./docs/bukkit
 
