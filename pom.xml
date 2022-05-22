@@ -19,6 +19,25 @@
 		<github>GamerCoder215/MobChip</github>
 	</properties>
 
+	<developers>
+		<developer>
+			<name>GamerCoder215</name>
+			<roles>
+				<role>Owner</role>
+			</roles>
+			<email>gamercoder215@teaminceptus.us</email>
+			<organization>Team Inceptus</organization>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>GPL-3.0</name>
+			<url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
 	<scm>
 	    <connection>scm:git:${project.url}.git</connection>
 	    <developerConnection>scm:git:git@github.com:${github}.git</developerConnection>
