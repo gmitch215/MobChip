@@ -3,6 +3,7 @@ package me.gamercoder215.mobchip;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -166,5 +167,22 @@ public interface EntityBrain {
      * @return Restriction Radius
      */
     int getRestrictionRadius();
+
+    /**
+     * Whether this Mob can see another Entity.
+     * @param en Entity to test
+     * @return true if entity can see, else false
+     */
+    boolean canSee(@Nullable Entity en);
+
+    /**
+     * Whether this Mob can see another Entity.
+     * @param brain EntityBrain to test
+     * @return true if entity can see, else false
+     */
+    default boolean canSee(@Nullable EntityBrain brain) {
+        if (brain == null) return false;
+        return canSee(brain.getEntity());
+    }
     
 }

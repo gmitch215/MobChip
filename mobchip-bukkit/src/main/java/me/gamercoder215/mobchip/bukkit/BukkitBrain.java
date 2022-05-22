@@ -11,6 +11,7 @@ import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.core.BlockPos;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -134,6 +135,11 @@ public final class BukkitBrain implements EntityBrain {
 	@Override
 	public int getRestrictionRadius() {
 		return Math.min((int) Math.floor(nmsMob.getRestrictRadius()), Integer.MAX_VALUE);
+	}
+
+	@Override
+	public boolean canSee(@Nullable Entity en) {
+		return nmsMob.getSensing().hasLineOfSight(ChipConversions.convertType(en));
 	}
 
 	@Override
