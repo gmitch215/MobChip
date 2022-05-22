@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Bukkit Implementation of EntityBrain
+ * @see EntityBrain
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public final class BukkitBrain implements EntityBrain {
