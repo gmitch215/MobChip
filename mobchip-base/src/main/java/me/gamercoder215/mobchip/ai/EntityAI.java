@@ -1,12 +1,11 @@
 package me.gamercoder215.mobchip.ai;
 
-import java.util.Map;
-import java.util.Set;
-
-import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents Entity Pathfinder AI 
