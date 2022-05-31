@@ -367,11 +367,9 @@ public final class ChipConversions {
 	public static Class<? extends Pathfinder> wrapGoal(Class<? extends Goal> class1) {
 		try {
 			if (class1.equals(Goal.class)) return Pathfinder.class;
-
 			for (Class<? extends Pathfinder> clazz : getPathfinders()) {
 				if (clazz.getDeclaredMethod("getHandle").getReturnType().getCanonicalName().equals(class1.getCanonicalName())) return clazz;				
 			}
-
 			return null;
 		} catch (Exception e) {
 			return Pathfinder.class;
@@ -384,7 +382,6 @@ public final class ChipConversions {
 				if (en.getEntityId() == id) return en;
 			}
 		}
-		
 		return null;
 	}
 }

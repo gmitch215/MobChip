@@ -6,7 +6,6 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 /**
  * Represents an extendable Pathfinder for creating Custom Pathfinders.
@@ -19,43 +18,6 @@ public abstract class CustomPathfinder extends Pathfinder {
      */
     protected CustomPathfinder(@NotNull Mob m) {
         super(m);
-    }
-
-    /**
-     * Pathfinder Flags for this Custom Pathfinder
-     */
-    public enum PathfinderFlag {
-        /**
-         * Flag representing that the Pathfinder will move the entity
-         */
-        MOVEMENT(Flag.MOVE),
-        /**
-         * Flag representing that the Pathfinder will target something/someone
-         */
-        TARGETING(Flag.TARGET),
-        /**
-         * Flag representing that the Pathfinder will make the entity look at something/someone
-         */
-        LOOKING(Flag.LOOK),
-        /**
-         * Flag representing that the Pathfinder involves making the entity jump
-         */
-        JUMPING(Flag.JUMP)
-        ;
-
-        private final Flag type;
-
-        PathfinderFlag(Flag type) {
-            this.type = type;
-        }
-
-        /**
-         * Get the NMS Enum of this PathfinderFlag.
-         * @return Handle
-         */
-        public final Flag getHandle() {
-            return this.type;
-        }
     }
 
     /**
@@ -155,7 +117,7 @@ public abstract class CustomPathfinder extends Pathfinder {
             {
                 if (inst.getFlags() != null) {
                     EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
-                    for (PathfinderFlag f : inst.getFlags()) if (f != null) set.add(f.type);
+                    for (PathfinderFlag f : inst.getFlags()) if (f != null) set.add(f.getHandle());
                     this.setFlags(set);
                 }                
             }

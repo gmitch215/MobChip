@@ -2,6 +2,9 @@ package me.gamercoder215.mobchip.ai.goal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
@@ -154,12 +157,14 @@ public abstract class Pathfinder implements PathfinderInfo {
 	 * <strong>For custom pathfinders, extend {@link CustomPathfinder} instead.</strong>
 	 * @return NMS Class
 	 */
+	@NotNull
 	public abstract Goal getHandle();
 	
 	/**
 	 * Get the entity involved in this Pathfinder.
 	 * @return Creature involved
 	 */
+	@NotNull
 	public final Mob getEntity() {
 		return this.entity;
 	}
@@ -167,5 +172,56 @@ public abstract class Pathfinder implements PathfinderInfo {
 	public final String getInternalName() {
 		return getHandle().getClass().getSimpleName();
 	}
-	
+
+	/**
+	 * Fetches a Set of Flags that this Pathfinder has.
+	 * @return Set of Pathfinder Flags
+	 */
+	@NotNull
+	public final Set<PathfinderFlag> getFlag() {
+		Set<PathfinderFlag> flags = new HashSet<>();
+		for (Goal.Flag f : getHandle().getFlags()) {
+			for (PathfinderFlag fl : PathfinderFlag.values())
+				if (f == fl.type) flags.add(fl);
+		}
+
+		return flags;
+	}
+
+    /**
+     * Pathfinder Flags for a Pathfinder
+     */
+    public enum PathfinderFlag {
+        /**
+         * Flag representing that the Pathfinder will move the entity
+         */
+        MOVEMENT(Goal.Flag.MOVE),
+        /**
+         * Flag representing that the Pathfinder will target something/someone
+         */
+        TARGETING(Goal.Flag.TARGET),
+        /**
+         * Flag representing that the Pathfinder will make the entity look at something/someone
+         */
+        LOOKING(Goal.Flag.LOOK),
+        /**
+         * Flag representing that the Pathfinder involves making the entity jump
+         */
+        JUMPING(Goal.Flag.JUMP)
+        ;
+
+        private final Goal.Flag type;
+
+        PathfinderFlag(Goal.Flag type) {
+            this.type = type;
+        }
+
+        /**
+         * Get the NMS Enum of this PathfinderFlag.
+         * @return Handle
+         */
+        public final Goal.Flag getHandle() {
+            return this.type;
+        }
+    }
 }
