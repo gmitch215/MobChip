@@ -1,17 +1,15 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.bukkit.entity.Mob;
-import org.jetbrains.annotations.NotNull;
-
 import me.gamercoder215.mobchip.util.ChipConversions;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import org.bukkit.entity.Mob;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a Pathfinder Goal of an Entity.

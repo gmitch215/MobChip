@@ -130,6 +130,73 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.0.0-M2</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>deploy</phase>
+						<id>deploy-obf</id>
+						<goals>
+							<goal>deploy-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</file>
+							<url>file:///home/jitpack/deploy</url>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<classifier>remapped-obf</classifier>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>deploy</phase>
+						<id>deploy-mojang</id>
+						<goals>
+							<goal>deploy-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}-remapped-mojang.jar</file>
+							<url>file:///home/jitpack/deploy</url>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<classifier>remapped-mojang</classifier>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>deploy</phase>
+						<id>deploy-spigot</id>
+						<goals>
+							<goal>deploy-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}.jar</file>
+							<url>file:///home/jitpack/deploy</url>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
     </build>
 
