@@ -1,0 +1,26 @@
+name: Feature Request
+description: Request an addition or removal of MobChip.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a MobChip feature. Please fill out the information below.
+  - type: dropdown
+    attributes:
+      label: Feature Type
+      description: What area of improvement would you suggest?
+      multiple: false
+      options:
+        - Optimization
+        - Compatibility
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description of Feature
+      placeholder: |
+        Ex: Please add support for Minecraft 1.xx.x
+    validations:
+      required: true

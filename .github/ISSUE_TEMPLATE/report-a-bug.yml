@@ -1,0 +1,50 @@
+name: Report a Bug
+description: Report a MobChip Bug.
+labels: ['unconfirmed bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a MobChip bug. Please take time to fill out the information below.
+  - type: dropdown
+    attributes:
+      label: Bug Type
+      description: What type of bug are you trying to report?
+      multiple: true
+      options:
+        - Performance / Memory Leak / Server Crash
+        - Compatibility Issues
+        - Console Errors
+        - Other Unexpected Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Description
+      placeholder: |
+        Ex: "Pathfinder is not being added"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: What you expect the plugin to do.
+      placeholder: |
+        Ex: "Pathfinder should be added"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: What does the plugin do? What are the error messages shown?
+      placeholder: |
+        Ex: "AI is adding the wrong Pathfinder"
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        In the box below, you can attach any relevant info or files that may help us solve the bug.
+        If you think this issue is relevant to any other issues, please mention it here.
