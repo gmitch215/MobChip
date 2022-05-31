@@ -19,6 +19,7 @@ import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 final class BukkitAI implements EntityAI {
 	
@@ -145,4 +146,32 @@ final class BukkitAI implements EntityAI {
 		return entries;
 	}
 
+	/**
+	 * Fetches all pathfinders that this Entity is running.
+	 * @return Set of running Pathfinders
+	 */
+	@Override
+	public @NotNull Set<Pathfinder> getRunningGoals() {
+		Set<Pathfinder> running = new HashSet<>();
+		sel.getRunningGoals().forEach(r -> running.add(ChipConversions.wrapGoal(r.getGoal())));
+		return running;
+	}
+
+	/**
+	 * Disables all Pathfinders with this flag.
+	 * @param flag Flag to disable
+	 */
+	@Override
+	public void disableFlag(@Nullable Pathfinder.PathfinderFlag flag) {
+		sel.disableControlFlag(flag.getHandle());
+	}
+
+	/**
+	 * Enables all Pathfinders with this flag.
+	 * @param flag Flag to enable
+	 */
+	@Override
+	public void enableFlag(@Nullable Pathfinder.PathfinderFlag flag) {
+		sel.enableControlFlag(flag.getHandle());
+	}
 }
