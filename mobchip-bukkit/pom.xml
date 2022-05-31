@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+  	<modelVersion>4.0.0</modelVersion>
 	<parent>
     	<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
@@ -8,23 +8,16 @@
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
 
+	<properties>
+		<spigot.plugin.inputFile>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</spigot.plugin.inputFile>
+		<spigot.plugin.srgIn>org.spigotmc:minecraft-server:${minecraft.version}</spigot.plugin.srgIn>
+		<spigot.plugin.remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar</spigot.plugin.remappedDependencies>
+	</properties>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.4</version>
-				<executions>
-					<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>shade</goal>
-					</goals>
-					</execution>
-				</executions>
-			</plugin>
-				<plugin>
 				<groupId>net.md-5</groupId>
 				<artifactId>specialsource-maven-plugin</artifactId>
 				<version>1.2.2</version>
@@ -36,11 +29,12 @@
 						</goals>
 						<id>remap-obf</id>
 						<configuration>
-							<srgIn>org.spigotmc:minecraft-server:${minecraft.version}:txt:maps-mojang</srgIn>
+							<srgIn>${spigot.plugin.srgIn}:txt:maps-mojang</srgIn>
 							<reverse>true</reverse>
-							<remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar:remapped-mojang</remappedDependencies>
-							<remappedArtifactAttached>true</remappedArtifactAttached>
+							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-mojang</remappedDependencies>
 							<remappedClassifierName>remapped-obf</remappedClassifierName>
+							<finalName>${project.build.finalName}-remapped-obf</finalName>
+							<remappedArtifactAttached>true</remappedArtifactAttached>
 						</configuration>
 					</execution>
 					<execution>
@@ -50,9 +44,88 @@
 						</goals>
 						<id>remap-spigot</id>
 						<configuration>
-							<inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-							<srgIn>org.spigotmc:minecraft-server:${minecraft.version}:csrg:maps-spigot</srgIn>
-							<remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar:remapped-obf</remappedDependencies>
+							<inputFile>${spigot.plugin.inputFile}</inputFile>
+							<srgIn>${spigot.plugin.srgIn}:csrg:maps-spigot</srgIn>
+							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-obf</remappedDependencies>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>remap</goal>
+						</goals>
+						<id>remap-mojang</id>
+						<configuration>
+							<inputFile>${spigot.plugin.inputFile}</inputFile>
+							<srgIn>${spigot.plugin.srgIn}:txt:maps-mojang</srgIn>
+							<finalName>${project.build.finalName}-remapped-mojang</finalName>
+							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-mojang</remappedDependencies>
+							<remappedClassifierName>remapped-mojang</remappedClassifierName>
+							<remappedArtifactAttached>true</remappedArtifactAttached>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<id>default-install</id>
+						<goals>
+							<goal>install</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>install</phase>
+						<id>install-obf</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</file>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<classifier>remapped-obf</classifier>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>install</phase>
+						<id>install-mojang</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}-remapped-mojang.jar</file>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<classifier>remapped-mojang</classifier>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>install</phase>
+						<id>install-spigot</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}.jar</file>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
 						</configuration>
 					</execution>
 				</executions>

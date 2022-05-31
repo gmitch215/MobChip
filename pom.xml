@@ -70,7 +70,7 @@
 
 	<build>
 		<finalName>${project.name}-b${buildNumber}</finalName>
-		<defaultGoal>package clean install</defaultGoal>
+		<defaultGoal>clean install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -93,28 +93,52 @@
 					<shortRevisionLength>6</shortRevisionLength>
 				</configuration>
 			</plugin>
-              	<plugin>
-                	<groupId>org.apache.maven.plugins</groupId>
-                	<artifactId>maven-javadoc-plugin</artifactId>
-                	<version>3.4.0</version>
-                	<configuration>
-                	    <links>
-            	            <link>https://hub.spigotmc.org/javadocs/spigot/</link>
-        	                <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
-							<link>https://gamercoder215.github.io/MobChip/base/</link>
-	                    </links>
-						<excludePackageNames>*.util</excludePackageNames>
-                	</configuration>
-                	<executions>
-                    	<execution>
-                        	<id>javadoc-jar</id>
-                        	<phase>package</phase>
-                        	<goals>
-								<goal>jar</goal>
-                        	</goals>
-                    	</execution>
-                	</executions>
-              </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<links>
+						<link>https://hub.spigotmc.org/javadocs/spigot/</link>
+						<link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
+						<link>https://gamercoder215.github.io/MobChip/base/</link>
+					</links>
+					<excludePackageNames>*.util</excludePackageNames>
+				</configuration>
+				<executions>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/**/*</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
 	</build>
 </project>
