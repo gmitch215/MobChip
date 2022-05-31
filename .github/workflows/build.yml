@@ -25,20 +25,3 @@ jobs:
           
       - name: Build JavaDocs
         run: bash javadoc.sh
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        java-version: [18]
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
-      - name: Build Project
-        run: mvn clean install
