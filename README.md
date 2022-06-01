@@ -18,9 +18,11 @@ improve the hassle of playing around with NMS and learning how to import and use
 - **Transparent**: Most classes have a `getHandle` or a similar method to represent the NMS class, if you want to do some editing yourself. We also have ways of converting NMS Classes to MobChip Wrappers, for easy functionality.
 
 ## Installation
-![GitHub branch checks state](https://img.shields.io/github/checks-status/GamerCoder215/MobChip/master)
+![GitHub](https://img.shields.io/github/license/GamerCoder215/MobChip)
+[![GitHub branch checks state](https://github.com/GamerCoder215/MobChip/actions/workflows/build.yml/badge.svg)](https://github.com/GamerCoder215/MobChip/actions/workflows/build.yml)
 [![](https://jitpack.io/v/GamerCoder215/MobChip.svg)](https://jitpack.io/#GamerCoder215/MobChip)
 [![](https://jitci.com/gh/GamerCoder215/MobChip/svg)](https://jitci.com/gh/GamerCoder215/MobChip)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/GamerCoder215/MobChip?style=plastic)
 
 <details>
     <summary>Maven</summary>
@@ -51,7 +53,15 @@ improve the hassle of playing around with NMS and learning how to import and use
         <dependency>
             <groupId>com.github.GamerCoder215.MobChip</groupId>
             <artifactId>mobchip-bukkit</artifactId>
-            <version>[VERSION]</version> <!-- Example: 1.0.0 -->
+            <version>[VERSION]</version> <!-- Example: 1.0.1 -->
+        </dependency>
+
+        <!-- Supports remapped-mojang for handle methods -->
+        <dependency>
+            <groupId>com.github.GamerCoder215.MobChip</groupId>
+            <artifactId>mobchip-bukkit</artifactId>
+            <version>[VERSION]</version>
+            <classifier>remapped-mojang</classifier>
         </dependency>
     </dependencies>
     
