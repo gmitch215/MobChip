@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import net.minecraft.world.entity.PathfinderMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -155,28 +156,28 @@ public final class ChipConversions {
 	}
 	
 	public static DamageSource convertType(DamageCause c) {
-		return switch (c) {
-			case FIRE -> DamageSource.IN_FIRE;
-			case LIGHTNING -> DamageSource.LIGHTNING_BOLT;
-			case FIRE_TICK -> DamageSource.ON_FIRE;
-			case SUFFOCATION -> DamageSource.IN_WALL;
-			case LAVA -> DamageSource.LAVA;
-			case HOT_FLOOR -> DamageSource.HOT_FLOOR;
-			case CRAMMING -> DamageSource.CRAMMING;
-			case DROWNING -> DamageSource.DROWN;
-			case STARVATION -> DamageSource.STARVE;
-			case CONTACT -> DamageSource.CACTUS;
-			case MAGIC -> DamageSource.MAGIC;
-			case FALL -> DamageSource.FALL;
-			case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
-			case VOID -> DamageSource.OUT_OF_WORLD;
-			case WITHER -> DamageSource.WITHER;
-			case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
-			case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
-			case FREEZE -> DamageSource.FREEZE;
-			case DRYOUT -> DamageSource.DRY_OUT;
-			default -> DamageSource.GENERIC;
-		};
+		switch (c) {
+			case FIRE: return DamageSource.IN_FIRE;
+			case LIGHTNING: return DamageSource.LIGHTNING_BOLT;
+			case FIRE_TICK: return DamageSource.ON_FIRE;
+			case SUFFOCATION: return DamageSource.IN_WALL;
+			case LAVA: return DamageSource.LAVA;
+			case HOT_FLOOR: return DamageSource.HOT_FLOOR;
+			case CRAMMING: return DamageSource.CRAMMING;
+			case DROWNING: return DamageSource.DROWN;
+			case STARVATION: return DamageSource.STARVE;
+			case CONTACT: return DamageSource.CACTUS;
+			case MAGIC: return DamageSource.MAGIC;
+			case FALL: return DamageSource.FALL;
+			case FLY_INTO_WALL: return DamageSource.FLY_INTO_WALL;
+			case VOID: return DamageSource.OUT_OF_WORLD;
+			case WITHER: return DamageSource.WITHER;
+			case FALLING_BLOCK: return DamageSource.FALLING_BLOCK;
+			case DRAGON_BREATH: return DamageSource.DRAGON_BREATH;
+			case FREEZE: return DamageSource.FREEZE;
+			case DRYOUT: return DamageSource.DRY_OUT;
+			default: return DamageSource.GENERIC;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -236,12 +237,20 @@ public final class ChipConversions {
 		}	
 	}
 	
-	public static net.minecraft.world.entity.PathfinderMob convertType(Creature en) {
+	public static PathfinderMob convertType(Creature en) {
 		try {
 			return ChipConversions.getHandle(en);
 		} catch (Exception e) {
 			return null;
 		}	
+	}
+
+	public static Creature convertType(PathfinderMob en) {
+		try {
+			return (Creature) en.getBukkitEntity();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static EntityType<?> convertType(org.bukkit.entity.EntityType type) {

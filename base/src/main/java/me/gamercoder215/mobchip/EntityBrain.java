@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip;
 
 import java.util.Map;
 
+import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
@@ -53,6 +54,12 @@ public interface EntityBrain {
      */
     @NotNull
     EntityController getController();
+
+    /**
+     * Get the Entity's Behavior associated with this Brain.
+     * @return Entity Behavior
+     */
+    EntityBehavior getBehaviors();
 
     /**
      * Sets a permanent memory into this entity's brain.
@@ -189,5 +196,12 @@ public interface EntityBrain {
         if (brain == null) return false;
         return canSee(brain.getEntity());
     }
+
+    /**
+     * Fetches the Entity Body Editor.
+     * @return Entity Body Editor
+     */
+    @NotNull
+    EntityBody getBody();
     
 }

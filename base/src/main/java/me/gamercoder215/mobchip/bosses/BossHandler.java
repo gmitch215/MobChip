@@ -51,7 +51,8 @@ public final class BossHandler {
 
         @EventHandler
         public void onDamageDefensive(EntityDamageEvent e) {
-            if (!(e.getEntity() instanceof Mob m)) return;
+            if (!(e.getEntity() instanceof Mob)) return;
+            Mob m = (Mob) e.getEntity();
 
             if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
                 boss.onDamageDefensive(e);
@@ -60,7 +61,8 @@ public final class BossHandler {
 
         @EventHandler
         public void onDamageOffensive(EntityDamageByEntityEvent e) {
-            if (!(e.getDamager() instanceof Mob m)) return;
+            if (!(e.getDamager() instanceof Mob)) return;
+            Mob m = (Mob) e.getEntity();
 
             if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
                 boss.onDamageOffensive(e);
@@ -69,7 +71,8 @@ public final class BossHandler {
 
         @EventHandler
         public void onDeath(EntityDeathEvent e) {
-            if (!(e.getEntity() instanceof Mob m)) return;
+            if (!(e.getEntity() instanceof Mob)) return;
+            Mob m = (Mob) e.getEntity();
 
             if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
                 boss.onDeath(e);

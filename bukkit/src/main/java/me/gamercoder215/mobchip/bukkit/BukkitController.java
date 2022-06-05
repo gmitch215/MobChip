@@ -29,6 +29,11 @@ final class BukkitController implements EntityController {
     }
 
     @Override
+    public boolean isLookingAtTarget() {
+        return lookC.isLookingAtTarget();
+    }
+
+    @Override
     public EntityController moveTo(double x, double y, double z, double speedMod) {
         moveC.setWantedPosition(x, y, z, speedMod);
         moveC.tick();

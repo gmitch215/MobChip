@@ -1,11 +1,6 @@
 package me.gamercoder215.mobchip.bukkit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -60,7 +55,8 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public boolean containsValue(Object value) {
-		if (!(value instanceof PathfinderInfo info)) return false;
+		if (!(value instanceof PathfinderInfo)) return false;
+		PathfinderInfo info = (PathfinderInfo) value;
 		for (Goal g : sel.getAvailableGoals()) {
 			if (g.getClass().getSimpleName().equals(info.getInternalName())) return true;
 		}
@@ -70,7 +66,8 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public Pathfinder get(Object key) {
-		if (!(key instanceof Integer in)) return null;
+		if (!(key instanceof Integer)) return null;
+		Integer in = (Integer) key;
 		return ChipConversions.wrapGoal(goals.get(in));
 	}
 
@@ -138,9 +135,8 @@ final class BukkitAI implements EntityAI {
 	@Override
 	public @NotNull Set<Entry<Integer, Pathfinder>> entrySet() {
 		Set<Entry<Integer, Pathfinder>> entries = new HashSet<>();
-
 		for (WrappedGoal g : sel.getAvailableGoals()) {
-			entries.add(Map.entry(g.getPriority(), ChipConversions.wrapGoal(g.getGoal())));
+			entries.add(new AbstractMap.SimpleEntry<>(g.getPriority(), ChipConversions.wrapGoal(g.getGoal())));
 		}
 
 		return entries;

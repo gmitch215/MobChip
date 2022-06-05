@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 
+import java.util.Optional;
+
 /**
  * Represents an Entity Controller, used for calling direct actions for an entity.
  * <p>
@@ -131,5 +133,10 @@ public interface EntityController {
      */
     Location getTargetLookLocation();
 
+    /**
+     * Whether this Mob is looking at the last Look Target.
+     * @return true if looking, else false
+     */
+    boolean isLookingAtTarget();
     
 }
