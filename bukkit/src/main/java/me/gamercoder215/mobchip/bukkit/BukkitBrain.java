@@ -78,6 +78,10 @@ public final class BukkitBrain implements EntityBrain {
 		return new BukkitController(m.getWorld(), nmsMob.getJumpControl(), nmsMob.getLookControl(), nmsMob.getMoveControl());
 	}
 
+	/**
+	 * Get the Entity's Behavior associated with this Brain.
+	 * @return Entity Behavior
+	 */
 	@Override
 	public EntityBehavior getBehaviors() {
 		if (nmsMob instanceof PathfinderMob) return new BukkitCreatureBehavior((PathfinderMob) nmsMob);
@@ -86,6 +90,10 @@ public final class BukkitBrain implements EntityBrain {
 		else return new BukkitEntityBehavior(nmsMob);
 	}
 
+	/**
+	 * Fetches the Entity Body Editor.
+	 * @return Entity Body Editor
+	 */
 	@Override
 	public @NotNull EntityBody getBody() {
 		return new BukkitBody(nmsMob);
