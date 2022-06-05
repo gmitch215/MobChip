@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BehaviorResult {
 
     /**
+     * Constructs an Abstract Behavior Result.
+     */
+    protected BehaviorResult() {}
+
+    /**
      * Fetches the Status of this BehaviorResult.
      * @return Behavior Status
      */
@@ -35,6 +40,11 @@ public abstract class BehaviorResult {
 
         Status() {}
 
+        /**
+         * Converts a MobChip Behavior Status to a NMS Behavior Status.
+         * @return NMS Behavior Status
+         */
+        @NotNull
         public Behavior.Status getHandle() {
             if (this == STOPPED) return Behavior.Status.STOPPED;
             return Behavior.Status.RUNNING;

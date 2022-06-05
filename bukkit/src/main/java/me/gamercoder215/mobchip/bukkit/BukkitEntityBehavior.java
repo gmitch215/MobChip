@@ -37,7 +37,7 @@ class BukkitEntityBehavior implements EntityBehavior {
     public @NotNull BehaviorResult eraseIf(@NotNull Predicate<org.bukkit.entity.Mob> function, @NotNull EntityMemory<?> memory) throws IllegalArgumentException {
         Validate.notNull(function, "Function cannot be null");
         Validate.notNull(memory, "Memory cannot be null");
-        return new BukkitBehaviorResult( new EraseMemoryIf<Mob>(m -> function.test(ChipConversions.convertType(m)), memory.getHandle()), level, nmsMob);
+        return new BukkitBehaviorResult(new EraseMemoryIf<>(m -> function.test(ChipConversions.convertType(m)), memory.getHandle()), level, nmsMob);
     }
 
     @Override

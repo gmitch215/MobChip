@@ -13,7 +13,7 @@ import static net.minecraft.world.entity.Pose.*;
 
 class BukkitBody implements EntityBody {
 
-    private Mob nmsMob;
+    private final Mob nmsMob;
 
     BukkitBody(Mob nmsMob) {
         this.nmsMob = nmsMob;
