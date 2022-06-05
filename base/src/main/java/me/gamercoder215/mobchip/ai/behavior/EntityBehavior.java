@@ -19,6 +19,7 @@ public interface EntityBehavior {
      * @param speedModifier Speed Modifier while backing up
      * @return Result of Behavior
      */
+    @NotNull
     BehaviorResult backupIfClose(int minDistance, float speedModifier);
 
     /**
