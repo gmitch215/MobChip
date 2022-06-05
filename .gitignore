@@ -1,11 +1,5 @@
-bin/
-.settings/
 .gitpod.yml
-/mobchip-base/target/
-/mobchip-bukkit/target/
-/target/
-/mobchip-base/dependency-reduced-pom.xml
-/mobchip-bukkit/dependency-reduced-pom.xml
+target
 *.iml
 
 .vscode/

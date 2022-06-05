@@ -16,8 +16,8 @@ mkdir ./docs/bukkit
 
 echo "[MobChip JavaDoc Builder] Injecting..."
 
-cp -R mobchip-base/target/apidocs/* docs/base
-cp -R mobchip-bukkit/target/apidocs/* docs/bukkit
+cp -R base/target/apidocs/* docs/base
+cp -R bukkit/target/apidocs/* docs/bukkit
 
 git checkout gh-pages
 

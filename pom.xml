@@ -3,7 +3,7 @@
 
 	<groupId>me.gamercoder215</groupId>
 	<artifactId>mobchip-parent</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<name>MobChip-Parent</name>
@@ -13,9 +13,9 @@
 	<properties>
 		<minecraft.version>1.18.2-R0.1-SNAPSHOT</minecraft.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
-		<java.version>17</java.version>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
+		<java.version>8</java.version>
 		<github>GamerCoder215/MobChip</github>
 	</properties>
 
@@ -45,8 +45,8 @@
 	</scm>
 	
 	<modules>
-		<module>mobchip-base</module>
-		<module>mobchip-bukkit</module>
+		<module>base</module>
+		<module>bukkit</module>
 	</modules>
 
 	<repositories>
