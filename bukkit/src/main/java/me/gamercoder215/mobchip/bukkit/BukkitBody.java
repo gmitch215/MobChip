@@ -63,13 +63,13 @@ class BukkitBody implements EntityBody {
      */
     @Override
     public InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand) {
-        switch (nmsMob.interact(ChipConversions.convertType(p), hand.getHandle())) {
-            case SUCCESS: return InteractionResult.SUCCESS;
-            case CONSUME: return InteractionResult.CONSUME;
-            case CONSUME_PARTIAL: return InteractionResult.CONSUME_PARTIAL;
-            case FAIL: return InteractionResult.FAIL;
-            default: return InteractionResult.PASS;
-        }
+        return switch (nmsMob.interact(ChipConversions.convertType(p), hand.getHandle())) {
+            case SUCCESS -> InteractionResult.SUCCESS;
+            case CONSUME -> InteractionResult.CONSUME;
+            case CONSUME_PARTIAL -> InteractionResult.CONSUME_PARTIAL;
+            case FAIL -> InteractionResult.FAIL;
+            default -> InteractionResult.PASS;
+        };
     }
 
     @Override
@@ -87,37 +87,29 @@ class BukkitBody implements EntityBody {
     public @Nullable BoundingBox getPoseBounds(@Nullable Pose pose) {
         final net.minecraft.world.entity.Pose p;
         switch (pose) {
-            case FALL_FLYING: {
+            case FALL_FLYING -> {
                 p = FALL_FLYING;
-                break;
             }
-            case DYING: {
+            case DYING -> {
                 p = DYING;
-                break;
             }
-            case SLEEPING: {
+            case SLEEPING -> {
                 p = SLEEPING;
-                break;
             }
-            case SPIN_ATTACK: {
+            case SPIN_ATTACK -> {
                 p = SPIN_ATTACK;
-                break;
             }
-            case SNEAKING: {
+            case SNEAKING -> {
                 p = CROUCHING;
-                break;
             }
-            case LONG_JUMPING: {
+            case LONG_JUMPING -> {
                 p = LONG_JUMPING;
-                break;
             }
-            case SWIMMING: {
+            case SWIMMING -> {
                 p = SWIMMING;
-                break;
             }
-            default: {
+            default -> {
                 p = STANDING;
-                break;
             }
         }
 

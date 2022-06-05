@@ -116,13 +116,13 @@ public interface EntityBody {
          * @return NMS InteractionResult
          */
         public net.minecraft.world.InteractionResult getHandle() {
-            switch (this) {
-                case SUCCESS: return net.minecraft.world.InteractionResult.SUCCESS;
-                case CONSUME: return net.minecraft.world.InteractionResult.CONSUME;
-                case CONSUME_PARTIAL: return net.minecraft.world.InteractionResult.CONSUME_PARTIAL;
-                case FAIL: return net.minecraft.world.InteractionResult.FAIL;
-                default: return net.minecraft.world.InteractionResult.PASS;
-            }
+            return switch (this) {
+                case SUCCESS -> net.minecraft.world.InteractionResult.SUCCESS;
+                case CONSUME -> net.minecraft.world.InteractionResult.CONSUME;
+                case CONSUME_PARTIAL -> net.minecraft.world.InteractionResult.CONSUME_PARTIAL;
+                case FAIL -> net.minecraft.world.InteractionResult.FAIL;
+                default -> net.minecraft.world.InteractionResult.PASS;
+            };
         }
 
     }

@@ -55,8 +55,7 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public boolean containsValue(Object value) {
-		if (!(value instanceof PathfinderInfo)) return false;
-		PathfinderInfo info = (PathfinderInfo) value;
+		if (!(value instanceof PathfinderInfo info)) return false;
 		for (Goal g : sel.getAvailableGoals()) {
 			if (g.getClass().getSimpleName().equals(info.getInternalName())) return true;
 		}
@@ -66,8 +65,7 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public Pathfinder get(Object key) {
-		if (!(key instanceof Integer)) return null;
-		Integer in = (Integer) key;
+		if (!(key instanceof Integer in)) return null;
 		return ChipConversions.wrapGoal(goals.get(in));
 	}
 
