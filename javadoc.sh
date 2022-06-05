@@ -20,6 +20,7 @@ cp -R base/target/apidocs/* docs/base
 cp -R bukkit/target/apidocs/* docs/bukkit
 
 git checkout gh-pages
+cp -R favicon.ico docs/
 
 for dir in ./*
 do
@@ -32,6 +33,8 @@ done
 
 cp -Rfv ./docs/* ./
 rm -rf ./docs
+
+echo "# MobChip JavaDocs" > README.md
 
 echo "[MobChip JavaDoc Builder] Committing..."
 
