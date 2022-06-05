@@ -34,7 +34,7 @@ done
 cp -Rfv ./docs/* ./
 rm -rf ./docs
 
-echo "# MobChip JavaDocs" > README.md
+echo \# MobChip JavaDocs > README.md
 
 echo "[MobChip JavaDoc Builder] Committing..."
 
