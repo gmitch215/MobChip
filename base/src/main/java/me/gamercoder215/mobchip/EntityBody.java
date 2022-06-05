@@ -136,22 +136,6 @@ public interface EntityBody {
     InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand);
 
     /**
-     * Swings this Mob's Hand.
-     * @param hand Hand to Broadcast
-     */
-    default void swing(@Nullable InteractionHand hand) {
-        if (hand == null) return;
-        swing(hand, false);
-    }
-
-    /**
-     * Swings this Mob's Hand.
-     * @param hand Hand to swing
-     * @param broadcast Whether to broadcast and send the Animation Packet sent when interacting (defaults to false or just broadcast)
-     */
-    void swing(@Nullable InteractionHand hand, boolean broadcast);
-
-    /**
      * Whether this Entity is sensitive to water (e.g. enderman)
      * @return true if sensitive to water, else false
      */
@@ -200,5 +184,31 @@ public interface EntityBody {
      * @return true if Mob is immune to fire, else false
      */
     boolean isFireImmune();
+
+    /**
+     * Whether this Mob is swinging its arm.
+     * @return true if mob is swinging its arm, else false
+     */
+    boolean isSwinging();
+
+    /**
+     * Whether this Mob can be ridden underwater.
+     * @return true if mob can be ridden underwater, else false
+     */
+    boolean canRideUnderwater();
+
+    /**
+     * Whether this Mob is invisible to this Player.
+     * @param p Player to use
+     * @return true if mob is invisible to this player, else false
+     */
+    boolean isInvisibleTo(@Nullable Player p);
+
+    /**
+     * Gets this Mob's Main Hand.
+     * @return Mob's Main Hand
+     */
+    @NotNull
+    InteractionHand getMainHand();
 
 }

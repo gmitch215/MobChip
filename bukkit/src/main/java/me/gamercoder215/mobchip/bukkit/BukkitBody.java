@@ -73,12 +73,6 @@ class BukkitBody implements EntityBody {
     }
 
     @Override
-    public void swing(InteractionHand hand, boolean broadcast) {
-        if (hand == null) return;
-        nmsMob.swing(hand.getHandle(), broadcast);
-    }
-
-    @Override
     public boolean isSensitiveToWater() {
         return nmsMob.isSensitiveToWater();
     }
@@ -146,6 +140,29 @@ class BukkitBody implements EntityBody {
     @Override
     public boolean isFireImmune() {
         return nmsMob.fireImmune();
+    }
+
+    @Override
+    public boolean isSwinging() {
+        return nmsMob.swinging;
+    }
+
+    @Override
+    public boolean canRideUnderwater() {
+        return nmsMob.rideableUnderWater();
+    }
+
+    @Override
+    public boolean isInvisibleTo(@Nullable Player p) {
+        return nmsMob.isInvisibleTo(ChipConversions.convertType(p));
+    }
+
+    @Override
+    public @NotNull InteractionHand getMainHand() {
+        return switch (nmsMob.getMainArm()) {
+            case LEFT -> InteractionHand.OFF_HAND;
+            case RIGHT -> InteractionHand.MAIN_HAND;
+        };
     }
 
 }
