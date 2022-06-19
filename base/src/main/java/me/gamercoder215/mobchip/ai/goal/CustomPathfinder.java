@@ -1,11 +1,10 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import java.util.EnumSet;
-
+import net.minecraft.world.entity.ai.goal.Goal;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.world.entity.ai.goal.Goal;
+import java.util.EnumSet;
 
 /**
  * Represents an extendable Pathfinder for creating Custom Pathfinders.
@@ -95,14 +94,6 @@ public abstract class CustomPathfinder extends Pathfinder {
     public boolean canInterrupt() { return true; }
 
     /**
-     * Whether this Pathfinder Goal will update every tick. Default: false
-     * <p>
-     * The Goal will usually update every 2-5 ticks. Returning true is not recommended.
-     * @return true if updating every tick, else false
-     */
-    public boolean updateEveryTick() { return false; }
-
-    /**
      * Whether this Pathfinder Goal will continue to be used.
      * <p>
      * Override this method if you have additional checks after the Pathfinder has started. By default, it will call {@link #canStart()}.
@@ -110,6 +101,7 @@ public abstract class CustomPathfinder extends Pathfinder {
      */
     public boolean canContinueToUse() { return canStart(); }
 
+    @Override
     public final Goal getHandle() {
         CustomPathfinder inst = this;
 
@@ -133,10 +125,6 @@ public abstract class CustomPathfinder extends Pathfinder {
             }
 
             @Override
-            public boolean requiresUpdateEveryTick() {
-                return inst.updateEveryTick();
-            }
-
             public boolean canContinueToUse() {
                 return inst.canContinueToUse();
             }

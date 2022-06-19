@@ -1,16 +1,15 @@
 package me.gamercoder215.mobchip.ai.goal.target;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
-import org.bukkit.entity.Mob;
-import org.jetbrains.annotations.NotNull;
-
 import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
+import org.bukkit.entity.Mob;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * Represents a Pathfinder that involves targeting.

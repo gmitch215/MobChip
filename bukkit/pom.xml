@@ -3,7 +3,7 @@
 	<parent>
     	<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
@@ -12,6 +12,7 @@
 		<spigot.plugin.inputFile>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</spigot.plugin.inputFile>
 		<spigot.plugin.srgIn>org.spigotmc:minecraft-server:${minecraft.version}</spigot.plugin.srgIn>
 		<spigot.plugin.remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar</spigot.plugin.remappedDependencies>
+		<minecraft.version>1.19-R0.1-SNAPSHOT</minecraft.version>
 	</properties>
 
     <build>
@@ -197,6 +198,43 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<links>
+						<link>https://hub.spigotmc.org/javadocs/spigot/</link>
+						<link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
+					</links>
+				</configuration>
+				<executions>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<includeDependencySources>true</includeDependencySources>
+                            <dependencySourceExcludes>
+								<exclude>net.minecraft.*</exclude>
+								<exclude>org.*</exclude>
+								<exclude>me.gamercoder215.mobchip.abstraction.*</exclude>
+
+								<dependencySourceExclude>net.minecraft.*</dependencySourceExclude>
+								<dependencySourceExclude>org.*</dependencySourceExclude>
+								<dependencySourceExclude>me.gamercoder215.mobchip.abstraction.*</dependencySourceExclude>
+							</dependencySourceExcludes>
+
+							<sourceFileExcludes>
+								<sourceFileExclude>**/me/gamercoder215/mobchip/abstraction/*.java</sourceFileExclude>
+								<exclude>**/me/gamercoder215/mobchip/abstraction/*.java</exclude>
+							</sourceFileExcludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
     </build>
 
@@ -219,6 +257,31 @@
 			<version>${minecraft.version}</version>
 			<scope>provided</scope>
 			<classifier>remapped-mojang</classifier>
+		</dependency>
+		<!-- Abstraction -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_17_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_18_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_18_R2</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_19_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

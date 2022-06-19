@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 
-import java.util.Optional;
-
 /**
  * Represents an Entity Controller, used for calling direct actions for an entity.
  * <p>

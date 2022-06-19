@@ -1,8 +1,8 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import java.util.function.Predicate;
-
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Predicate;
 
 /**
  * Represents a Conditional State for this Pathfinder to work

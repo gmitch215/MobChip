@@ -1,13 +1,12 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
+import me.gamercoder215.mobchip.util.MobChipUtil;
+import net.minecraft.world.level.pathfinder.Node;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import me.gamercoder215.mobchip.util.ChipConversions;
-import net.minecraft.world.level.pathfinder.Node;
 
 /**
  * Represents a Navigation Point, also known as a Node.
@@ -61,7 +60,7 @@ public final class NavigationNode {
      * @return distance
      */
     public float distance(@NotNull Location loc) {
-        return getHandle().distanceTo(ChipConversions.convertType(loc));
+        return getHandle().distanceTo(MobChipUtil.convert(loc));
     }
     
     /**
@@ -88,7 +87,7 @@ public final class NavigationNode {
      * @return distance squared
      */
     public float distanceSquared(@NotNull Location loc) {
-        return getHandle().distanceToSqr(ChipConversions.convertType(loc));
+        return getHandle().distanceToSqr(MobChipUtil.convert(loc));
     }
     
     /**

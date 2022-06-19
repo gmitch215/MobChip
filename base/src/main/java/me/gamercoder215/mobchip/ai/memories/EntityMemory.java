@@ -1,34 +1,26 @@
 package me.gamercoder215.mobchip.ai.memories;
 
+import me.gamercoder215.mobchip.ai.SpeedModifier;
+import me.gamercoder215.mobchip.util.MobChipUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.world.entity.ai.behavior.PositionTracker;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.memory.WalkTarget;
+import net.minecraft.world.phys.Vec3;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hoglin;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Piglin;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.jetbrains.annotations.NotNull;
-
-import me.gamercoder215.mobchip.ai.SpeedModifier;
-import me.gamercoder215.mobchip.util.ChipConversions;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
-import net.minecraft.world.entity.ai.behavior.PositionTracker;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities;
-import net.minecraft.world.entity.ai.memory.WalkTarget;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * Represents a Memory of an entity
@@ -43,7 +35,7 @@ public final class EntityMemory<T> {
     /**
      * The Celebrating Location of this Entity.
      */
-    public static final EntityMemory<Location> CELEBRATING_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, ChipConversions::convertType);
+    public static final EntityMemory<Location> CELEBRATING_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, MobChipUtil::convert);
     /**
      * This Entity's Home.
      */
@@ -67,11 +59,7 @@ public final class EntityMemory<T> {
     /**
      * An Array of Nearby Living Entities.
      */
-    public static final EntityMemory<LivingEntity[]> NEAREST_LIVING_ENTITIES = new EntityMemory<>(LivingEntity[].class, MemoryModuleType.NEAREST_LIVING_ENTITIES, LIST(ChipConversions::convertType));
-    /**
-     * An Array of Nearby Visible Living Entities.
-     */
-    public static final EntityMemory<NearestVisibleEntities> NEAREST_VISIBLE_LIVING_ENTITIES = new EntityMemory<>(NearestVisibleEntities.class, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, NearestVisibleEntities::getHandle);
+    public static final EntityMemory<LivingEntity[]> NEAREST_LIVING_ENTITIES = new EntityMemory<>(LivingEntity[].class, MemoryModuleType.NEAREST_LIVING_ENTITIES, LIST(MobChipUtil::convert));
     /**
      * An Array of Visible Villager Babies.
      */
@@ -84,15 +72,15 @@ public final class EntityMemory<T> {
     /**
      * An Array of Nearby Players.
      */
-    public static final EntityMemory<Player[]> NEAREST_PLAYERS = new EntityMemory<>(Player[].class, MemoryModuleType.NEAREST_PLAYERS, LIST(ChipConversions::convertType));
+    public static final EntityMemory<Player[]> NEAREST_PLAYERS = new EntityMemory<>(Player[].class, MemoryModuleType.NEAREST_PLAYERS, LIST(MobChipUtil::convert));
     /**
      * The Nearest Visible Player.
      */
-    public static final EntityMemory<Player> NEAREST_VISIBLE_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_VISIBLE_PLAYER, ChipConversions::convertType);
+    public static final EntityMemory<Player> NEAREST_VISIBLE_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MobChipUtil::convert);
     /**
      * The Nearest Visible Player this entity can attack.
      */
-    public static final EntityMemory<Player> NEAREST_VISIBLE_ATTACKING_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, ChipConversions::convertType);
+    public static final EntityMemory<Player> NEAREST_VISIBLE_ATTACKING_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, MobChipUtil::convert);
     /**
      * The Entity's Walking Target. See {@link WalkingTarget} for more information on how to set up.
      */
@@ -117,7 +105,7 @@ public final class EntityMemory<T> {
     /**
      * The Entity's Attack Target.
      */
-    public static final EntityMemory<LivingEntity> ATTACK_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.ATTACK_TARGET, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> ATTACK_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.ATTACK_TARGET, MobChipUtil::convert);
     /**
      * Whether this Entity's Attack is cooling down.
      */
@@ -125,15 +113,15 @@ public final class EntityMemory<T> {
     /**
      * The Entity's Interaction Target.
      */
-    public static final EntityMemory<LivingEntity> INTERACTION_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.INTERACTION_TARGET, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> INTERACTION_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.INTERACTION_TARGET, MobChipUtil::convert);
     /**
      * The Entity's Breeding Target.
      */
-    public static final EntityMemory<Ageable> BREEDING_TARGET = new EntityMemory<>(Ageable.class, MemoryModuleType.BREED_TARGET, ChipConversions::convertType);
+    public static final EntityMemory<Ageable> BREEDING_TARGET = new EntityMemory<>(Ageable.class, MemoryModuleType.BREED_TARGET, MobChipUtil::convert);
     /**
      * The Entity's Riding Target.
      */
-    public static final EntityMemory<Entity> RIDING_TARGET = new EntityMemory<>(Entity.class, MemoryModuleType.RIDE_TARGET, ChipConversions::convertType);
+    public static final EntityMemory<Entity> RIDING_TARGET = new EntityMemory<>(Entity.class, MemoryModuleType.RIDE_TARGET, MobChipUtil::convert);
     /**
      * An Array of Doors that are interactable (will ignore blocks without BlockData {@link Door})
      */
@@ -155,27 +143,27 @@ public final class EntityMemory<T> {
     /**
      * The nearest bed available for this Entity.
      */
-    public static final EntityMemory<Location> NEAREST_BED = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_BED, ChipConversions::convertType);
+    public static final EntityMemory<Location> NEAREST_BED = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_BED, MobChipUtil::convert);
     /**
      * The Last DamageCause of this Entity.
      */
-    public static final EntityMemory<DamageCause> LAST_HURT_CAUSE = new EntityMemory<>(DamageCause.class, MemoryModuleType.HURT_BY, ChipConversions::convertType);
+    public static final EntityMemory<DamageCause> LAST_HURT_CAUSE = new EntityMemory<>(DamageCause.class, MemoryModuleType.HURT_BY, MobChipUtil::convert);
     /**
      * The Last entity that caused this Entity Damage.
      */
-    public static final EntityMemory<LivingEntity> LAST_HURT_ENTITY = new EntityMemory<>(LivingEntity.class, MemoryModuleType.HURT_BY_ENTITY, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> LAST_HURT_ENTITY = new EntityMemory<>(LivingEntity.class, MemoryModuleType.HURT_BY_ENTITY, MobChipUtil::convert);
     /**
      * The Entity to avoid.
      */
-    public static final EntityMemory<LivingEntity> AVOID_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.AVOID_TARGET, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> AVOID_TARGET = new EntityMemory<>(LivingEntity.class, MemoryModuleType.AVOID_TARGET, MobChipUtil::convert);
     /**
      * The Nearest Hostile Living Entity.
      */
-    public static final EntityMemory<LivingEntity> NEAREST_HOSTILE = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_HOSTILE, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> NEAREST_HOSTILE = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_HOSTILE, MobChipUtil::convert);
     /**
      * The Nearest Living Entity that this Mob can attack.
      */
-    public static final EntityMemory<LivingEntity> NEAREST_ATTACKABLE = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_ATTACKABLE, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> NEAREST_ATTACKABLE = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_ATTACKABLE, MobChipUtil::convert);
     /**
      * A Hiding Place for this Entity during a Raid.
      */
@@ -215,7 +203,7 @@ public final class EntityMemory<T> {
     /**
      * The nearest visible Adult for this Mob.
      */
-    public static final EntityMemory<Ageable> NEAREST_VISIBLE_ADULT = new EntityMemory<>(Ageable.class, MemoryModuleType.NEAREST_VISIBLE_ADULT, ChipConversions::convertType);
+    public static final EntityMemory<Ageable> NEAREST_VISIBLE_ADULT = new EntityMemory<>(Ageable.class, MemoryModuleType.NEAREST_VISIBLE_ADULT, MobChipUtil::convert);
     /**
      * How many ticks this Mob has played dead.
      */
@@ -223,7 +211,7 @@ public final class EntityMemory<T> {
     /**
      * The Player this Mob is tempting.
      */
-    public static final EntityMemory<Player> TEMPTING_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.TEMPTING_PLAYER, ChipConversions::convertType);
+    public static final EntityMemory<Player> TEMPTING_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.TEMPTING_PLAYER, MobChipUtil::convert);
     /**
      * The cooldown, in ticks, of this Mob's tempting.
      */
@@ -279,7 +267,7 @@ public final class EntityMemory<T> {
     /**
      * This Entity's Celebration Location.
      */
-    public static final EntityMemory<Location> CELEBRATION_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, ChipConversions::convertType);
+    public static final EntityMemory<Location> CELEBRATION_LOCATION = new EntityMemory<>(Location.class, MemoryModuleType.CELEBRATE_LOCATION, MobChipUtil::convert);
     /**
      * Whether this entity is dancing.
      */
@@ -287,31 +275,31 @@ public final class EntityMemory<T> {
     /**
      * The Nearest Huntable Hoglin for this Entity (Used for Piglins).
      */
-    public static final EntityMemory<Hoglin> NEAREST_HUNTABLE_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, ChipConversions::convertType);
+    public static final EntityMemory<Hoglin> NEAREST_HUNTABLE_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, MobChipUtil::convert);
     /**
      * The Nearest Baby Hoglin for this Entity (Used for Piglins)
      */
-    public static final EntityMemory<Hoglin> NEAREST_BABY_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, ChipConversions::convertType);
+    public static final EntityMemory<Hoglin> NEAREST_BABY_HOGLIN = new EntityMemory<>(Hoglin.class, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MobChipUtil::convert);
     /**
      * The Nearest Player that is not wearing Golden Armor (Used for Piglins)
      */
-    public static final EntityMemory<Player> NEAREST_NONGOLD_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, ChipConversions::convertType);
+    public static final EntityMemory<Player> NEAREST_NONGOLD_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MobChipUtil::convert);
     /**
      * An Array of Nearby adult Piglins.
      */
-    public static final EntityMemory<Piglin[]> NEARBY_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEARBY_ADULT_PIGLINS, LIST(ChipConversions::convertType));
+    public static final EntityMemory<Piglin[]> NEARBY_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEARBY_ADULT_PIGLINS, LIST(MobChipUtil::convert));
     /**
      * An Array of Nearby and Visible adult Piglins.
      */
-    public static final EntityMemory<Piglin[]> NEARBY_VISIBLE_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, LIST(ChipConversions::convertType));
+    public static final EntityMemory<Piglin[]> NEARBY_VISIBLE_ADULT_PIGLINS = new EntityMemory<>(Piglin[].class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, LIST(MobChipUtil::convert));
     /**
      * The Nearest Adult Piglin.
      */
-    public static final EntityMemory<Piglin> NEAREST_ADULT_PIGLIN = new EntityMemory<>(Piglin.class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, ChipConversions::convertType);
+    public static final EntityMemory<Piglin> NEAREST_ADULT_PIGLIN = new EntityMemory<>(Piglin.class, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, MobChipUtil::convert);
     /**
      * The Nearest Zombified LivingEntity.
      */
-    public static final EntityMemory<LivingEntity> NEAREST_ZOMBIFIED = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, ChipConversions::convertType);
+    public static final EntityMemory<LivingEntity> NEAREST_ZOMBIFIED = new EntityMemory<>(LivingEntity.class, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, MobChipUtil::convert);
     /**
      * The amount of Visible Adult Piglins.
      */
@@ -323,11 +311,11 @@ public final class EntityMemory<T> {
     /**
      * The amount of Visible Adult Piglins.
      */
-    public static final EntityMemory<Player> NEAREST_TEMPTED_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, ChipConversions::convertType);
+    public static final EntityMemory<Player> NEAREST_TEMPTED_PLAYER = new EntityMemory<>(Player.class, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MobChipUtil::convert);
     /**
      * The nearest Repelled for this Entity.
      */
-    public static final EntityMemory<Location> NEAREST_REPELLENT = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_REPELLENT, ChipConversions::convertType);
+    public static final EntityMemory<Location> NEAREST_REPELLENT = new EntityMemory<>(Location.class, MemoryModuleType.NEAREST_REPELLENT, MobChipUtil::convert);
     /**
      * Whether this Entity has Eaten Recently.
      */
@@ -358,35 +346,7 @@ public final class EntityMemory<T> {
 		@NotNull Object getHandle();
 		
 	}
-	
-    /**
-     * Represents a Memory Type of NearestVisibleEntities
-     */
-    public static final class NearestVisibleEntities implements ComplexMemoryType {
-    
-    	private final LivingEntity entity;
-    	private final List<LivingEntity> nearest;
-    	
-    	/**
-    	 * Construct a NearestVisibleEntities 
-    	 * @param entity The Entity to Use
-    	 * @param nearest A List of Nearby Entities
-    	 */
-    	public NearestVisibleEntities(@NotNull LivingEntity entity, @NotNull List<LivingEntity> nearest) {
-    		this.entity = entity;
-    		this.nearest = nearest;
-    	}
-    	
-    	/**
-    	 * Get the Handle of this NearestVisibleEntities.
-    	 */
-    	@NotNull
-    	public NearestVisibleLivingEntities getHandle() {
-    	 	return new NearestVisibleLivingEntities(ChipConversions.convertType(entity), ChipConversions.convertType(nearest));
-    	}
-    	
-    }
-    
+
     /**
      * Represents a Memory Type of Walking Target
      *
@@ -458,8 +418,9 @@ public final class EntityMemory<T> {
 			this.speedMod = (float) mod;
 		}
 		
-		public @NotNull WalkTarget getHandle() {
-			return new WalkTarget(ChipConversions.convertType(loc), speedMod, distance);
+		@Override
+        public @NotNull WalkTarget getHandle() {
+			return new WalkTarget(MobChipUtil.convert(loc), speedMod, distance);
 		}
     	
     }
@@ -475,7 +436,7 @@ public final class EntityMemory<T> {
     }
     
     private static Function<Location, GlobalPos> GLOCATION() {
-        return l -> GlobalPos.of(ChipConversions.convertType(l.getWorld()).dimension(), ChipConversions.convertType(l));
+        return l -> GlobalPos.of(MobChipUtil.convert(l.getWorld()).dimension(), MobChipUtil.convert(l));
     }
     
     private static <T> Function<T, T> SELF() {

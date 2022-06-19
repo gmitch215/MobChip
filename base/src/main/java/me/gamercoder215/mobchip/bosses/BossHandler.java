@@ -75,7 +75,7 @@ public final class BossHandler {
             if (boss.getMob().getUniqueId().equals(m.getUniqueId())) {
                 boss.onDeath(e);
                 for (ItemStack i : boss.getDrops()) m.getWorld().dropItemNaturally(m.getLocation(), i);
-                if (boss.getDeathSound() != null) m.getWorld().playSound(m, boss.getDeathSound(), 3F, 1F);
+                if (boss.getDeathSound() != null) m.getWorld().playSound(m.getLocation(), boss.getDeathSound(), 3F, 1F);
             }
         }
 

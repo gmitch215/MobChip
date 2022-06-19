@@ -1,6 +1,6 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import me.gamercoder215.mobchip.util.ChipConversions;
+import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.bukkit.entity.Mob;
@@ -135,7 +135,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 	protected Pathfinder(@NotNull Mob entity) throws IllegalArgumentException {
 		if (entity == null) throw new IllegalArgumentException("Entity cannot be null");
 		this.entity = entity;
-		this.nmsEntity = ChipConversions.convertType(entity);
+		this.nmsEntity = MobChipUtil.getWrapper().convert(entity);
 	}
 	
 	/**
@@ -167,6 +167,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 		return this.entity;
 	}
 
+	@Override
 	public final String getInternalName() {
 		return getHandle().getClass().getSimpleName();
 	}

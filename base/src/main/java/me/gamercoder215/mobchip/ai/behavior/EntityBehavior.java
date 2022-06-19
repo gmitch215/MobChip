@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 /**
  * Represents Entity Behavior.
- * <p>
+ * <p></p>
  * Some of these may require {@link EntityMemory}(ies) to be present or not present, so calling some of these methods will not always work.
  */
 public interface EntityBehavior {
@@ -48,23 +48,6 @@ public interface EntityBehavior {
      * @throws IllegalArgumentException if function or memory is null
      */
     @NotNull BehaviorResult eraseIf(@NotNull Predicate<Mob> function, @NotNull EntityMemory<?> memory) throws IllegalArgumentException;
-
-    /**
-     * Moves this Mob to a Village's Celebration Location for winning a raid.
-     * @param minDist Minimum Distance to location
-     * @param speedMod Speed Modifier while moving
-     * @return Result of Behavior
-     */
-    @NotNull BehaviorResult moveToCelebrateLocation(int minDist, float speedMod);
-
-    /**
-     * Moves this Mob to a Village's Celebration Location for winning a raid, with no speed modifier.
-     * @param minDist Minimum Distance to location
-     * @return Result of Behavior
-     */
-    default @NotNull BehaviorResult moveToCelebrateLocation(int minDist) {
-        return moveToCelebrateLocation(minDist, 1);
-    }
 
     /**
      * Makes this Entity move to its wanted item.
