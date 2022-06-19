@@ -15,21 +15,36 @@ jobs:
     name: Maven Setup
     steps:
       - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+      - name: Setup Project
+        run: mvn package install
+      - name: Maven Information
+        run: mvn dependency:tree
+  build-16:
+    needs: setup
+    runs-on: ubuntu-latest
+    name: Build Java 16
+    steps:
+      - uses: actions/checkout@v3
+
       - name: Set up JDK 16
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '16'
           cache: 'maven'
-      - name: Setup Project
-        run: mvn package install
-      - name: Maven Information
-        run: mvn dependency:tree
+      - name: Build Project
+        run: mvn clean install -pl "!1_18_R1,!1_18_R2,!1_19_R1"
   build:
     needs: setup
     strategy:
       matrix:
-        java-version: [16, 17, 18]
+        java-version: [17, 18]
 
     runs-on: ubuntu-latest
     name: Build Java ${{ matrix.java-version }}
@@ -51,11 +66,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up JDK 16
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '16'
+          java-version: '17'
           cache: 'maven'
 
       - name: Build Project
