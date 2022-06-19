@@ -1,5 +1,4 @@
 .gitpod.yml
-target
 *.iml
 
 .vscode/
@@ -7,3 +6,8 @@ target
 .apt_generated_tests/
 build.sh
 .idea/
+
+bukkit/target
+*/target
+/target
+
