@@ -30,7 +30,7 @@ improve the hassle of playing around with NMS and learning how to import and use
 ```xml
 <project>
     
-    <!-- ... -->
+    <!-- Import JitPack Repo -->
     
     <repositories>
         <repository>
@@ -39,7 +39,7 @@ improve the hassle of playing around with NMS and learning how to import and use
         </repository>
     </repositories>
     
-    <!-- Base Module - Used for Base Classes -->
+    <!-- Base Module - Used for Base Interfaces -->
     
     
     <dependencies>
@@ -49,7 +49,7 @@ improve the hassle of playing around with NMS and learning how to import and use
             <version>[VERSION]</version>
         </dependency>
         
-        <!-- Bukkit Module - Used for Development & Events - Contains Base -->
+        <!-- Bukkit Module - Used for Implmentation, Development & Events - Contains Base -->
         <dependency>
             <groupId>com.github.GamerCoder215.MobChip</groupId>
             <artifactId>mobchip-bukkit</artifactId>
@@ -99,6 +99,8 @@ import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 
+// Bukkit Imports...
+
 public class MyPlugin extends JavaPlugin {
 
     public Pathfinder getPathfinder(Mob m) {
@@ -133,7 +135,7 @@ public class MyPlugin extends JavaPlugin {
 Here's an example of how to add the Pathfinder that makes one entity avoid another entity (PathfinderAvoidEntity):
 
 ```java
-import me.gamercoder215.mobchip.ai.goal.PathfinderAvoidEntity;
+import PathfinderAvoidEntity;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
@@ -174,13 +176,12 @@ public class MyPlugin extends JavaPlugin {
 Say you want to have a custom pathfinder for your own Pet System, or a custom Entity Attack? MobChip contains a well-documented abstract class you can extend that shows you how to set it up.
 
 ```java
-import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
-import me.gamercoder215.mobchip.ai.goal.CustomPathfinder.PathfinderFlag;
+import CustomPathfinder;
+import CustomPathfinder.PathfinderFlag;
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 
 // Bukkit Imports...
 
-@SuppressWarnings("ALL")
 public class MyPathfinder extends CustomPathfinder {
 
     public MyPathfinder(Mob m) {
@@ -329,7 +330,7 @@ import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 
-// Bukkit imports...
+// Bukkit Imports...
 
 public class MyPlugin extends JavaPlugin {
 
@@ -348,5 +349,43 @@ public class MyPlugin extends JavaPlugin {
 
 }
 
+
+```
+
+### Behaviors
+Behaviors are actions that Entities can take based on pre-determined memories. 
+
+Behaviors sometimes depend on some memories being present or absent for a different effect. 
+
+These memories may change per-version, and documentation on what is required may be added in the future.
+
+```java
+import me.gamercoder215.mobchip.bukkit.BukkitBrain;
+import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
+
+// Bukkit Imports...
+
+public class MyPlugin extends JavaPlugin {
+    
+    public void updateBehavior(Mob m) {
+        EntityBrain brain = BukkitBrain.getBrain(m);
+        
+        EntityBehavior behavior = BukkitBrain.getBehaviors();
+        
+        // Subclasses are CreatureBehavior, VillagerBehavior, and WardenBehavior (1.19+) for those interfaces
+        // Casting is required
+        
+        behavior.backupIfClose(3, 1); // Backs up if an entity is within 3 blocks with no speed modifier (1)
+        
+        // Creature c = ...
+        brain = BukkitBrain.getBrain(c);
+        CreatureBehavior cbehavior = (CreatureBehavior) brain.getBehaviors();
+        
+        cbehavior.panic(); // Makes the creature panic
+        
+    }
+    
+}
 
 ```
