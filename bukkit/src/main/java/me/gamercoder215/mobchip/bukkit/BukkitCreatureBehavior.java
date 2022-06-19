@@ -2,7 +2,7 @@ package me.gamercoder215.mobchip.bukkit;
 
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.behavior.CreatureBehavior;
-import me.gamercoder215.mobchip.util.ChipConversions;
+import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.behavior.AnimalPanic;
 import net.minecraft.world.entity.ai.behavior.FollowTemptation;
@@ -28,7 +28,7 @@ class BukkitCreatureBehavior extends BukkitEntityBehavior implements CreatureBeh
 
     @Override
     public @NotNull BehaviorResult followTemptation(Function<LivingEntity, Float> speedModifier) {
-        return new BukkitBehaviorResult(new FollowTemptation(f -> speedModifier.apply(ChipConversions.convertType(f))), level, nmsMob);
+        return new BukkitBehaviorResult(new FollowTemptation(f -> speedModifier.apply(MobChipUtil.convert(f))), level, nmsMob);
     }
 
     @Override

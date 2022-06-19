@@ -4,12 +4,13 @@ import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
+import me.gamercoder215.mobchip.ai.behavior.WardenBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
-import me.gamercoder215.mobchip.util.ChipConversions;
+import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.npc.Villager;
@@ -32,7 +33,7 @@ public final class BukkitBrain implements EntityBrain {
 
 	private BukkitBrain(@NotNull Mob m) {
 		this.m = m;
-		this.nmsMob = ChipConversions.convertType(m);
+		this.nmsMob = MobChipUtil.convert(m);
 	}
 
 	/**
@@ -48,6 +49,7 @@ public final class BukkitBrain implements EntityBrain {
 	 * Get the Entity AI associated with this Brain.
 	 * @return Entity AI
 	 */
+	@Override
 	public @NotNull EntityAI getGoalAI() {
 		return new BukkitAI(nmsMob.goalSelector, false);
 	}
@@ -56,6 +58,7 @@ public final class BukkitBrain implements EntityBrain {
 	 * Get the Entity Target AI associated with this Brain.
 	 * @return Entity Target AI
 	 */
+	@Override
 	public @NotNull EntityAI getTargetAI() {
 		return new BukkitAI(nmsMob.targetSelector, true);
 	}
@@ -75,7 +78,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityController getController() {
-		return new BukkitController(m.getWorld(), nmsMob.getJumpControl(), nmsMob.getLookControl(), nmsMob.getMoveControl());
+		return new BukkitController(m, m.getWorld(), nmsMob.getJumpControl(), nmsMob.getLookControl(), nmsMob.getMoveControl());
 	}
 
 	/**
@@ -87,7 +90,15 @@ public final class BukkitBrain implements EntityBrain {
 		if (nmsMob instanceof PathfinderMob) return new BukkitCreatureBehavior((PathfinderMob) nmsMob);
 		else if (nmsMob instanceof Villager) return new BukkitVillagerBehavior((Villager) nmsMob);
 
-		else return new BukkitEntityBehavior(nmsMob);
+		if (m.getType().name().equalsIgnoreCase("WARDEN")) {
+			try {
+				Class<?> wardenClass = Class.forName("net.minecraft.world.entity.monster.Warden");
+
+				return (WardenBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitWardenBehavior").getConstructor(wardenClass).newInstance(nmsMob);
+			} catch (Exception ignored) {}
+		}
+
+		return new BukkitEntityBehavior(nmsMob);
 	}
 
 	/**
@@ -247,7 +258,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean canSee(@Nullable Entity en) {
-		return nmsMob.getSensing().hasLineOfSight(ChipConversions.convertType(en));
+		return nmsMob.getSensing().hasLineOfSight(MobChipUtil.convert(en));
 	}
 
 	/**

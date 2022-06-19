@@ -3,7 +3,7 @@ package me.gamercoder215.mobchip.bukkit;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
-import me.gamercoder215.mobchip.util.ChipConversions;
+import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.*;
@@ -37,12 +37,7 @@ class BukkitEntityBehavior implements EntityBehavior {
     public @NotNull BehaviorResult eraseIf(@NotNull Predicate<org.bukkit.entity.Mob> function, @NotNull EntityMemory<?> memory) throws IllegalArgumentException {
         Validate.notNull(function, "Function cannot be null");
         Validate.notNull(memory, "Memory cannot be null");
-        return new BukkitBehaviorResult(new EraseMemoryIf<>(m -> function.test(ChipConversions.convertType(m)), memory.getHandle()), level, nmsMob);
-    }
-
-    @Override
-    public @NotNull BehaviorResult moveToCelebrateLocation(int minDist, float speedMod) {
-        return new BukkitBehaviorResult(new GoToCelebrateLocation<>(minDist, speedMod), level, nmsMob);
+        return new BukkitBehaviorResult(new EraseMemoryIf<>(m -> function.test(MobChipUtil.convert(m)), memory.getHandle()), level, nmsMob);
     }
 
     @Override

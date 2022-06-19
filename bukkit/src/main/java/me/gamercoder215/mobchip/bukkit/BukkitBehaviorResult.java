@@ -3,7 +3,6 @@ package me.gamercoder215.mobchip.bukkit;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import org.jetbrains.annotations.NotNull;
 

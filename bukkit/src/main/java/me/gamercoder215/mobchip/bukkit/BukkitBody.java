@@ -1,7 +1,7 @@
 package me.gamercoder215.mobchip.bukkit;
 
 import me.gamercoder215.mobchip.EntityBody;
-import me.gamercoder215.mobchip.util.ChipConversions;
+import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.entity.Player;
@@ -9,6 +9,7 @@ import org.bukkit.entity.Pose;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import static net.minecraft.world.entity.Pose.*;
 
 class BukkitBody implements EntityBody {
@@ -63,7 +64,7 @@ class BukkitBody implements EntityBody {
      */
     @Override
     public InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand) {
-        return switch (nmsMob.interact(ChipConversions.convertType(p), hand.getHandle())) {
+        return switch (nmsMob.interact(MobChipUtil.convert(p), hand.getHandle())) {
             case SUCCESS -> InteractionResult.SUCCESS;
             case CONSUME -> InteractionResult.CONSUME;
             case CONSUME_PARTIAL -> InteractionResult.CONSUME_PARTIAL;
@@ -81,30 +82,14 @@ class BukkitBody implements EntityBody {
     public @Nullable BoundingBox getPoseBounds(@Nullable Pose pose) {
         final net.minecraft.world.entity.Pose p;
         switch (pose) {
-            case FALL_FLYING -> {
-                p = FALL_FLYING;
-            }
-            case DYING -> {
-                p = DYING;
-            }
-            case SLEEPING -> {
-                p = SLEEPING;
-            }
-            case SPIN_ATTACK -> {
-                p = SPIN_ATTACK;
-            }
-            case SNEAKING -> {
-                p = CROUCHING;
-            }
-            case LONG_JUMPING -> {
-                p = LONG_JUMPING;
-            }
-            case SWIMMING -> {
-                p = SWIMMING;
-            }
-            default -> {
-                p = STANDING;
-            }
+            case FALL_FLYING -> p = FALL_FLYING;
+            case DYING -> p = DYING;
+            case SLEEPING -> p = SLEEPING;
+            case SPIN_ATTACK -> p = SPIN_ATTACK;
+            case SNEAKING -> p = CROUCHING;
+            case LONG_JUMPING -> p = LONG_JUMPING;
+            case SWIMMING -> p = SWIMMING;
+            default -> p = STANDING;
         }
 
         AABB box = nmsMob.getLocalBoundsForPose(p);
@@ -154,7 +139,7 @@ class BukkitBody implements EntityBody {
 
     @Override
     public boolean isInvisibleTo(@Nullable Player p) {
-        return nmsMob.isInvisibleTo(ChipConversions.convertType(p));
+        return nmsMob.isInvisibleTo(MobChipUtil.convert(p));
     }
 
     @Override
