@@ -23,6 +23,8 @@ jobs:
           cache: 'maven'
       - name: Setup Project
         run: mvn package install
+      - name: Maven Information
+        run: mvn dependency:tree
   build:
     needs: setup
     strategy:
