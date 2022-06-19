@@ -1,4 +1,4 @@
 /**
- * Utility Packages for Managing NMS
+ * Package representing MobChip Utilities
  */
 package me.gamercoder215.mobchip.util;
