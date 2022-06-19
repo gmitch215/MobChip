@@ -41,7 +41,7 @@
 	<scm>
 	    <connection>scm:git:${project.url}.git</connection>
 	    <developerConnection>scm:git:git@github.com:${github}.git</developerConnection>
-	    <url>${project.url}</url>
+	    <url>git@github.com:${github}.git</url>
 	</scm>
 	
 	<modules>
