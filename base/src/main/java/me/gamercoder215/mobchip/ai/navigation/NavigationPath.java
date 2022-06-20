@@ -1,107 +1,55 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
-import net.minecraft.world.level.pathfinder.Path;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents an Immutable List of Nodes
+ * Represents a Path for an Entity
  */
-public abstract class NavigationPath implements Iterable<NavigationNode> {
-    private final Path handle;
-    private final List<NavigationNode> nodes;
-
-
-    /**
-     * Creates a NavigationPath from a NMS Path.
-     * @param nms Path to use
-     */
-    protected NavigationPath(@NotNull Path nms) {
-       this.handle = nms; 
-       this.nodes = new ArrayList<>();
-    }
-
-    /**
-     * Gets the current NMS Path represented by this NavigationPath.
-     * @return Path Handle
-     */
-    public final Path getHandle() {
-        return this.handle;
-    }
-
-    /**
-     * Advances this path.
-     */
-    public abstract void advance();
+public interface NavigationPath extends Iterable<NavigationNode> {
 
     /**
      * Whether this NavigationPath is complete.
      * @return true if complete, else false
      */
-    public boolean isDone() {
-        return this.handle.isDone();
-    }
+    boolean isDone();
 
     /**
-     * Get the size of this NavigationPath.
-     * @return size
+     * Whether this NavigationPath contains all of these Navigation Nodes.
+     * @param coll Collection to test
+     * @return true if contains, else false
      */
-    public int size() {
-        return nodes.size();
-    }
+    default boolean containsAll(Collection<? extends NavigationNode> coll) {
+        AtomicBoolean state = new AtomicBoolean(true);
+        for (NavigationNode n : coll)
+            if (!contains(n)) { state.set(false); break; }
 
-    /**
-     * Whether this NavigationPath is empty.
-     * @return true if empty, else false
-     */
-    public boolean isEmpty() {
-        return nodes.isEmpty();
+        return state.get();
     }
 
     /**
      * Whether this Path contains this Navigation Node.
-     * @param o NavigationNode
+     * @param node NavigationNode
      * @return true if contains, else false
      */
-    public boolean contains(@Nullable NavigationNode o) {
-        return nodes.contains(o);
-    }
+    boolean contains(@Nullable NavigationNode node);
 
-    @Override
-    @NotNull
-    public Iterator<NavigationNode> iterator() {
-        return nodes.iterator();
-    }
+    boolean isEmpty();
+
+    /**
+     * Advances this path.
+     */
+    void advance();
 
     /**
      * Converts this NavigationPath into an Array of Nodes.
      * @return Array of NavigationNode
      */
-    @NotNull
-    public NavigationNode[] toArray() {
-        return nodes.toArray(new NavigationNode[0]);
-    }
-
-    /**
-     * Whether this NavigationPath contains all of these Navigation Nodes.
-     * @param c Collection to test
-     * @return true if contains, else false
-     */
-    public boolean containsAll(@Nullable Collection<NavigationNode> c) {
-        if (c == null) return false;
-        return new HashSet<>(nodes).containsAll(c);
-    }
-
-    /**
-     * Whether this NavigationPath contains all of these Navigation Nodes.
-     * @param nodes Nodes to test
-     * @return true if contains, else false
-     */
-    public boolean containsAll(@Nullable NavigationNode... nodes) {
-        return containsAll(Arrays.asList(nodes));
-    }
+    NavigationNode[] toArray();
 
     /**
      * Returns the index of this Navigation Node.
@@ -109,18 +57,24 @@ public abstract class NavigationPath implements Iterable<NavigationNode> {
      * @return Index found
      * @see List#indexOf(Object)
      */
-    public int indexOf(@Nullable NavigationNode o) {
-        return nodes.indexOf(o);
-    }
+    int indexOf(@Nullable NavigationNode o);
 
     /**
-     * Returns the last index of this Navigation Node.
+     * Returns the last index of tRhis Navigation Node.
      * @param o NavigationNode to fetch
      * @return Index found
      * @see List#lastIndexOf(Object)
      */
-    public int lastIndexOf(@Nullable NavigationNode o) {
-        return nodes.lastIndexOf(o);
+    int lastIndexOf(@Nullable NavigationNode o);
+
+    /**
+     * Whether this NavigationPath contains all of these Navigation Nodes.
+     * @param nodes Nodes to test
+     * @return true if contains, else false
+     */
+    default boolean containsAll(@Nullable NavigationNode... nodes) {
+        return containsAll(Arrays.asList(nodes));
     }
-    
+
+
 }

@@ -99,11 +99,7 @@ public final class NavigationNode {
         return distance(en.getLocation());
     }
 
-    /**
-     * Get the NMS Representation of this Navigation Node.
-     * @return NMS Node
-     */
-    public Node getHandle() {
+    private Node getHandle() {
         return new Node(x, y, z);
     }
     
