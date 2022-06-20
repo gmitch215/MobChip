@@ -1,8 +1,5 @@
 package me.gamercoder215.mobchip.bosses;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Location;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
@@ -11,6 +8,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents a Boss Minion
@@ -45,7 +46,7 @@ public final class Minion<T extends Mob> {
 		else this.attributes = new HashMap<>();
 		
 		if (equipment != null) this.equipment = equipment;
-		else this.equipment = new HashMap<>();
+		else this.equipment = new EnumMap<>(EquipmentSlot.class);
 	}
 	
 	/**

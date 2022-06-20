@@ -212,7 +212,7 @@ public abstract class Boss<T extends Mob> {
                             try {
                                 m.invoke(inst);
                             } catch (InvocationTargetException e) {
-                                e.getCause().printStackTrace();
+                                Logger.getGlobal().severe(e.getCause().getMessage());
                             } catch (Exception e) {
                                 Logger.getGlobal().severe(e.getMessage());
                             }
