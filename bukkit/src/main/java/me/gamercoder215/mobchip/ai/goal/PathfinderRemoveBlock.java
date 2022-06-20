@@ -48,8 +48,6 @@ public final class PathfinderRemoveBlock extends Pathfinder implements SpeedModi
             return bp;
         } else {
             BlockPos[] bp1 = new BlockPos[]{new BlockPos(bp.below()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPos(bp.above())};
-            int i = bp1.length;
-
             for (BlockPos bps : bp1)
                 if (g.getBlockState(bps).is(block)) {
                     return bps;
