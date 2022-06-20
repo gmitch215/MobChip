@@ -1,18 +1,17 @@
 package me.gamercoder215.mobchip;
 
-import java.util.Map;
-
+import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
+import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import me.gamercoder215.mobchip.ai.EntityAI;
-import me.gamercoder215.mobchip.ai.controller.EntityController;
-import me.gamercoder215.mobchip.ai.memories.EntityMemory;
-import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
+import java.util.Map;
 
 /**
  * Represents an Entire Entity Brain
@@ -68,26 +67,24 @@ public interface EntityBrain {
      * @throws IllegalArgumentException if the value is not suitable for this memory
      * @param <T> Memory Type
      */
-    <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value) throws IllegalArgumentException;
+    <T> void setMemory(@NotNull Memory<T> memory, @Nullable T value) throws IllegalArgumentException;
     
     /**
      * Sets a temporary memory into this entity's brain.
-     * <p>
-     * Removing ANY memory should be using {@link #setMemory(EntityMemory, Object)} with null as the second parameter.
      * @param memory Memory to change
      * @param value Value of new memory
      * @param expire How many ticks until this memory will be forgotten/removed
      * @throws IllegalArgumentException if the value is not suitable for this memory / ticks amount is invalid
      * @param <T> Memory Type
      */
-    <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value, long expire) throws IllegalArgumentException;
+    <T> void setMemory(@NotNull Memory<T> memory, @Nullable T value, long expire) throws IllegalArgumentException;
 
     /**
      * Sets multiple permanent memories into this Entity's Brain.
      * @param map Map of Memories to their values
      */
-    default void setMemories(@NotNull Map<EntityMemory, ?> map) {
-        for (Map.Entry<EntityMemory, ?> entry : map.entrySet()) {
+    default void setMemories(@NotNull Map<Memory, ?> map) {
+        for (Map.Entry<Memory, ?> entry : map.entrySet()) {
             setMemory(entry.getKey(), entry.getValue());
         }
     }
@@ -97,8 +94,8 @@ public interface EntityBrain {
      * @param map Map of Memories to their values
      * @param expire How many ticks until this memory is forgotten/removed
      */
-    default void setMemories(@NotNull Map<EntityMemory, ?> map, long expire) {
-        for (Map.Entry<EntityMemory, ?> entry : map.entrySet()) {
+    default void setMemories(@NotNull Map<Memory, ?> map, long expire) {
+        for (Map.Entry<Memory, ?> entry : map.entrySet()) {
             setMemory(entry.getKey(), entry.getValue(), expire);
         }
     }
@@ -110,31 +107,37 @@ public interface EntityBrain {
      * @param <T> Memory Type
      */
     @Nullable
-    <T> T getMemory(@NotNull EntityMemory<T> memory);
+    <T> T getMemory(@NotNull Memory<T> memory);
 
     /**
      * Get the expiration date of this Memory.
      * @param memory Memory to fetch
      * @return Found expiration date, or 0 if no expiration or not found
      */
-    long getExpiration(@NotNull EntityMemory<?> memory);
+    long getExpiration(@NotNull Memory<?> memory);
 
     /**
      * Whether this Brain contains this memory.
      * @param memory Memory to fetch
      * @return true if contains, else false
      */
-    boolean containsMemory(@NotNull EntityMemory<?> memory);
+    boolean containsMemory(@NotNull Memory<?> memory);
+
+    /**
+     * Removes a Memory from this EntityBrain.
+     * @param memory Memory to remove
+     */
+    void removeMemory(@NotNull Memory<?> memory);
 
     /**
      * Whether this Brain contains all of these memories.
      * @param memories Group of memories to query
      * @return true if they <strong>all</strong> are contained, else false
      */
-    default boolean containsAllMemories(@NotNull EntityMemory<?>... memories) {
+    default boolean containsAllMemories(@NotNull Memory<?>... memories) {
 		boolean contains = true;
 
-		for (EntityMemory m : memories) {
+		for (Memory m : memories) {
 			if (!(containsMemory(m))) {
 				contains = false;
 				break;

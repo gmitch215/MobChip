@@ -4,15 +4,19 @@ import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
+import me.gamercoder215.mobchip.ai.behavior.FrogBehavior;
 import me.gamercoder215.mobchip.ai.behavior.WardenBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
+import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
 import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.npc.Villager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,11 +25,16 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.logging.Logger;
+
 /**
  * Bukkit Implementation of EntityBrain
  * @see EntityBrain
  */
-@SuppressWarnings({"unchecked", "deprecation"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class BukkitBrain implements EntityBrain {
 	
 	private final Mob m;
@@ -34,6 +43,24 @@ public final class BukkitBrain implements EntityBrain {
 	private BukkitBrain(@NotNull Mob m) {
 		this.m = m;
 		this.nmsMob = MobChipUtil.convert(m);
+	}
+
+	private static <T> Object convertMemory(Memory<T> t, T value) {
+		try {
+			Field f = t.getClass().getDeclaredField("convert");
+			f.setAccessible(true);
+
+			Function<T, ?> convert = Function.class.cast(f.get(t));
+
+			return convert.apply(value);
+		} catch (Exception e) {
+			Logger.getGlobal().severe(e.getMessage());
+			return null;
+		}
+	}
+	
+	private static MemoryModuleType getHandle(Memory<?> memory) {
+		return ((EntityMemory<?>) memory).getHandle();
 	}
 
 	/**
@@ -89,13 +116,17 @@ public final class BukkitBrain implements EntityBrain {
 	public EntityBehavior getBehaviors() {
 		if (nmsMob instanceof PathfinderMob) return new BukkitCreatureBehavior((PathfinderMob) nmsMob);
 		else if (nmsMob instanceof Villager) return new BukkitVillagerBehavior((Villager) nmsMob);
+		else if (nmsMob instanceof Axolotl) return new BukkitAxolotlBehavior((Axolotl) nmsMob);
 
-		if (m.getType().name().equalsIgnoreCase("WARDEN")) {
-			try {
-				Class<?> wardenClass = Class.forName("net.minecraft.world.entity.monster.Warden");
-
-				return (WardenBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitWardenBehavior").getConstructor(wardenClass).newInstance(nmsMob);
-			} catch (Exception ignored) {}
+		else switch (m.getType().name().toLowerCase()) {
+				case "warden": try {
+						Class<?> wardenClass = Class.forName("net.minecraft.world.entity.monster.Warden");
+						return (WardenBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitWardenBehavior").getConstructor(wardenClass).newInstance(nmsMob);
+					} catch (Exception ignored) { return null; }
+				case "frog": try {
+					Class<?> frogClass = Class.forName("net.minecraft.world.entity.animal.frog.Frog");
+					return (FrogBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitFrogBehavior").getConstructor(frogClass).newInstance(nmsMob);
+				} catch (Exception ignored) { return null; }
 		}
 
 		return new BukkitEntityBehavior(nmsMob);
@@ -118,26 +149,26 @@ public final class BukkitBrain implements EntityBrain {
 	 * @param <T> Memory Type
 	 */
 	@Override
-	public <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value) throws IllegalArgumentException {
+	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value) throws IllegalArgumentException {
 		if (value == null) {
-			nmsMob.getBrain().eraseMemory(memory.getHandle());
+			nmsMob.getBrain().eraseMemory(getHandle(memory));
 			return;
 		}
 
-		if (memory.convert(value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
+		if (convertMemory(memory, value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
 
 		Object old = getMemory(memory);
 
-		nmsMob.getBrain().setMemory(memory.getHandle(), memory.convert(value));
+		nmsMob.getBrain().setMemory(getHandle(memory), convertMemory(memory, value));
 
-		MemoryChangeEvent event = new MemoryChangeEvent(this, memory, old, value);
+		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
 	}
 
 	/**
 	 * Sets a temporary memory into this entity's brain.
 	 * <p>
-	 * Removing ANY memory should be using {@link #setMemory(EntityMemory, Object)} with null as the second parameter.
+	 * Removing ANY memory should be using {@link #setMemory(Memory, Object)} with null as the second parameter.
 	 * @param memory Memory to change
 	 * @param value Value of new memory
 	 * @param expire How many ticks until this memory will be forgotten/removed
@@ -145,14 +176,14 @@ public final class BukkitBrain implements EntityBrain {
 	 * @param <T> Memory Type
 	 */
 	@Override
-	public <T> void setMemory(@NotNull EntityMemory<T> memory, @Nullable T value, long expire) throws IllegalArgumentException {
+	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException {
 		if (expire < 0) throw new IllegalArgumentException("Invalid ticks number " + expire);
-		if (memory.convert(value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
+		if (convertMemory(memory, value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
 
-		nmsMob.getBrain().setMemoryWithExpiry(memory.getHandle(), memory.convert(value), expire);
+		nmsMob.getBrain().setMemoryWithExpiry(getHandle(memory), convertMemory(memory, value), expire);
 		Object old = getMemory(memory);
 
-		MemoryChangeEvent event = new MemoryChangeEvent(this, memory, old, value);
+		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
 	}
 
@@ -163,10 +194,23 @@ public final class BukkitBrain implements EntityBrain {
 	 * @param <T> Memory Type
 	 */
 	@Override
-	public <T> @Nullable T getMemory(@NotNull EntityMemory<T> memory) {
-		if (nmsMob.getBrain().getMemory(memory.getHandle()).isPresent())
-		return (T) nmsMob.getBrain().getMemory(memory.getHandle()).get();
-		else return null;
+	public <T> @Nullable T getMemory(@NotNull Memory<T> memory) {
+		Optional<?> mem = nmsMob.getBrain().getMemory(getHandle(memory));
+		if (mem.isEmpty()) return null;
+
+		Class<T> clazz = memory.getBukkitClass();
+		Object o = mem.get();
+
+		try {
+			Field f = memory.getClass().getDeclaredField("backConvert");
+			Function back = Function.class.cast(f.get(memory));
+			return clazz.cast(back.apply(o));
+		} catch (ClassCastException e) {
+			return null;
+		} catch (Exception e) {
+			Logger.getGlobal().severe(e.getMessage());
+			return null;
+		}
 	}
 
 	/**
@@ -175,8 +219,8 @@ public final class BukkitBrain implements EntityBrain {
 	 * @return Found expiration date, or 0 if no expiration or not found
 	 */
 	@Override
-	public long getExpiration(@NotNull EntityMemory<?> memory) {
-		return nmsMob.getBrain().getTimeUntilExpiry(memory.getHandle());
+	public long getExpiration(@NotNull Memory<?> memory) {
+		return nmsMob.getBrain().getTimeUntilExpiry(getHandle(memory));
 	}
 
 	/**
@@ -185,8 +229,13 @@ public final class BukkitBrain implements EntityBrain {
 	 * @return true if contains, else false
 	 */
 	@Override
-	public boolean containsMemory(@NotNull EntityMemory<?> memory) {
-		return nmsMob.getBrain().hasMemoryValue(memory.getHandle());
+	public boolean containsMemory(@NotNull Memory<?> memory) {
+		return nmsMob.getBrain().hasMemoryValue(getHandle(memory));
+	}
+
+	@Override
+	public void removeMemory(@NotNull Memory<?> memory) {
+		nmsMob.getBrain().eraseMemory(getHandle(memory));
 	}
 
 	/**
