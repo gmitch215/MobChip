@@ -37,7 +37,7 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
         this.reach = getBoolean(TargetGoal.class.cast(g), "d");
         this.interval = getInt(NearestAttackableTargetGoal.class.cast(g), "b");
         this.conditions = m -> getField(NearestAttackableTargetGoal.class.cast(g), "d", TargetingConditions.class).test(nmsEntity, MobChipUtil.convert(m));
-        this.filter = (Class<T>) getField(NearestAttackableTargetGoal.class.cast(g), "a", Class.class);
+        this.filter = getField(NearestAttackableTargetGoal.class.cast(g), "a", Class.class);
     }
 
     /**
