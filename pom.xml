@@ -17,6 +17,8 @@
 		<maven.compiler.target>16</maven.compiler.target>
 		<java.version>16</java.version>
 		<github>GamerCoder215/MobChip</github>
+		<sonar.organization>gamercoder215</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<developers>
