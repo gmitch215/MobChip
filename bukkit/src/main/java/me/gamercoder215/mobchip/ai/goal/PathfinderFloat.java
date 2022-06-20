@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a Pathfinder that mobs need to float on water
  */
-public class PathfinderFloat extends Pathfinder {
+public final class PathfinderFloat extends Pathfinder {
 
 	/**
 	 * Constructs a PathfinderFloat from a NMS FloatGoal
