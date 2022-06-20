@@ -111,20 +111,6 @@ public interface EntityBody {
 
         InteractionResult() {}
 
-        /**
-         * Converts a MobChip InteractionResult to a NMS InteractionResult.
-         * @return NMS InteractionResult
-         */
-        public net.minecraft.world.InteractionResult getHandle() {
-            return switch (this) {
-                case SUCCESS -> net.minecraft.world.InteractionResult.SUCCESS;
-                case CONSUME -> net.minecraft.world.InteractionResult.CONSUME;
-                case CONSUME_PARTIAL -> net.minecraft.world.InteractionResult.CONSUME_PARTIAL;
-                case FAIL -> net.minecraft.world.InteractionResult.FAIL;
-                default -> net.minecraft.world.InteractionResult.PASS;
-            };
-        }
-
     }
 
     /**
