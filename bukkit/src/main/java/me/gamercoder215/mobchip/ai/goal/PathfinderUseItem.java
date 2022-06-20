@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Mob to use an Item
@@ -38,7 +39,7 @@ public final class PathfinderUseItem extends Pathfinder implements Conditional<M
             Predicate<net.minecraft.world.entity.Mob> p = (Predicate<net.minecraft.world.entity.Mob>) a.get(g);
             this.requirements = m -> p.test(MobChipUtil.convert(m));
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 

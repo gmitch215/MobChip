@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Mob to follow another Mob
@@ -43,7 +44,7 @@ public final class PathfinderFollowMob extends Pathfinder implements SpeedModifi
             Predicate<net.minecraft.world.entity.Mob> predicate = (Predicate<net.minecraft.world.entity.Mob>) a.get(g);
             this.followPredicate = m -> predicate.test(MobChipUtil.convert(m));
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 

@@ -8,6 +8,7 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder to climb on Powdered Snow
@@ -28,7 +29,7 @@ public final class PathfinderClimbPowderedSnow extends Pathfinder implements Wor
             a.setAccessible(true);
             this.w = MobChipUtil.convert((Level) a.get(g));
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 

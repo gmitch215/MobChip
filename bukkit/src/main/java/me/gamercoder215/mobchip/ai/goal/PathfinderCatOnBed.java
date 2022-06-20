@@ -6,6 +6,7 @@ import org.bukkit.entity.Cat;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Cat to sit on a Bed
@@ -31,7 +32,7 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 			b.setAccessible(true);
 			this.range = b.getInt(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 

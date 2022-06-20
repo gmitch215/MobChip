@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder to avoid a LivingEntity
@@ -39,7 +40,7 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 			d.setAccessible(true);
 			this.filter = (Class<T>) MobChipUtil.toBukkitClass(LivingEntity.class, d.getType().asSubclass(net.minecraft.world.entity.Entity.class));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 

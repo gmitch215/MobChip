@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for an Entity to move to another block
@@ -43,7 +44,7 @@ public final class PathfinderMoveToBlock extends Pathfinder implements SpeedModi
                 
                 return (boolean) m.invoke(g, MobChipUtil.convert(l.getWorld()), new BlockPos(l.getX(), l.getY(), l.getZ()));
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getGlobal().severe(e.getMessage());
                 return false;
             }
         };

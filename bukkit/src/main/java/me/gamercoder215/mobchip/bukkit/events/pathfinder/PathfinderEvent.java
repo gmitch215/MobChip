@@ -4,7 +4,7 @@ import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents an event involving a Pathfinder
@@ -22,7 +22,7 @@ public abstract class PathfinderEvent extends Event {
      * @param pathfinder Pathfinder involved
      * @param target true if AI is target, else false
      */
-    public PathfinderEvent(@NotNull EntityAI ai, @NotNull Pathfinder pathfinder, boolean target) {
+    public PathfinderEvent(@Nullable EntityAI ai, @Nullable Pathfinder pathfinder, boolean target) {
         this.ai = ai;
         this.pathfinder = pathfinder;
         this.isTarget = target;
@@ -45,6 +45,7 @@ public abstract class PathfinderEvent extends Event {
      * Gets the current EntityAI involved in this Event.
      * @return EntityAI involved
      */
+    @Nullable
     public EntityAI getAI()  {
         return this.ai;
     }
@@ -61,6 +62,7 @@ public abstract class PathfinderEvent extends Event {
      * Gets the Pathfinder involved in this event.
      * @return Pathfinder involved
      */
+    @Nullable
     public Pathfinder getPathfinder() {
         return this.pathfinder;
     }

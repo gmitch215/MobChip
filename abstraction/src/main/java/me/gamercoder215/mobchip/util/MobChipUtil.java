@@ -42,11 +42,10 @@ public final class MobChipUtil {
 
 	public static ChipUtil getWrapper() {
 		try {
-			String var10000 = ChipUtil.class.getPackage().getName();
-			return (ChipUtil)Class.forName(var10000 + ".ChipUtil" + getServerVersion()).getConstructor().newInstance();
-		} catch (Exception var1) {
-			var1.printStackTrace();
-			return null;
+			String pkg = ChipUtil.class.getPackage().getName();
+			return (ChipUtil)Class.forName(pkg + ".ChipUtil" + getServerVersion()).getConstructor().newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException("Invalid Version: " + getServerVersion());
 		}
 	}
 

@@ -12,6 +12,7 @@ import org.bukkit.entity.Creature;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Creature to remove a block
@@ -38,7 +39,7 @@ public final class PathfinderRemoveBlock extends Pathfinder implements SpeedModi
             if (p != null)
                 this.toRemove = entity.getWorld().getBlockAt(p.getX(), p.getY(), p.getZ());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 

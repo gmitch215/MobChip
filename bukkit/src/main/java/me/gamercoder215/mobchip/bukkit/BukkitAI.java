@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Logger;
 
 final class BukkitAI implements EntityAI {
 	
@@ -33,7 +34,7 @@ final class BukkitAI implements EntityAI {
 		} catch (ExceptionInInitializerError e) {
 			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return null;
 		}
 	}
@@ -67,7 +68,7 @@ final class BukkitAI implements EntityAI {
 
 			return list;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return new ArrayList<>();
 		}
 	}

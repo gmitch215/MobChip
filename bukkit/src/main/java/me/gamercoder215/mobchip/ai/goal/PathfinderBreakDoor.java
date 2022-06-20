@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder that has a Mob break a door
@@ -42,7 +43,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 			this.validDiffs = (Predicate<net.minecraft.world.Difficulty>) b.get(g);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 	

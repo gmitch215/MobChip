@@ -5,6 +5,7 @@ import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for Wolf Begging
@@ -25,7 +26,7 @@ public final class PathfinderBeg extends Pathfinder implements Ranged {
 			a.setAccessible(true);
 			this.lookRange = a.getFloat(goal);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 	

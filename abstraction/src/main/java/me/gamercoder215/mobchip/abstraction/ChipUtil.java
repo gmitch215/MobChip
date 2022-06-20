@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
@@ -175,7 +176,7 @@ public interface ChipUtil {
 
             return m.getReturnType().asSubclass(bukkit);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
             return null;
         }
     }
@@ -184,7 +185,7 @@ public interface ChipUtil {
         try {
             return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.Entity.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
             return null;
         }
     }
@@ -193,7 +194,7 @@ public interface ChipUtil {
         try {
             return clazz.getDeclaredField("entity").getType().asSubclass(net.minecraft.world.entity.LivingEntity.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
             return null;
         }
     }

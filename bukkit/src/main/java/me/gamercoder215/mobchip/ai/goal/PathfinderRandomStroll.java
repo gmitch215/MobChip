@@ -7,6 +7,7 @@ import org.bukkit.entity.Creature;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for Creatures to randomly stroll
@@ -27,7 +28,7 @@ public class PathfinderRandomStroll extends Pathfinder implements SpeedModifier 
             a.setAccessible(true);
             this.speedMod = a.getDouble(g);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 

@@ -6,6 +6,7 @@ import org.bukkit.entity.Cat;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Cat to sit on a block
@@ -26,7 +27,7 @@ public final class PathfinderCatOnBlock extends Pathfinder implements SpeedModif
 			a.setAccessible(true);
 			this.speedMod = a.getDouble(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 	

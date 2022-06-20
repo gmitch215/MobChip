@@ -9,6 +9,7 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for an Entity to look at another Entity
@@ -46,7 +47,7 @@ public final class PathfinderLookAtEntity<T extends LivingEntity> extends Pathfi
             c.setAccessible(true);
             this.filterClass = (Class<T>) MobChipUtil.toBukkitClass(LivingEntity.class, (Class<? extends net.minecraft.world.entity.LivingEntity>) c.get(g));
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 
