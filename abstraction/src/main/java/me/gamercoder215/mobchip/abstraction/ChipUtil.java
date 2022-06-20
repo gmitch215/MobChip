@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -19,6 +20,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
 import java.util.List;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 /**
  * Represents an Abstract Wrapper
@@ -52,6 +55,8 @@ public interface ChipUtil {
     net.minecraft.world.entity.Mob convert(Mob m);
 
     net.minecraft.world.entity.LivingEntity convert(LivingEntity en);
+
+    ItemEntity convert(Item i);
 
     PathfinderMob convert(Creature c);
 
@@ -98,6 +103,10 @@ public interface ChipUtil {
         return (Creature) mob.getBukkitEntity();
     }
 
+    default Ageable convert(AgeableMob mob) { return (Ageable) mob.getBukkitEntity(); }
+
+    default Entity convert(net.minecraft.world.entity.Entity en) { return en.getBukkitEntity(); }
+
     default net.minecraft.world.entity.EntityType<?> convert(org.bukkit.entity.EntityType type) {
         return Registry.ENTITY_TYPE.get(convert(type.getKey()));
     }
@@ -125,6 +134,39 @@ public interface ChipUtil {
     default Location convert(World w, BlockPos pos) {
         return new Location(w, pos.getX(), pos.getY(), pos.getZ());
     }
+
+    default Player convert(net.minecraft.world.entity.player.Player p) {
+        return Bukkit.getPlayer(p.getUUID());
+    }
+
+    default EntityDamageEvent.DamageCause convert(DamageSource c) {
+        return switch (c.msgId) {
+            case "inFire" -> FIRE;
+            case "lightningBolt" -> LIGHTNING;
+            case "onFire" -> FIRE_TICK;
+            case "lava" -> LAVA;
+            case "hotFloor" -> HOT_FLOOR;
+            case "inWall" -> SUFFOCATION;
+            case "cramming" -> CRAMMING;
+            case "drown" -> DROWNING;
+            case "starve" -> STARVATION;
+            case "cactus", "sweetBerryBush", "stalagmite" -> CONTACT;
+            case "fall" -> FALL;
+            case "flyIntoWall" -> FLY_INTO_WALL;
+            case "outOfWorld" -> VOID;
+            case "magic" -> MAGIC;
+            case "wither" -> WITHER;
+            case "anvil", "fallingBlock", "fallingStalactite" -> FALLING_BLOCK;
+            case "dragonBreath" -> DRAGON_BREATH;
+            case "dryout" -> DRYOUT;
+            case "freeze" -> FREEZE;
+            default -> CUSTOM;
+        };
+    }
+
+    default Hoglin convert(net.minecraft.world.entity.monster.hoglin.Hoglin h) { return (Hoglin) h.getBukkitEntity(); }
+
+    default Piglin convert(net.minecraft.world.entity.monster.piglin.AbstractPiglin p) { return (Piglin) p.getBukkitEntity(); }
 
     default <T extends org.bukkit.entity.Entity> Class<? extends T> toBukkitClass(Class<T> bukkit, Class<? extends net.minecraft.world.entity.Entity> clazz) {
         try {
@@ -155,6 +197,8 @@ public interface ChipUtil {
             return null;
         }
     }
+
+    default Item convert(ItemEntity en) { return (Item) en.getBukkitEntity(); }
 
 
 }

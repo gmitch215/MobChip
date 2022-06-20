@@ -6,8 +6,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -20,6 +22,7 @@ import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -56,6 +59,12 @@ public class ChipUtil1_18_R1 implements ChipUtil {
     @Override
     public Piglin convert(org.bukkit.entity.Piglin p) {
         return ((CraftPiglin) p).getHandle();
+    }
+
+    @Override
+    public ItemEntity convert(Item i) {
+        Location l = i.getLocation();
+        return new ItemEntity(convert(i.getWorld()), l.getX(), l.getY(), l.getZ(), convert(i.getItemStack()));
     }
 
     @Override
