@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Represents a Boss Entity.
@@ -201,6 +202,7 @@ public abstract class Boss<T extends Mob> {
                     Repeatable r = m.getAnnotation(Repeatable.class);
 
                     new BukkitRunnable() {
+                        @Override
                         public void run() {
                             if (mob.isDead()) {
                                 cancel();
@@ -212,7 +214,7 @@ public abstract class Boss<T extends Mob> {
                             } catch (InvocationTargetException e) {
                                 e.getCause().printStackTrace();
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                Logger.getGlobal().severe(e.getMessage());
                             }
                         }
                     }.runTaskTimer(plugin, r.delay(), r.interval());
