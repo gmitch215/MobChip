@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder that involves targeting.
@@ -40,7 +41,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			f.setAccessible(true);
 			return clazz.cast(f.get(g));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return null;
 		}
 	}
@@ -51,7 +52,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			f.setAccessible(true);
 			return f.getDouble(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -62,7 +63,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			f.setAccessible(true);
 			return f.getFloat(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -73,7 +74,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			f.setAccessible(true);
 			return f.getInt(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -89,7 +90,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 
 			a.set(g, value);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 
@@ -99,7 +100,7 @@ public abstract class TargetPathfinder extends Pathfinder {
 			f.setAccessible(true);
 			return f.getBoolean(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return false;
 		}
 	}
@@ -123,7 +124,7 @@ public abstract class TargetPathfinder extends Pathfinder {
      * Constructs a TargetPathfinder.
      * @param m Mob to use
      */
-    public TargetPathfinder(@NotNull Mob m) {
+    protected TargetPathfinder(@NotNull Mob m) {
         super(m);
     } 
 
@@ -131,7 +132,7 @@ public abstract class TargetPathfinder extends Pathfinder {
      * Constructs a TargetPathfinder.
      * @param m NMS Mob to use
      */
-    public TargetPathfinder(@NotNull net.minecraft.world.entity.Mob m) {
+    protected TargetPathfinder(@NotNull net.minecraft.world.entity.Mob m) {
         super(m);
     } 
 

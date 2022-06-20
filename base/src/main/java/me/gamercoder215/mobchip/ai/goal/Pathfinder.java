@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder Goal of an Entity.
@@ -39,7 +40,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 			f.setAccessible(true);
 			return clazz.cast(f.get(g));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return null;
 		}
 	}
@@ -50,7 +51,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 			f.setAccessible(true);
 			return f.getDouble(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -61,7 +62,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 			f.setAccessible(true);
 			return f.getFloat(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -72,7 +73,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 			f.setAccessible(true);
 			return f.getInt(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return 1;
 		}
 	}
@@ -88,7 +89,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 
 			a.set(g, value);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 		}
 	}
 
@@ -98,7 +99,7 @@ public abstract class Pathfinder implements PathfinderInfo {
 			f.setAccessible(true);
 			return f.getBoolean(g);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getGlobal().severe(e.getMessage());
 			return false;
 		}
 	}
