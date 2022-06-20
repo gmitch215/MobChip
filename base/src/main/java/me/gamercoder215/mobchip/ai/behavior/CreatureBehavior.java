@@ -32,9 +32,10 @@ public interface CreatureBehavior extends EntityBehavior {
      * Follows the Entity's Temptation (e.g. target, tempting player).
      * @param speedModifier Function that returns speed modifier
      * @return Result of Behavior
+     * @throws IllegalArgumentException if speed modifier is null
      */
     @NotNull
-    BehaviorResult followTemptation(Function<LivingEntity, Float> speedModifier);
+    BehaviorResult followTemptation(@NotNull Function<LivingEntity, Float> speedModifier) throws IllegalArgumentException;
 
     /**
      * Follows the Entity's Temptation (e.g. target, tempting player).

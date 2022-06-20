@@ -1,6 +1,6 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
-import me.gamercoder215.mobchip.ai.memories.EntityMemory;
+import me.gamercoder215.mobchip.ai.memories.Memory;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 /**
  * Represents Entity Behavior.
  * <p></p>
- * Some of these may require {@link EntityMemory}(ies) to be present or not present, so calling some of these methods will not always work.
+ * Some of these may require {@link Memory}(ies) to be present or not present, so calling some of these methods will not always work.
  */
 public interface EntityBehavior {
 
@@ -38,7 +38,7 @@ public interface EntityBehavior {
      * @return Result of Behavior
      * @throws IllegalArgumentException if memory is null
      */
-    @NotNull BehaviorResult passiveIf(@NotNull EntityMemory<?> memory, int durationTicks) throws IllegalArgumentException;
+    @NotNull BehaviorResult passiveIf(@NotNull Memory<?> memory, int durationTicks) throws IllegalArgumentException;
 
     /**
      * Erases a memory if function returns true.
@@ -47,13 +47,13 @@ public interface EntityBehavior {
      * @return Result of Behavior
      * @throws IllegalArgumentException if function or memory is null
      */
-    @NotNull BehaviorResult eraseIf(@NotNull Predicate<Mob> function, @NotNull EntityMemory<?> memory) throws IllegalArgumentException;
+    @NotNull BehaviorResult eraseIf(@NotNull Predicate<Mob> function, @NotNull Memory<?> memory) throws IllegalArgumentException;
 
     /**
      * Makes this Entity move to its wanted item.
      * @param minDist Minimum Distance from Item
      * @param speedMod Speed Modifier while moving
-     * @param requireTarget Whether a {@link EntityMemory#WALKING_TARGET} is required (if false, requires there to not be one, defaults to true)
+     * @param requireTarget Whether a walking target is required (if false, requires there to not be one, defaults to true)
      * @return Result of Behavior
      */
     @NotNull BehaviorResult moveToWantedItem(int minDist, float speedMod, boolean requireTarget);

@@ -3,15 +3,17 @@ package me.gamercoder215.mobchip.bukkit;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
+import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.util.MobChipUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.*;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
-
+@SuppressWarnings("rawtypes")
 class BukkitEntityBehavior implements EntityBehavior {
 
     final Mob nmsMob;
@@ -28,16 +30,20 @@ class BukkitEntityBehavior implements EntityBehavior {
     }
 
     @Override
-    public @NotNull BehaviorResult passiveIf(@NotNull EntityMemory<?> memory, int durationTicks) throws IllegalArgumentException {
+    public @NotNull BehaviorResult passiveIf(@NotNull Memory<?> memory, int durationTicks) throws IllegalArgumentException {
         Validate.notNull(memory, "Memory cannot be null");
-        return new BukkitBehaviorResult(new BecomePassiveIfMemoryPresent(memory.getHandle(), durationTicks), level, nmsMob);
+        return new BukkitBehaviorResult(new BecomePassiveIfMemoryPresent(getHandle(memory), durationTicks), level, nmsMob);
+    }
+    
+    private static MemoryModuleType getHandle(Memory<?> memory) {
+        return ((EntityMemory<?>) memory).getHandle();
     }
 
     @Override
-    public @NotNull BehaviorResult eraseIf(@NotNull Predicate<org.bukkit.entity.Mob> function, @NotNull EntityMemory<?> memory) throws IllegalArgumentException {
+    public @NotNull BehaviorResult eraseIf(@NotNull Predicate<org.bukkit.entity.Mob> function, @NotNull Memory<?> memory) throws IllegalArgumentException {
         Validate.notNull(function, "Function cannot be null");
         Validate.notNull(memory, "Memory cannot be null");
-        return new BukkitBehaviorResult(new EraseMemoryIf<>(m -> function.test(MobChipUtil.convert(m)), memory.getHandle()), level, nmsMob);
+        return new BukkitBehaviorResult(new EraseMemoryIf<>(m -> function.test(MobChipUtil.convert(m)), getHandle(memory)), level, nmsMob);
     }
 
     @Override
