@@ -64,7 +64,12 @@ class BukkitBody implements EntityBody {
      */
     @Override
     public InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand) {
-        return switch (nmsMob.interact(MobChipUtil.convert(p), hand.getHandle())) {
+        final net.minecraft.world.InteractionHand h;
+
+        if (hand == InteractionHand.OFF_HAND) h = net.minecraft.world.InteractionHand.OFF_HAND;
+        else h = net.minecraft.world.InteractionHand.MAIN_HAND;
+
+        return switch (nmsMob.interact(MobChipUtil.convert(p), h)) {
             case SUCCESS -> InteractionResult.SUCCESS;
             case CONSUME -> InteractionResult.CONSUME;
             case CONSUME_PARTIAL -> InteractionResult.CONSUME_PARTIAL;
@@ -114,7 +119,12 @@ class BukkitBody implements EntityBody {
     @Override
     public void useItem(@Nullable InteractionHand hand) {
         if (hand == null) return;
-        nmsMob.startUsingItem(hand.getHandle());
+
+        final net.minecraft.world.InteractionHand h;
+        if (hand == InteractionHand.OFF_HAND) h = net.minecraft.world.InteractionHand.OFF_HAND;
+        else h = net.minecraft.world.InteractionHand.MAIN_HAND;
+
+        nmsMob.startUsingItem(h);
     }
 
     @Override

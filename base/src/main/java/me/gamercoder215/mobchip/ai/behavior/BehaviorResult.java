@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
-import net.minecraft.world.entity.ai.behavior.Behavior;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,16 +38,6 @@ public abstract class BehaviorResult {
         RUNNING;
 
         Status() {}
-
-        /**
-         * Converts a MobChip Behavior Status to a NMS Behavior Status.
-         * @return NMS Behavior Status
-         */
-        @NotNull
-        public Behavior.Status getHandle() {
-            if (this == STOPPED) return Behavior.Status.STOPPED;
-            return Behavior.Status.RUNNING;
-        }
     }
 
 }

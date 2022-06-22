@@ -64,15 +64,6 @@ public interface EntityBody {
         InteractionHand() {}
 
         /**
-         * Converts a MobChip InteractionHand to a NMS InteractionHand.
-         * @return NMS InteractionHand
-         */
-        public net.minecraft.world.InteractionHand getHandle() {
-           if (this == MAIN_HAND) return net.minecraft.world.InteractionHand.MAIN_HAND;
-           return net.minecraft.world.InteractionHand.OFF_HAND;
-        }
-
-        /**
          * Converts this InteractionHand to an EquipmentSlot.
          * @return EquipmentSlot Variant
          */
