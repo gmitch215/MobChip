@@ -75,10 +75,16 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
+      - name: Extract Development
+        id: project
+        run: echo ::set-output name=dev::$(mvn help:evaluate -Dexpression=development -q -DforceStdout)
+
       - name: Build Project
+        if: ${{ !steps.project.outputs.dev }}
         run: mvn package
           
       - name: Build JavaDocs
+        if: ${{ !steps.project.outputs.dev }}
         run: bash javadoc.sh
 
   analyze:

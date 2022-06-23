@@ -3,7 +3,7 @@
 
 	<groupId>me.gamercoder215</groupId>
 	<artifactId>mobchip-parent</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<name>MobChip-Parent</name>
@@ -13,9 +13,14 @@
 	<properties>
 		<minecraft.version>1.17-R0.1-SNAPSHOT</minecraft.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<development>true</development>
+
 		<maven.compiler.source>16</maven.compiler.source>
 		<maven.compiler.target>16</maven.compiler.target>
 		<java.version>16</java.version>
+
 		<github>GamerCoder215/MobChip</github>
 		<sonar.organization>gamercoder215</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -43,8 +48,15 @@
 	<scm>
 	    <connection>scm:git:${project.url}.git</connection>
 	    <developerConnection>scm:git:git@github.com:${github}.git</developerConnection>
-	    <url>git@github.com:${github}.git</url>
+	    <url>https://github.com/${github}</url>
 	</scm>
+
+	<inceptionYear>2022</inceptionYear>
+
+	<ciManagement>
+		<system>GitHub Actions</system>
+		<url>https://github.com/${github}/actions</url>
+	</ciManagement>
 	
 	<modules>
 		<module>base</module>
