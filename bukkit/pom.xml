@@ -3,7 +3,7 @@
 	<parent>
     	<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
@@ -96,6 +96,7 @@
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
 							<classifier>remapped-obf</classifier>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 					<execution>
@@ -112,6 +113,7 @@
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
 							<classifier>remapped-mojang</classifier>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 					<execution>
@@ -127,6 +129,7 @@
 							<version>${project.version}</version>
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 				</executions>
@@ -161,6 +164,7 @@
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
 							<classifier>remapped-obf</classifier>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 					<execution>
@@ -178,6 +182,7 @@
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
 							<classifier>remapped-mojang</classifier>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 					<execution>
@@ -194,6 +199,27 @@
 							<version>${project.version}</version>
 							<packaging>${project.packaging}</packaging>
 							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<attach>false</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<attach>false</attach>
+							<includePom>true</includePom>
 						</configuration>
 					</execution>
 				</executions>

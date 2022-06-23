@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>mobchip-base</artifactId>
@@ -39,6 +39,59 @@
 						</goals>
 						<configuration>
 							<includeDependencySources>false</includeDependencySources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<attach>false</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<attach>false</attach>
+							<includePom>true</includePom>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<id>default-install</id>
+						<goals>
+							<goal>install</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>install</phase>
+						<id>install</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}.jar</file>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<packaging>${project.packaging}</packaging>
+							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
+							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
 						</configuration>
 					</execution>
 				</executions>
