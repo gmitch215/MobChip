@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,8 +43,12 @@ public class ChipUtil1_18_R1 implements ChipUtil {
     }
 
     @Override
-    public SoundEvent convert(Sound s) {
-        return CraftSound.getSoundEffect(s);
+    public SoundEvent convert(Sound s) { return CraftSound.getSoundEffect(s); }
+
+    @Override
+    public boolean exists(NamespacedKey key, Registry<?> registry) {
+        ResourceLocation loc = convert(key);
+        return registry.containsKey(loc);
     }
 
     @Override
