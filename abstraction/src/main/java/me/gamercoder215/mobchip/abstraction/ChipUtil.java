@@ -65,6 +65,8 @@ public interface ChipUtil {
 
     RangedAttribute convert(Attribute a);
 
+    boolean exists(NamespacedKey key, Registry<?> registry);
+
     // Defaults (Requires no CraftBukkit)
 
     default DamageSource convert(EntityDamageEvent.DamageCause c) {

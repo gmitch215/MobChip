@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip.util;
 
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -182,5 +183,6 @@ public final class MobChipUtil {
 	public static Item convert(ItemEntity en) { return getWrapper().convert(en); }
 
 	public static ItemEntity convert(Item i) { return getWrapper().convert(i); }
+	public static boolean exists(NamespacedKey key, Registry<?> registry) { return getWrapper().exists(key, registry); }
 
 }
