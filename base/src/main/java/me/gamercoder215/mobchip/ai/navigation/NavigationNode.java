@@ -1,7 +1,5 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
-import me.gamercoder215.mobchip.util.MobChipUtil;
-import net.minecraft.world.level.pathfinder.Node;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -50,8 +48,8 @@ public final class NavigationNode {
      * @param node NavigationNode to use
      * @return distance
      */
-    public float distance(@NotNull NavigationNode node) {
-        return getHandle().distanceTo(node.getHandle());
+    public double distance(@NotNull NavigationNode node) {
+        return Math.sqrt(distanceSquared(node));
     }
     
     /**
@@ -59,8 +57,8 @@ public final class NavigationNode {
      * @param loc Location to use
      * @return distance
      */
-    public float distance(@NotNull Location loc) {
-        return getHandle().distanceTo(MobChipUtil.convert(loc));
+    public double distance(@NotNull Location loc) {
+        return distance(new NavigationNode(loc));
     }
     
     /**
@@ -68,7 +66,7 @@ public final class NavigationNode {
      * @param en Entity to use
      * @return distance
      */
-    public float distance(@NotNull Entity en) {
+    public double distance(@NotNull Entity en) {
         return distance(en.getLocation());
     }
     
@@ -77,8 +75,12 @@ public final class NavigationNode {
      * @param node NavigationNode to use
      * @return distance squared
      */
-    public float distanceSquared(@NotNull NavigationNode node) {
-        return getHandle().distanceToSqr(node.getHandle());
+    public double distanceSquared(@NotNull NavigationNode node) {
+        double x = this.x - node.x;
+        double y = this.y - node.y;
+        double z = this.z - node.z;
+
+        return x * x + y * y + z * z;
     }
     
     /**
@@ -86,8 +88,8 @@ public final class NavigationNode {
      * @param loc Location to use
      * @return distance squared
      */
-    public float distanceSquared(@NotNull Location loc) {
-        return getHandle().distanceToSqr(MobChipUtil.convert(loc));
+    public double distanceSquared(@NotNull Location loc) {
+        return distanceSquared(new NavigationNode(loc));
     }
     
     /**
@@ -95,14 +97,32 @@ public final class NavigationNode {
      * @param en Entity to use
      * @return distance squared
      */
-    public float distanceSquared(@NotNull Entity en) {
+    public double distanceSquared(@NotNull Entity en) {
         return distance(en.getLocation());
     }
 
-    private Node getHandle() {
-        return new Node(x, y, z);
+    /**
+     * Fetches the Manhattan distance to another NavigationNode.
+     * @param node NavigationNode to use
+     * @return Manhattan distance
+     */
+    public double distanceManhattan(@NotNull NavigationNode node) {
+        double x = Math.abs(this.x - node.x);
+        double y = Math.abs(this.y - node.y);
+        double z = Math.abs(this.z - node.z);
+
+        return x + y + z;
     }
-    
+
+    /**
+     * Fetches the Manhattan distance to another Location.
+     * @param loc Location to use
+     * @return Manhattan distance
+     */
+    public double distanceManhattan(@NotNull Location loc) {
+        return distanceManhattan(new NavigationNode(loc));
+    }
+
     /**
      * Fetches the current X value of this NavigationNode.
      * @return X coordinate
@@ -134,6 +154,7 @@ public final class NavigationNode {
      * @param z Amount of Z to add
      * @return this class, for chaining
      */
+    @NotNull
     public NavigationNode add(int x, int y, int z) {
         this.x += x;
         this.y += y;
@@ -148,11 +169,72 @@ public final class NavigationNode {
      * @param z Amount of Z to remove
      * @return this class, for chaining
      */
-    public NavigationNode remove(int x, int y, int z) {
+    @NotNull
+    public NavigationNode  remove(int x, int y, int z) {
         this.x -= x;
         this.y -= y;
         this.z -= z;
         return this;
+    }
+
+    /**
+     * Adds a NavigationNode to this NavigationNode.
+     * @param node NavigationNode to add
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode add(@NotNull NavigationNode node) {
+        return add(node.x, node.y, node.z);
+    }
+
+    /**
+     * Adds a location to this NavigationNode.
+     * @param loc Location to add
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode add(@NotNull Location loc) {
+        return add(new NavigationNode(loc));
+    }
+
+    /**
+     * Adds an entity's location to this NavigationNode.
+     * @param en Entity to add
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode add(@NotNull Entity en) {
+        return add(en.getLocation());
+    }
+
+    /**
+     * Removes a Location from this NavigationNode.
+     * @param loc Location to remove
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode remove(@NotNull Location loc) {
+        return remove(new NavigationNode(loc));
+    }
+
+    /**
+     * Removes an entity's location from this NavigationNode.
+     * @param en Entity to remove
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode remove(@NotNull Entity en) {
+        return remove(en.getLocation());
+    }
+
+    /**
+     * Removes a NavigationNode from this NavigationNode.
+     * @param node NavigationNode to remove
+     * @return this class, for chaining
+     */
+    @NotNull
+    public NavigationNode remove(@NotNull NavigationNode node) {
+        return remove(node.x, node.y, node.z);
     }
     
     /**
