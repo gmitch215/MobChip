@@ -60,7 +60,7 @@ public interface NavigationPath extends Iterable<NavigationNode> {
     int indexOf(@Nullable NavigationNode o);
 
     /**
-     * Returns the last index of tRhis Navigation Node.
+     * Returns the last index of this Navigation Node.
      * @param o NavigationNode to fetch
      * @return Index found
      * @see List#lastIndexOf(Object)
