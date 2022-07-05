@@ -2,22 +2,15 @@ package me.gamercoder215.mobchip.bukkit;
 
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
-import me.gamercoder215.mobchip.ai.behavior.FrogBehavior;
-import me.gamercoder215.mobchip.ai.behavior.WardenBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
-import me.gamercoder215.mobchip.util.MobChipUtil;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
-import net.minecraft.world.entity.npc.Villager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -25,43 +18,19 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
 /**
  * Bukkit Implementation of EntityBrain
  * @see EntityBrain
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public final class BukkitBrain implements EntityBrain {
 	
 	private final Mob m;
-	private final net.minecraft.world.entity.Mob nmsMob;
 
 	private BukkitBrain(@NotNull Mob m) {
 		this.m = m;
-		this.nmsMob = MobChipUtil.convert(m);
 	}
 
-	private static <T> Object convertMemory(Memory<T> t, T value) {
-		try {
-			Field f = t.getClass().getDeclaredField("convert");
-			f.setAccessible(true);
-
-			Function<T, ?> convert = Function.class.cast(f.get(t));
-
-			return convert.apply(value);
-		} catch (Exception e) {
-			Logger.getGlobal().severe(e.getMessage());
-			return null;
-		}
-	}
-	
-	private static MemoryModuleType getHandle(Memory<?> memory) {
-		return ((EntityMemory<?>) memory).getHandle();
-	}
+	private static final ChipUtil wrapper = ChipUtil.getWrapper();
 
 	/**
 	 * Get the EntityBrain of this Mob.
@@ -78,7 +47,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityAI getGoalAI() {
-		return new BukkitAI(nmsMob.goalSelector, false);
+		return new BukkitAI(m, false);
 	}
 
 	/**
@@ -87,7 +56,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityAI getTargetAI() {
-		return new BukkitAI(nmsMob.targetSelector, true);
+		return new BukkitAI(m, true);
 	}
 
 	/**
@@ -96,7 +65,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityNavigation createNavigation() {
-		return new BukkitNavigation(nmsMob.getNavigation(), m);
+		return wrapper.getNavigation(m);
 	}
 
 	/**
@@ -105,7 +74,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityController getController() {
-		return new BukkitController(m, m.getWorld(), nmsMob.getJumpControl(), nmsMob.getLookControl(), nmsMob.getMoveControl());
+		return wrapper.getController(m);
 	}
 
 	/**
@@ -114,22 +83,16 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public EntityBehavior getBehaviors() {
-		if (nmsMob instanceof PathfinderMob) return new BukkitCreatureBehavior((PathfinderMob) nmsMob);
-		else if (nmsMob instanceof Villager) return new BukkitVillagerBehavior((Villager) nmsMob);
-		else if (nmsMob instanceof Axolotl) return new BukkitAxolotlBehavior((Axolotl) nmsMob);
-
-		else switch (m.getType().name().toLowerCase()) {
-				case "warden": try {
-						Class<?> wardenClass = Class.forName("net.minecraft.world.entity.monster.Warden");
-						return (WardenBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitWardenBehavior").getConstructor(wardenClass).newInstance(nmsMob);
-					} catch (Exception ignored) { return null; }
-				case "frog": try {
-					Class<?> frogClass = Class.forName("net.minecraft.world.entity.animal.frog.Frog");
-					return (FrogBehavior) Class.forName("me.gamercoder215.mobchip.bukkit.BukkitFrogBehavior").getConstructor(frogClass).newInstance(nmsMob);
-				} catch (Exception ignored) { return null; }
+		try {
+			Class<?> b = Class.forName(BukkitBrain.class.getPackage().getName() + ".Bukkit" + Character.toUpperCase(m.getType().name().charAt(0)) + m.getType().name().substring(1).toLowerCase() + "Behavior");
+			return (EntityBehavior) b.getConstructor(m.getType().getEntityClass()).newInstance(m);
+		} catch (ClassNotFoundException | NoSuchMethodException e) {
+			return new BukkitEntityBehavior(m);
+		} catch (Exception e) {
+			Bukkit.getLogger().severe(e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+			return new BukkitEntityBehavior(m);
 		}
-
-		return new BukkitEntityBehavior(nmsMob);
 	}
 
 	/**
@@ -138,7 +101,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityBody getBody() {
-		return new BukkitBody(nmsMob);
+		return wrapper.getBody(m);
 	}
 
 	/**
@@ -150,16 +113,8 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value) throws IllegalArgumentException {
-		if (value == null) {
-			nmsMob.getBrain().eraseMemory(getHandle(memory));
-			return;
-		}
-
-		if (convertMemory(memory, value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
-
 		Object old = getMemory(memory);
-
-		nmsMob.getBrain().setMemory(getHandle(memory), convertMemory(memory, value));
+		wrapper.setMemory(m, memory, value);
 
 		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
@@ -177,11 +132,8 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException {
-		if (expire < 0) throw new IllegalArgumentException("Invalid ticks number " + expire);
-		if (convertMemory(memory, value) == null) throw new IllegalArgumentException("Invalid argument: " + value.getClass().getName());
-
-		nmsMob.getBrain().setMemoryWithExpiry(getHandle(memory), convertMemory(memory, value), expire);
 		Object old = getMemory(memory);
+		wrapper.setMemory(m, memory, value, expire);
 
 		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
@@ -195,22 +147,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public <T> @Nullable T getMemory(@NotNull Memory<T> memory) {
-		Optional<?> mem = nmsMob.getBrain().getMemory(getHandle(memory));
-		if (mem.isEmpty()) return null;
-
-		Class<T> clazz = memory.getBukkitClass();
-		Object o = mem.get();
-
-		try {
-			Field f = memory.getClass().getDeclaredField("backConvert");
-			Function back = Function.class.cast(f.get(memory));
-			return clazz.cast(back.apply(o));
-		} catch (ClassCastException e) {
-			return null;
-		} catch (Exception e) {
-			Logger.getGlobal().severe(e.getMessage());
-			return null;
-		}
+		return wrapper.getMemory(m, memory);
 	}
 
 	/**
@@ -220,7 +157,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public long getExpiration(@NotNull Memory<?> memory) {
-		return nmsMob.getBrain().getTimeUntilExpiry(getHandle(memory));
+		return wrapper.getExpiry(m, memory);
 	}
 
 	/**
@@ -230,12 +167,12 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean containsMemory(@NotNull Memory<?> memory) {
-		return nmsMob.getBrain().hasMemoryValue(getHandle(memory));
+		return wrapper.contains(m, memory);
 	}
 
 	@Override
 	public void removeMemory(@NotNull Memory<?> memory) {
-		nmsMob.getBrain().eraseMemory(getHandle(memory));
+		wrapper.removeMemory(m, memory);
 	}
 
 	/**
@@ -244,7 +181,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean isInRestriction() {
-		return nmsMob.isWithinRestriction();
+		return wrapper.isRestricted(m);
 	}
 
 	/**
@@ -260,7 +197,7 @@ public final class BukkitBrain implements EntityBrain {
 		Location newCenter = event.getNewCenter();
 		int newRadius = event.getNewRadius();
 
-		nmsMob.restrictTo(new BlockPos(newCenter.getX(), newCenter.getY(), newCenter.getZ()), newRadius);
+		wrapper.restrictTo(m, newCenter.getX(), newCenter.getY(), newCenter.getZ(), newRadius);
 	}
 
 	/**
@@ -268,7 +205,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public void clearRestrictionArea() {
-		nmsMob.clearRestriction();
+		wrapper.clearRestriction(m);
 	}
 
 	/**
@@ -277,9 +214,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public Location getRestrictionArea() {
-		BlockPos center = nmsMob.getRestrictCenter();
-		if (center == null) return null;
-		return new Location(m.getWorld(), center.getX(), center.getY(), center.getZ());
+		return wrapper.getRestriction(m);
 	}
 
 	/**
@@ -288,7 +223,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean hasRestriction() {
-		return nmsMob.hasRestriction();
+		return wrapper.hasRestriction(m);
 	}
 
 	/**
@@ -297,7 +232,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public int getRestrictionRadius() {
-		return Math.min((int) Math.floor(nmsMob.getRestrictRadius()), Integer.MAX_VALUE);
+		return wrapper.getRestrictionRadius(m);
 	}
 
 	/**
@@ -307,7 +242,7 @@ public final class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean canSee(@Nullable Entity en) {
-		return nmsMob.getSensing().hasLineOfSight(MobChipUtil.convert(en));
+		return wrapper.canSee(m, en);
 	}
 
 	/**
