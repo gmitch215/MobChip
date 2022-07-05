@@ -188,7 +188,28 @@ public abstract class Boss<T extends Mob> {
         this.mob = mob;
         
         for (AttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
-        for (EquipmentSlot s : equipment.keySet()) mob.getEquipment().setItem(s, equipment.get(s));
+        for (EquipmentSlot s : equipment.keySet()) {
+            switch (s) {
+                case HAND:
+                    mob.getEquipment().setItemInMainHand(equipment.get(s));
+                    break;
+                case OFF_HAND:
+                    mob.getEquipment().setItemInOffHand(equipment.get(s));
+                    break;
+                case FEET:
+                    mob.getEquipment().setBoots(equipment.get(s));
+                    break;
+                case LEGS:
+                    mob.getEquipment().setLeggings(equipment.get(s));
+                    break;
+                case CHEST:
+                    mob.getEquipment().setChestplate(equipment.get(s));
+                    break;
+                case HEAD:
+                    mob.getEquipment().setHelmet(equipment.get(s));
+                    break;
+            }
+        }
         
         if (spawnSound != null) l.getWorld().playSound(l, deathSound, 3F, 1F);
 

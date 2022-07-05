@@ -96,14 +96,35 @@ public final class Minion<T extends Mob> {
 	public T spawn(@Nullable Location loc) {
 		if (loc == null) return null;
 		
-		T entity = loc.getWorld().spawn(loc, entityClazz);
-		entity.setHealth(health);
-		entity.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
-		for (EquipmentSlot s : equipment.keySet()) entity.getEquipment().setItem(s, equipment.get(s), true);
+		T mob = loc.getWorld().spawn(loc, entityClazz);
+		mob.setHealth(health);
+		mob.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(health);
+		for (EquipmentSlot s : equipment.keySet()) {
+			switch (s) {
+				case HAND:
+					mob.getEquipment().setItemInMainHand(equipment.get(s));
+					break;
+				case OFF_HAND:
+					mob.getEquipment().setItemInOffHand(equipment.get(s));
+					break;
+				case FEET:
+					mob.getEquipment().setBoots(equipment.get(s));
+					break;
+				case LEGS:
+					mob.getEquipment().setLeggings(equipment.get(s));
+					break;
+				case CHEST:
+					mob.getEquipment().setChestplate(equipment.get(s));
+					break;
+				case HEAD:
+					mob.getEquipment().setHelmet(equipment.get(s));
+					break;
+			}
+		}
 		
 		for (AttributeInstance a : attributes.keySet()) a.setBaseValue(attributes.get(a));
 		
-		return entity;
+		return mob;
 	}
 	
 	/**
