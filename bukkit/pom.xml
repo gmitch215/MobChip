@@ -3,207 +3,14 @@
 	<parent>
     	<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
-		<version>1.2.1-SNAPSHOT</version>
+		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
 
-	<properties>
-		<spigot.plugin.inputFile>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</spigot.plugin.inputFile>
-		<spigot.plugin.srgIn>org.spigotmc:minecraft-server:${minecraft.version}</spigot.plugin.srgIn>
-		<spigot.plugin.remappedDependencies>org.spigotmc:spigot:${minecraft.version}:jar</spigot.plugin.remappedDependencies>
-		<minecraft.version>1.19-R0.1-SNAPSHOT</minecraft.version>
-	</properties>
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
-			<plugin>
-				<groupId>net.md-5</groupId>
-				<artifactId>specialsource-maven-plugin</artifactId>
-				<version>1.2.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>remap</goal>
-						</goals>
-						<id>remap-obf</id>
-						<configuration>
-							<srgIn>${spigot.plugin.srgIn}:txt:maps-mojang</srgIn>
-							<reverse>true</reverse>
-							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-mojang</remappedDependencies>
-							<remappedClassifierName>remapped-obf</remappedClassifierName>
-							<finalName>${project.build.finalName}-remapped-obf</finalName>
-							<remappedArtifactAttached>true</remappedArtifactAttached>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>remap</goal>
-						</goals>
-						<id>remap-spigot</id>
-						<configuration>
-							<inputFile>${spigot.plugin.inputFile}</inputFile>
-							<srgIn>${spigot.plugin.srgIn}:csrg:maps-spigot</srgIn>
-							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-obf</remappedDependencies>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>remap</goal>
-						</goals>
-						<id>remap-mojang</id>
-						<configuration>
-							<inputFile>${spigot.plugin.inputFile}</inputFile>
-							<srgIn>${spigot.plugin.srgIn}:txt:maps-mojang</srgIn>
-							<finalName>${project.build.finalName}-remapped-mojang</finalName>
-							<remappedDependencies>${spigot.plugin.remappedDependencies}:remapped-mojang</remappedDependencies>
-							<remappedClassifierName>remapped-mojang</remappedClassifierName>
-							<remappedArtifactAttached>true</remappedArtifactAttached>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>3.0.0-M1</version>
-				<executions>
-					<execution>
-						<phase>install</phase>
-						<id>default-install</id>
-						<goals>
-							<goal>install</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>install</phase>
-						<id>install-obf</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</file>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<classifier>remapped-obf</classifier>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>install</phase>
-						<id>install-mojang</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}-remapped-mojang.jar</file>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<classifier>remapped-mojang</classifier>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>install</phase>
-						<id>install-spigot</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}.jar</file>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>3.0.0-M2</version>
-				<executions>
-					<execution>
-						<id>default-deploy</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>deploy</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>deploy</phase>
-						<id>deploy-obf</id>
-						<goals>
-							<goal>deploy-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}-remapped-obf.jar</file>
-							<url>file:///home/jitpack/deploy</url>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<classifier>remapped-obf</classifier>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>deploy</phase>
-						<id>deploy-mojang</id>
-						<goals>
-							<goal>deploy-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}-remapped-mojang.jar</file>
-							<url>file:///home/jitpack/deploy</url>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<classifier>remapped-mojang</classifier>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>deploy</phase>
-						<id>deploy-spigot</id>
-						<goals>
-							<goal>deploy-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.build.finalName}.jar</file>
-							<url>file:///home/jitpack/deploy</url>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<packaging>${project.packaging}</packaging>
-							<javadoc>${project.build.directory}/${project.build.finalName}-javadoc.jar</javadoc>
-							<sources>${project.build.directory}/${project.build.finalName}-sources.jar</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -243,6 +50,7 @@
 						</goals>
 						<configuration>
 							<includeDependencySources>true</includeDependencySources>
+
                             <dependencySourceExcludes>
 								<exclude>net.minecraft.*</exclude>
 								<exclude>org.*</exclude>
@@ -254,7 +62,6 @@
 							</dependencySourceExcludes>
 
 							<sourceFileExcludes>
-								<sourceFileExclude>**/me/gamercoder215/mobchip/abstraction/*.java</sourceFileExclude>
 								<exclude>**/me/gamercoder215/mobchip/abstraction/*.java</exclude>
 							</sourceFileExcludes>
 						</configuration>
@@ -279,12 +86,53 @@
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot</artifactId>
-			<version>${minecraft.version}</version>
+			<artifactId>spigot-api</artifactId>
+			<version>1.19-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-			<classifier>remapped-mojang</classifier>
 		</dependency>
 		<!-- Abstraction -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_13_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_13_R2</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_14_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_15_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_16_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_16_R2</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_16_R3</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>mobchip-1_17_R1</artifactId>

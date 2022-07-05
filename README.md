@@ -12,10 +12,10 @@ improve the hassle of playing around with NMS and learning how to import and use
 
 ## Why?
 
-- **Small**: MobChip is currently below 200KB, and we will try to optimize and keep it as small as possible.
+- **Small**: MobChip is currently below 1MB, and we will try to optimize and keep it as small as possible.
 - **Simple**: MobChip has documentation, API usage, and other utilities to help ease the experience of working with Entity AI.
 - **Flexible**: With normal NMS, you're often limited with what fields you are able to pick, and obfuscated methods make knowing what to pick even harder. Even with the addition of Mojang Mappings, there's still a lot of things that both new and experienced developers don't know. MobChip uses Reflection to help 
-- **Transparent**: Most classes have a `getHandle` or a similar method to represent the NMS class, if you want to do some editing yourself. We also have ways of converting NMS Classes to MobChip Wrappers, for easy functionality.
+- **Transparent**: Instead of the getHandle() methods in previous versions, we have open wrappers that allow you to switch between MobChip and NMS for your MC Version. Depend on one of the wrapper modules according to your MC Version.
 
 ## Installation
 ![GitHub](https://img.shields.io/github/license/GamerCoder215/MobChip)
@@ -39,8 +39,7 @@ improve the hassle of playing around with NMS and learning how to import and use
         </repository>
     </repositories>
     
-    <!-- Base Module - Used for Base Interfaces -->
-    
+    <!-- Base Module - Used for Base Interfaces & Built-In Template Classes -->
     
     <dependencies>
         <dependency>
@@ -55,14 +54,6 @@ improve the hassle of playing around with NMS and learning how to import and use
             <artifactId>mobchip-bukkit</artifactId>
             <version>[VERSION]</version> <!-- Example: 1.0.1 -->
         </dependency>
-
-        <!-- Supports remapped-mojang for handle methods -->
-        <dependency>
-            <groupId>com.github.GamerCoder215.MobChip</groupId>
-            <artifactId>mobchip-bukkit</artifactId>
-            <version>[VERSION]</version>
-            <classifier>remapped-mojang</classifier>
-        </dependency>
     </dependencies>
     
 </project>
@@ -70,7 +61,7 @@ improve the hassle of playing around with NMS and learning how to import and use
 </details>
 
 <details>
-    <summary>Gradle</summary>
+    <summary>Gradle (Groovy)</summary>
 
 ```gradle
 repositories {
@@ -78,7 +69,27 @@ repositories {
 }
 
 dependencies {
+    // Base Module - Used for Base Interfaces & Built-In Template Classes
     implementation 'com.github.GamerCoder215.MobChip:mobchip-base:[VERSION]'
+    // Bukkit Module - Used for Implmentation, Development & Events - Contains Base
+    implementation 'com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION]'
+}
+```
+</details>
+
+<details>
+    <summary>Gradle (Kotlin DSL)</summary>
+
+```kotlin
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // Base Module - Used for Base Interfaces & Built-In Template Classes
+    implementation(com.github.GamerCoder215.MobChip:mobchip-base:[VERSION])
+    // Bukkit Module - Used for Implmentation, Development & Events - Contains Base
+    implementation (com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION])
 }
 ```
 </details>
