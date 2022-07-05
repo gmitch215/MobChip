@@ -15,7 +15,7 @@ public interface Conditional<T> {
 	 * @return Predicate of Condition
 	 */
 	@NotNull
-	Predicate<T> getCondition();
+	Predicate<? super T> getCondition();
 	
 	/**
 	 * Sets the Condition of this Conditional Pathfinder.
