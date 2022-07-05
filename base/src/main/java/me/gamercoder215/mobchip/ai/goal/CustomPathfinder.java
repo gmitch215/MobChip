@@ -1,10 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import net.minecraft.world.entity.ai.goal.Goal;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
 
 /**
  * Represents an extendable Pathfinder for creating Custom Pathfinders.
@@ -25,15 +22,17 @@ public abstract class CustomPathfinder extends Pathfinder {
      * Example:
      * <pre>
      * // public class LavaFloat extends CustomPathfinder {
-     * 
+     *
      * // This Pathfinder Goal will involve movement and jumping, so we have to add it as a flag
-     * public PathfinderFlag[] getFlags() {
+     * public Set PathfinderFlag> getFlags() {
      *    return new PathfinderFlag[] { PathfinderFlag.MOVEMENT, PathfinderFlag.JUMPING; }
      * }
      * </pre>
+     *
      * @return Flags
      */
-    public abstract PathfinderFlag[] getFlags();
+    @Override
+    public abstract @NotNull PathfinderFlag[] getFlags();
 
     /**
      * Whether this Custom Pathfinder can start.
@@ -100,45 +99,5 @@ public abstract class CustomPathfinder extends Pathfinder {
      * @return true if Pathfinder can continue to use, else false
      */
     public boolean canContinueToUse() { return canStart(); }
-
-    @Override
-    public final Goal getHandle() {
-        CustomPathfinder inst = this;
-
-        return new Goal() {
-            {
-                if (inst.getFlags() != null) {
-                    EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
-                    for (PathfinderFlag f : inst.getFlags()) if (f != null) set.add(f.getHandle());
-                    this.setFlags(set);
-                }                
-            }
-
-            @Override
-            public boolean canUse() {
-                return inst.canStart();
-            }
-
-            @Override
-            public void tick() {
-                inst.tick();
-            }
-
-            @Override
-            public boolean canContinueToUse() {
-                return inst.canContinueToUse();
-            }
-
-            @Override
-            public boolean isInterruptable() {
-                return inst.canInterrupt();
-            }
-
-            @Override
-            public void start() {
-                inst.start();
-            }            
-        };
-    }
 
 }
