@@ -1,12 +1,8 @@
 package me.gamercoder215.mobchip.ai.goal;
 
 import me.gamercoder215.mobchip.ai.SpeedModifier;
-import net.minecraft.world.entity.ai.goal.CatLieOnBedGoal;
 import org.bukkit.entity.Cat;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Field;
-import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Cat to sit on a Bed
@@ -15,26 +11,6 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 
 	private double speedMod;
 	private int range;
-
-	/**
-	 * Constructs a PathfinderCatOnBed from a NMS CatLieOnBedGoal.
-	 * @param g NMS Goal
-	 */
-	public PathfinderCatOnBed(@NotNull CatLieOnBedGoal g) {
-		super(getEntity(g, "g"));
-
-		try {
-			Field a = CatLieOnBedGoal.class.getSuperclass().getDeclaredField("b");
-			a.setAccessible(true);
-			this.speedMod = a.getDouble(g);
-
-			Field b = CatLieOnBedGoal.class.getSuperclass().getDeclaredField("l");
-			b.setAccessible(true);
-			this.range = b.getInt(g);
-		} catch (Exception e) {
-			Logger.getGlobal().severe(e.getMessage());
-		}
-	}
 
 	/**
 	 * Constructs a PathfinderCatOnBed with a range of 4.
@@ -57,6 +33,9 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 		this.speedMod = speedMod;
 		this.range = range;
 	}
+
+	@Override
+	public Cat getEntity() { return (Cat) entity; }
 	
 	@Override
 	public float getRange() {
@@ -81,8 +60,8 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 	}
 
 	@Override
-	public CatLieOnBedGoal getHandle() {
-		return new CatLieOnBedGoal((net.minecraft.world.entity.animal.Cat) nmsEntity, speedMod, range);
-	}
+	public @NotNull PathfinderFlag[] getFlags() { return new PathfinderFlag[] { PathfinderFlag.MOVEMENT, PathfinderFlag.JUMPING }; }
 
+	@Override
+	public String getInternalName() { return "PathfinderGoalCatSitOnBed"; }
 }

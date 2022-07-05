@@ -1,12 +1,8 @@
 package me.gamercoder215.mobchip.ai.goal;
 
 import me.gamercoder215.mobchip.ai.SpeedModifier;
-import net.minecraft.world.entity.ai.goal.CatSitOnBlockGoal;
 import org.bukkit.entity.Cat;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Field;
-import java.util.logging.Logger;
 
 /**
  * Represents a Pathfinder for a Cat to sit on a block
@@ -14,22 +10,6 @@ import java.util.logging.Logger;
 public final class PathfinderCatOnBlock extends Pathfinder implements SpeedModifier {
 
 	private double speedMod;
-
-	/**
-	 * Constructs a PathfinderCatOnBlock from a NMS CatSitOnBlockGoal.
-	 * @param g NMS Goal
-	 */
-	public PathfinderCatOnBlock(@NotNull CatSitOnBlockGoal g) {
-		super(getEntity(g, "g"));
-
-		try {
-			Field a = CatSitOnBlockGoal.class.getSuperclass().getDeclaredField("b");
-			a.setAccessible(true);
-			this.speedMod = a.getDouble(g);
-		} catch (Exception e) {
-			Logger.getGlobal().severe(e.getMessage());
-		}
-	}
 	
 	/**
 	 * Constructs a PathfinderCatOnBlock.
@@ -53,8 +33,13 @@ public final class PathfinderCatOnBlock extends Pathfinder implements SpeedModif
 	}
 
 	@Override
-	public CatSitOnBlockGoal getHandle() {
-		return new CatSitOnBlockGoal((net.minecraft.world.entity.animal.Cat) nmsEntity, speedMod);
+	public @NotNull PathfinderFlag[] getFlags() {
+		return new PathfinderFlag[0];
 	}
 
+	@Override
+	public Cat getEntity() { return (Cat) entity; }
+
+	@Override
+	public String getInternalName() { return "PathfinderGoalJumpOnBlock"; }
 }
