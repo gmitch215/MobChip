@@ -1,9 +1,7 @@
 package me.gamercoder215.mobchip;
 
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Pose;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -117,14 +115,6 @@ public interface EntityBody {
      * @return true if sensitive to water, else false
      */
     boolean isSensitiveToWater();
-
-    /**
-     * Fetches a BoundingBox for the bounds of an Entity's Pose.
-     * @param pose Pose to use
-     * @return BoundingBox showing Pose Bounds
-     */
-    @Nullable
-    BoundingBox getPoseBounds(@Nullable Pose pose);
 
     /**
      * Whether this Mob is affected by Potions.
