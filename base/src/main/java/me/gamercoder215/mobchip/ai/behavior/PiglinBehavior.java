@@ -1,12 +1,11 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Piglin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Represents Behavior for a Bukkit {@link Piglin}
+ * Represents Behavior for a Bukkit Piglin
  */
 public interface PiglinBehavior extends CreatureBehavior {
 
