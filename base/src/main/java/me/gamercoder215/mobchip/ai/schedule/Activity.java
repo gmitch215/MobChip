@@ -1,39 +1,55 @@
 package me.gamercoder215.mobchip.ai.schedule;
 
-import me.gamercoder215.mobchip.util.MobChipUtil;
-import net.minecraft.core.Registry;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a Schedule Activity
  */
-public final class Activity implements Keyed {
+public enum Activity implements Keyed {
+
+    ;
 
     private final NamespacedKey key;
     private final ActivityAction action;
 
-    /**
-     * Creates a new Activity.
-     * @param key Identifier Key to use
-     * @param action Action that is executed for this activity
-     * @throws IllegalArgumentException if key or action is null
-     * @throws UnsupportedOperationException if activity already exists
-     */
-    public Activity(@NotNull NamespacedKey key, @NotNull ActivityAction action) throws IllegalArgumentException, UnsupportedOperationException {
-        Validate.notNull(key, "Key cannot be null");
-        Validate.notNull(action, "Action cannot be null");
-        if (MobChipUtil.exists(key, Registry.ACTIVITY)) { throw new UnsupportedOperationException("Activity already exists"); }
-
+    Activity(NamespacedKey key, ActivityAction action) {
         this.key = key;
         this.action = action;
     }
 
-    @NotNull
+    /**
+     * Fetches the Unique Key for this Activity
+     * @return Activity's Unique Key
+     */
     @Override
-    public NamespacedKey getKey() {
+    public @NotNull NamespacedKey getKey() {
         return this.key;
     }
+
+    /**
+     * Fetches this Activity's Action.
+     * @return Action for this Activity
+     */
+    public @NotNull ActivityAction getAction() {
+        return this.action;
+    }
+
+    /**
+     * Fetches an Activity by its key.
+     * @param key Key to fetch
+     * @return Activity with the given key
+     */
+    @Nullable
+    public static Activity getByKey(NamespacedKey key) {
+        for (Activity activity : values()) {
+            if (activity.getKey().equals(key)) {
+                return activity;
+            }
+        }
+        return null;
+    }
+
 }
