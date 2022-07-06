@@ -17,4 +17,10 @@ public interface FrogBehavior extends CreatureBehavior {
     @NotNull
     BehaviorResult shootTongue(Sound tongueSound, Sound eatSound);
 
+    /**
+     * Makes this frog Croak.
+     * @return Result of Behavior
+     */
+    @NotNull
+    BehaviorResult croak();
 }

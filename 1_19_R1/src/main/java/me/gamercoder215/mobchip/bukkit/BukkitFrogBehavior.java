@@ -19,4 +19,9 @@ class BukkitFrogBehavior extends BukkitCreatureBehavior implements FrogBehavior 
     public @NotNull BehaviorResult shootTongue(Sound tongueSound, Sound eatSound) {
         return run("ShootTongue");
     }
+
+    @Override
+    public @NotNull BehaviorResult croak() {
+        return run("Croak");
+    }
 }
