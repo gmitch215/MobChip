@@ -2,54 +2,71 @@ package me.gamercoder215.mobchip.ai.schedule;
 
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Represents a Schedule Activity
+ * Represents an Activity assignable to a Mob.
  */
 public enum Activity implements Keyed {
 
+    /**
+     * Represents the Main Activity of the Mob.
+     */
+    CORE("core"),
+    /**
+     * Represents the Idle Activity of the Mob.
+     */
+    IDLE("idle"),
+    /**
+     * Represents the Working Activity of the Mob.
+     */
+    WORK("work"),
+    /**
+     * Represents the Playing Activity of the Mob.
+     */
+    PLAY("play"),
+    /**
+     * Represents the Sleeping/Resting Activity of the Mob.
+     */
+    REST("rest"),
+    /**
+     * Represents the Activity while hiding.
+     */
+    HIDE("hide"),
+    /**
+     * Represents the Activity during a raid.
+     */
+    RAID("raid"),
+    /**
+     * Represents the Activity right before a raid will happen.
+     */
+    PRE_RAID("pre_raid"),
     ;
 
     private final NamespacedKey key;
-    private final ActivityAction action;
 
-    Activity(NamespacedKey key, ActivityAction action) {
-        this.key = key;
-        this.action = action;
+    Activity(String id) {
+        this.key = NamespacedKey.minecraft(id);
     }
 
     /**
-     * Fetches the Unique Key for this Activity
-     * @return Activity's Unique Key
+     * Return the namespaced identifier for this object.
+     * @return this object's key
      */
     @Override
-    public @NotNull NamespacedKey getKey() {
+    public NamespacedKey getKey() {
         return this.key;
     }
 
     /**
-     * Fetches this Activity's Action.
-     * @return Action for this Activity
-     */
-    public @NotNull ActivityAction getAction() {
-        return this.action;
-    }
-
-    /**
      * Fetches an Activity by its key.
-     * @param key Key to fetch
-     * @return Activity with the given key
+     * @param key Key of the Activity
+     * @return Activity with the given key, or null if no Activity with the given key exists.
      */
     @Nullable
-    public static Activity getByKey(NamespacedKey key) {
-        for (Activity activity : values()) {
-            if (activity.getKey().equals(key)) {
-                return activity;
-            }
-        }
+    public static Activity getByKey(@Nullable NamespacedKey key) {
+        for (Activity a : values()) if (a.getKey().equals(key)) return a;
+
         return null;
     }
-
 }

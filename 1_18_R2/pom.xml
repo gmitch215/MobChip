@@ -12,6 +12,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
 
         <minecraft.version>1.18.2-R0.1-SNAPSHOT</minecraft.version>
     </properties>
