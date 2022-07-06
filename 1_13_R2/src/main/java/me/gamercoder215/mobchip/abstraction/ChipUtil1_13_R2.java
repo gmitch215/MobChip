@@ -166,14 +166,28 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     private static SoundEffect toNMS(Sound s) {
         return CraftSound.getSoundEffect(CraftSound.getSound(s));
     }
-
     @Override
-    public void addPathfinder(Pathfinder b, int priority, boolean target) {
+    public void removePathfinder(Pathfinder b, boolean target) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
         PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
 
-        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+        final PathfinderGoal g = toNMS(b);
+        if (g == null) return;
+        s.a(g);
+    }
+
+    @Override
+    public void clearPathfinders(Mob mob, boolean target) {
+        EntityInsentient m = toNMS(mob);
+        PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
+
+        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
+    }
+
+    private static PathfinderGoal toNMS(Pathfinder b) {
+        Mob mob = b.getEntity();
+        EntityInsentient m = toNMS(mob);
 
         final PathfinderGoal g;
         switch (b.getInternalName()) {
@@ -431,6 +445,19 @@ public class ChipUtil1_13_R2 implements ChipUtil {
                 } else g = null;
             }
         }
+
+        return g;
+    }
+
+    @Override
+    public void addPathfinder(Pathfinder b, int priority, boolean target) {
+        Mob mob = b.getEntity();
+        EntityInsentient m = toNMS(mob);
+        PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
+
+        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+
+        PathfinderGoal g = toNMS(b);
 
         if (g == null) return;
         s.a(priority, g);

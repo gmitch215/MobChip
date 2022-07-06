@@ -167,15 +167,11 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         return CraftSound.getSoundEffect(s);
     }
 
-    @Override
-    public void addPathfinder(Pathfinder b, int priority, boolean target) {
+    private static Goal toNMS(Pathfinder b) {
         Mob mob = b.getEntity();
         net.minecraft.world.entity.Mob m = toNMS(mob);
-        GoalSelector s = target ? m.targetSelector : m.goalSelector;
 
-        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
-
-        final Goal g = switch (b.getInternalName()) {
+        return switch (b.getInternalName()) {
             case "AvoidTarget" -> {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
                 yield new AvoidEntityGoal<>((PathfinderMob) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
@@ -442,9 +438,39 @@ public class ChipUtil1_18_R1 implements ChipUtil {
                 } else yield null;
             }
         };
+    }
+
+    @Override
+    public void addPathfinder(Pathfinder b, int priority, boolean target) {
+        Mob mob = b.getEntity();
+        net.minecraft.world.entity.Mob m = toNMS(mob);
+        GoalSelector s = target ? m.targetSelector : m.goalSelector;
+
+        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+
+        final Goal g = toNMS(b);
 
         if (g == null) return;
         s.addGoal(priority, g);
+    }
+
+    @Override
+    public void removePathfinder(Pathfinder b, boolean target) {
+        Mob mob = b.getEntity();
+        net.minecraft.world.entity.Mob m = toNMS(mob);
+        GoalSelector s = target ? m.targetSelector : m.goalSelector;
+
+        final Goal g = toNMS(b);
+        if (g == null) return;
+        s.removeGoal(g);
+    }
+
+    @Override
+    public void clearPathfinders(Mob mob, boolean target) {
+        net.minecraft.world.entity.Mob m = toNMS(mob);
+        GoalSelector s = target ? m.targetSelector : m.goalSelector;
+
+        s.removeAllGoals();
     }
 
     private static BehaviorResult.Status fromNMS(Behavior.Status status) {

@@ -24,7 +24,6 @@ public interface ChipUtil {
 
     void addCustomPathfinder(CustomPathfinder p, int priority, boolean target);
 
-    // Other
     Set<WrappedPathfinder> getGoals(Mob m, boolean target);
 
     Collection<WrappedPathfinder> getRunningGoals(Mob m, boolean target);
@@ -32,6 +31,14 @@ public interface ChipUtil {
     void setFlag(Mob m, Pathfinder.PathfinderFlag flag, boolean target, boolean value);
 
     void addPathfinder(Pathfinder p, int priority, boolean target);
+
+    void removePathfinder(Pathfinder p, boolean target);
+
+    void clearPathfinders(Mob mob, boolean target);
+
+    default void addPathfinders(Collection<? extends WrappedPathfinder> c, boolean target) {
+        for (WrappedPathfinder p : c) addPathfinder(p.getPathfinder(), p.getPriority(), target);
+    }
 
     BehaviorResult runBehavior(Mob m, String behaviorName, Object... args);
 

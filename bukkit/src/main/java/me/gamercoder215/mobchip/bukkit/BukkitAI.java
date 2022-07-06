@@ -3,18 +3,18 @@ package me.gamercoder215.mobchip.bukkit;
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
-import me.gamercoder215.mobchip.ai.goal.PathfinderInfo;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
+import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderAddEvent;
 import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderClearEvent;
+import me.gamercoder215.mobchip.bukkit.events.pathfinder.PathfinderRemoveEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static me.gamercoder215.mobchip.abstraction.ChipUtil.getWrapper;
 
@@ -31,15 +31,16 @@ final class BukkitAI implements EntityAI {
 		updateMap();
 	}
 
-	private static final ChipUtil wrapper = getWrapper();
-	
 	private void updateMap() {
 		goals.clear();
-		// TODO
+		goals.addAll(wrapper.getGoals(m, target));
 	}
 
+	private static final ChipUtil wrapper = getWrapper();
+
 	private void updateAI() {
-		// TODO
+		wrapper.clearPathfinders(m, target);
+		wrapper.addPathfinders(goals, target);
 	}
 
 	@Override
@@ -53,11 +54,37 @@ final class BukkitAI implements EntityAI {
 	}
 
 	@Override
-	public boolean contains(Object value) {
-		if (!(value instanceof PathfinderInfo)) return false;
-		PathfinderInfo info = (PathfinderInfo) value;
-		// TODO
+	public boolean contains(Object o) {
+		if (!(o instanceof WrappedPathfinder)) return false;
+		WrappedPathfinder p = (WrappedPathfinder) o;
+		return wrapper.getGoals(m, target).contains(p);
+	}
+
+	@Override
+	public boolean contains(Pathfinder value) {
+		return wrapper.getGoals(m, target).stream().map(WrappedPathfinder::getPathfinder).collect(Collectors.toList()).contains(value);
+	}
+
+	@Override
+	public Pathfinder put(@NotNull Pathfinder p, int priority) {
+		add(new WrappedPathfinder(p, priority));
+		return p;
+	}
+
+	@Override
+	public void putAll(@NotNull Map<? extends Pathfinder, Integer> map) {
+		map.forEach(this::put);
+	}
+
+	@Override
+	public boolean remove(@NotNull Pathfinder p) {
+		for (WrappedPathfinder w : wrapper.getGoals(m, target)) if (w.getPathfinder().equals(p)) return remove(w);
 		return false;
+	}
+
+	@Override
+	public boolean isRunning(Pathfinder p) {
+		return wrapper.getRunningGoals(m, target).stream().map(WrappedPathfinder::getPathfinder).collect(Collectors.toList()).contains(p);
 	}
 
 	@NotNull
@@ -79,41 +106,51 @@ final class BukkitAI implements EntityAI {
 
 	@Override
 	public boolean add(WrappedPathfinder p) {
-		return false;
-	}
+		boolean success = goals.add(p);
 
-	private void addNoAi(WrappedPathfinder value) {
-		goals.add(value);
+		PathfinderAddEvent event = new PathfinderAddEvent(this, p.getPathfinder(), target, p.getPriority());
+		Bukkit.getPluginManager().callEvent(event);
+		updateAI();
+
+		return success;
 	}
 
 	@Override
 	public boolean remove(Object key) {
-		// TODO
-		return false;
+		if (!(key instanceof WrappedPathfinder)) return false;
+		WrappedPathfinder p = (WrappedPathfinder) key;
+
+		boolean success = goals.remove(key);
+
+		PathfinderRemoveEvent event = new PathfinderRemoveEvent(this, p.getPathfinder(), target);
+		Bukkit.getPluginManager().callEvent(event);
+		updateAI();
+
+		return success;
 	}
 
 	@Override
 	public boolean containsAll(@NotNull Collection<?> c) {
-		// TODO
-		return false;
+		return goals.containsAll(c);
 	}
 
 	@Override
 	public boolean addAll(@NotNull Collection<? extends WrappedPathfinder> c) {
-		// TODO
-		return false;
+		AtomicBoolean success = new AtomicBoolean(true);
+
+		c.forEach(w -> { if (!add(w)) success.set(false); });
+
+		return success.get();
 	}
 
 	@Override
 	public boolean retainAll(@NotNull Collection<?> c) {
-		// TODO
-		return false;
+		return goals.retainAll(c);
 	}
 
 	@Override
 	public boolean removeAll(@NotNull Collection<?> c) {
-		// TODO
-		return false;
+		return goals.removeAll(c);
 	}
 
 	@Override
