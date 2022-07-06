@@ -77,12 +77,6 @@
 			<artifactId>mobchip-base</artifactId>
 			<version>${project.parent.version}</version>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.jetbrains</groupId>
-					<artifactId>annotations</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
