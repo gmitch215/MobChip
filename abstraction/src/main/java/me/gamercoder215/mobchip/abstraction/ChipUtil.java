@@ -8,6 +8,8 @@ import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
+import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -50,7 +52,9 @@ public interface ChipUtil {
 
     EntityBody getBody(Mob m);
 
-    <T> void setMemory(Mob mob, Memory<T> m, T value);
+    EntityScheduleManager getManager(Mob m);
+
+     <T>  void setMemory(Mob mob, Memory<T> m, T value);
 
     <T> void setMemory(Mob mob, Memory<T> m, T value, long durationTicks);
 
@@ -75,6 +79,8 @@ public interface ChipUtil {
     boolean hasRestriction(Mob m);
 
     boolean canSee(Mob m, Entity en);
+
+    Schedule getDefaultSchedule(String key);
 
     default void updateGoals(Map<Integer, Pathfinder> goals, Map<Integer, Boolean> target) {
         try {

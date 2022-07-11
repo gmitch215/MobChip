@@ -117,10 +117,20 @@ public final class Schedule {
         }
 
         /**
+         * Fetches the current Timeline as a map in this builder.
+         * @return Current Timeline
+         */
+        @NotNull
+        public Map<Integer, Activity> getTimeline() {
+            return this.map;
+        }
+
+        /**
          * Builds the Schedule.
          * @return Built Schedule
          * @throws IllegalArgumentException if timeline is empty
          */
+        @NotNull
         public Schedule build() throws IllegalArgumentException {
             if (map.isEmpty()) throw new IllegalArgumentException("Timeline cannot be empty");
 
