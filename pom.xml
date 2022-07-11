@@ -19,7 +19,6 @@
 
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
-		<java.version>8</java.version>
 
 		<github>GamerCoder215/MobChip</github>
 		<sonar.organization>gamercoder215</sonar.organization>
@@ -136,6 +135,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<shadeSourcesContent>true</shadeSourcesContent>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<filters>
 								<filter>
