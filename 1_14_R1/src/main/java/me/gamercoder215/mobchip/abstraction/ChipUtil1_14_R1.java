@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.*;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
+import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -1009,10 +1010,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         }
     }
 
-    private static EntityItem toNMS(org.bukkit.entity.Item i) {
-        return (EntityItem) ((CraftItem) i).getHandle();
-    }
-
     private static EntityLiving toNMS(LivingEntity en) {
         return ((CraftLivingEntity) en).getHandle();
     }
@@ -1286,27 +1283,62 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         }
     }
 
-    private static EntityInsentient getEntity(PathfinderGoal g, String name) {
-        try {
-            Class<?> clazz = g.getClass();
-            Field f = clazz.getDeclaredField(name);
-            f.setAccessible(true);
-            return (EntityInsentient) f.get(g);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return null;
-        }
-    }
-
     private static <T extends Entity> Class<? extends T> fromNMS(Class<? extends net.minecraft.server.v1_14_R1.Entity> clazz, Class<T> cast) {
         try {
-            Class<?> bukkit = Entity.class.getDeclaredMethod("getBukkitEntity").getReturnType();
-            return bukkit.asSubclass(cast);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            String name = clazz.getSimpleName();
+            if (name.contains("Entity")) name = name.replace("Entity", "");
 
+            final Class<? extends Entity> bukkit;
+
+            switch (name) {
+                case "": bukkit = Entity.class; break;
+                case "Living": bukkit = LivingEntity.class; break;
+                case "Lightning": bukkit = LightningStrike.class; break;
+                case "Insentient": bukkit = Mob.class; break;
+                case "TameableAnimal": bukkit = Tameable.class; break;
+
+                case "Animal": bukkit = Animals.class; break;
+                case "FishSchool": bukkit = Fish.class; break;
+                case "HorseAbstract": bukkit = AbstractHorse.class; break;
+                case "HorseMule": bukkit = Mule.class; break;
+                case "HorseSkeleton": bukkit = SkeletonHorse.class; break;
+                case "HorseZombie": bukkit = ZombieHorse.class; break;
+                case "HorseDonkey": bukkit = Donkey.class; break;
+                case "WaterAnimal": bukkit = WaterMob.class; break;
+
+                case "GiantZombie": bukkit = Giant.class; break;
+                case "GuardianElder": bukkit = ElderGuardian.class; break;
+                case "IllagerIllusioner": bukkit = Illusioner.class; break;
+                case "SkeletonStray": bukkit = Stray.class; break;
+                case "SkeletonWither": bukkit = WitherSkeleton.class; break;
+                case "ZombieHusk": bukkit = Husk.class; break;
+                case "ZombieVillager": bukkit = ZombieVillager.class; break;
+
+                case "Villager": bukkit = Villager.class; break;
+                case "VillagerAbstract": bukkit = AbstractVillager.class; break;
+                case "VillagerTrader": bukkit = WanderingTrader.class; break;
+
+                case "Human": bukkit = HumanEntity.class; break;
+                case "Player": bukkit = Player.class; break;
+
+                case "Fireworks": bukkit = Firework.class; break;
+                case "FishingHook": bukkit = FishHook.class; break;
+                case "Potion": bukkit = ThrownPotion.class; break;
+                case "ThrownTrident": bukkit = Trident.class; break;
+
+                case "MinecartAbstract": bukkit = Minecart.class; break;
+                case "MinecartChest": bukkit = StorageMinecart.class; break;
+                case "MinecartCommandBlock": bukkit = CommandMinecart.class; break;
+                case "MinecartFurnace": bukkit = PoweredMinecart.class; break;
+                case "MinecartHopper": bukkit = HopperMinecart.class; break;
+                case "MinecartMobSpawner": bukkit = SpawnerMinecart.class; break;
+                case "MinecartTNT": bukkit = ExplosiveMinecart.class; break;
+
+                default: bukkit = Class.forName("org.bukkit.entity." + name).asSubclass(Entity.class);
+            }
+
+            return bukkit.asSubclass(cast);
+        } catch (ClassNotFoundException e) {
             return cast;
         }
     }
@@ -1361,64 +1393,34 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         }
     }
 
-    private static float getFloat(PathfinderGoal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getFloat(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
-    }
+    private static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
 
-    private static double getDouble(PathfinderGoal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getDouble(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
-    }
+    private static double getDouble(PathfinderGoal o, String name) { return getObject(o, name, Double.class); }
 
-    private static boolean getBoolean(Object o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getBoolean(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return false;
-        }
-    }
+    private static boolean getBoolean(PathfinderGoal o, String name) { return getObject(o, name, Boolean.class); }
 
-    private static int getInt(PathfinderGoal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getInt(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
-    }
+    private static int getInt(PathfinderGoal o, String name) { return getObject(o, name, Integer.class); }
 
-    private static <T> T getObject(PathfinderGoal o, String name, Class<T> clazz) {
+    private static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
         try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return clazz.cast(f.get(o));
+            Class<? extends PathfinderGoal> clazz = o.getClass();
+
+            while (clazz.getSuperclass() != null) {
+                try {
+                    Field f = clazz.getDeclaredField(name);
+                    f.setAccessible(true);
+                    return cast.cast(f.get(o));
+                } catch (NoSuchFieldException e) {
+                    if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
+                    else break;
+                }
+            }
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return null;
         }
+
+        return null;
     }
 
     private static Mob fromNMS(EntityInsentient m) { return (Mob) m.getBukkitEntity(); }
@@ -1454,14 +1456,21 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
     private static Mob getEntity(PathfinderGoal g) {
         try {
-            for (Field f : g.getClass().getDeclaredFields()) {
-                f.setAccessible(true);
-                if (f.getDeclaringClass().isAssignableFrom(EntityInsentient.class) && Modifier.isFinal(f.getModifiers())) {
-                    return fromNMS((EntityInsentient) f.get(g));
+            Class<? extends PathfinderGoal> clazz = g.getClass();
+
+            while (clazz.getSuperclass() != null) {
+                for (Field f : clazz.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                        return fromNMS((EntityInsentient) f.get(g));
+                    }
                 }
+
+                if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
+                else break;
             }
-            if (g.getClass().getSuperclass().isAssignableFrom(PathfinderGoal.class)) return getEntity((PathfinderGoal) g.getClass().getSuperclass().cast(g));
-            else return null;
+
+            return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());

@@ -53,6 +53,7 @@ import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R1.entity.*;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.*;
+import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -1262,27 +1263,63 @@ public class ChipUtil1_19_R1 implements ChipUtil {
         };
     }
 
-    private static net.minecraft.world.entity.Mob getEntity(Goal g, String name) {
-        try {
-            Class<?> clazz = g.getClass();
-            Field f = clazz.getDeclaredField(name);
-            f.setAccessible(true);
-            return (net.minecraft.world.entity.Mob) f.get(g);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return null;
-        }
-    }
-
     private static <T extends Entity> Class<? extends T> fromNMS(Class<? extends net.minecraft.world.entity.Entity> clazz, Class<T> cast) {
         try {
-            Class<?> bukkit = Entity.class.getDeclaredMethod("getBukkitEntity").getReturnType();
+            String name = clazz.getSimpleName();
+            if (name.contains("Entity")) name = name.replace("Entity", "");
+
+            Class<? extends Entity> bukkit = switch (name) {
+                case "" -> Entity.class;
+                case "Living" -> LivingEntity.class;
+                case "Lightning" -> LightningStrike.class;
+                case "Insentient" -> Mob.class;
+                case "TameableAnimal" -> Tameable.class;
+
+                case "Animal" -> Animals.class;
+                case "FishSchool" -> Fish.class;
+                case "HorseAbstract" -> AbstractHorse.class;
+                case "HorseMule" -> Mule.class;
+                case "HorseSkeleton" -> SkeletonHorse.class;
+                case "HorseZombie" -> ZombieHorse.class;
+                case "HorseDonkey" -> Donkey.class;
+                case "WaterAnimal" -> WaterMob.class;
+
+                case "GiantZombie" -> Giant.class;
+                case "GuardianElder" -> ElderGuardian.class;
+                case "IllagerIllusioner" -> Illusioner.class;
+                case "SkeletonAbstract" -> AbstractSkeleton.class;
+                case "SkeletonStray" -> Stray.class;
+                case "SkeletonWither" -> WitherSkeleton.class;
+                case "ZombieHusk" -> Husk.class;
+                case "ZombieVillager" -> ZombieVillager.class;
+
+                case "Villager" -> Villager.class;
+                case "VillagerAbstract" -> AbstractVillager.class;
+                case "VillagerTrader" -> WanderingTrader.class;
+
+                case "Human" -> HumanEntity.class;
+                case "Player" -> Player.class;
+
+                case "FireballFireball" -> SizedFireball.class;
+                case "Fireworks" -> Firework.class;
+                case "FishingHook" -> FishHook.class;
+                case "Potion" -> ThrownPotion.class;
+                case "ProjectileThrowable" -> ThrowableProjectile.class;
+                case "ThrownTrident" -> Trident.class;
+
+                case "MinecartAbstract" -> Minecart.class;
+                case "MinecartChest" -> StorageMinecart.class;
+                case "MinecartCommandBlock" -> CommandMinecart.class;
+                case "MinecartFurnace" -> PoweredMinecart.class;
+                case "MinecartHopper" -> HopperMinecart.class;
+                case "MinecartMobSpawner" -> SpawnerMinecart.class;
+                case "MinecartTNT" -> ExplosiveMinecart.class;
+
+                default -> Class.forName("org.bukkit.entity." + name).asSubclass(Entity.class);
+            };
+
             return bukkit.asSubclass(cast);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            
+        } catch (ClassNotFoundException e) {
             return cast;
         }
     }
@@ -1337,64 +1374,40 @@ public class ChipUtil1_19_R1 implements ChipUtil {
         };
     }
 
-    private static float getFloat(Goal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getFloat(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
-    }
+    private static float getFloat(Goal o, String name) { return getObject(o, name, Float.class); }
 
     private static double getDouble(Goal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getDouble(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
+        return getObject(o, name, Double.class);
     }
 
-    private static boolean getBoolean(Object o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getBoolean(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return false;
-        }
+    private static boolean getBoolean(Goal o, String name) {
+        return getObject(o, name, Boolean.class);
     }
 
     private static int getInt(Goal o, String name) {
-        try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return f.getInt(o);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return 0;
-        }
+        return getObject(o, name, Integer.class);
     }
 
-    private static <T> T getObject(Goal o, String name, Class<T> clazz) {
+    private static <T> T getObject(Goal o, String name, Class<T> cast) {
         try {
-            Field f = o.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return clazz.cast(f.get(o));
+            Class<? extends Goal> clazz = o.getClass();
+
+            while (clazz.getSuperclass() != null) {
+                try {
+                    Field f = clazz.getDeclaredField(name);
+                    f.setAccessible(true);
+                    return cast.cast(f.get(o));
+                } catch (NoSuchFieldException e) {
+                    if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
+                    else break;
+                }
+            }
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            return null;
         }
+
+        return null;
     }
 
     private static Mob fromNMS(net.minecraft.world.entity.Mob m) { return (Mob) m.getBukkitEntity(); }
@@ -1411,14 +1424,21 @@ public class ChipUtil1_19_R1 implements ChipUtil {
 
     private static Mob getEntity(Goal g) {
         try {
-            for (Field f : g.getClass().getDeclaredFields()) {
-                f.setAccessible(true);
-                if (f.getDeclaringClass().isAssignableFrom(net.minecraft.world.entity.Mob.class) && Modifier.isFinal(f.getModifiers())) {
-                    return fromNMS((net.minecraft.world.entity.Mob) f.get(g));
+            Class<? extends Goal> clazz = g.getClass();
+
+            while (clazz.getSuperclass() != null) {
+                for (Field f : clazz.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    if (net.minecraft.world.entity.Mob.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                        return fromNMS((net.minecraft.world.entity.Mob) f.get(g));
+                    }
                 }
+
+                if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
+                else break;
             }
-            if (g.getClass().getSuperclass().isAssignableFrom(Goal.class)) return getEntity((Goal) g.getClass().getSuperclass().cast(g));
-            else return null;
+
+            return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
@@ -1500,7 +1520,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 case "BreakDoor" -> new PathfinderBreakDoor(m, getInt(g, "i"), d -> getObject(g, "h", Predicate.class).test(toNMS(d)));
                 case "Breath" -> new PathfinderBreathAir((Creature) m);
                 case "Breed" -> new PathfinderBreed((Animals) m, getDouble(g, "g"));
-                case "CatSitOnBed" -> new PathfinderCatOnBed((Cat) m, getDouble(MoveToBlockGoal.class.cast(g), "b"), getInt(MoveToBlockGoal.class.cast(g), "l"));
+                case "CatSitOnBed" -> new PathfinderCatOnBed((Cat) m, getDouble(g, "b"), getInt(g, "l"));
                 case "CrossbowAttack" -> new PathfinderRangedCrossbowAttack((Pillager) m, getDouble(g, "d"), (float) Math.sqrt(getFloat(g, "e")));
                 case "DoorOpen" -> new PathfinderOpenDoor(m, getBoolean(g, "a"));
                 case "WaterJump" -> new PathfinderDolphinJump((Dolphin) m, getInt(g, "c"));
@@ -1516,7 +1536,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 case "LeapAtTarget" -> new PathfinderLeapAtTarget(m, getFloat(g, "c"));
                 case "JumpOnBlock" -> new PathfinderCatOnBlock((Cat) m, getDouble(g, "g"));
                 case "LlamaFollow" -> new PathfinderLlamaFollowCaravan((Llama) m, getDouble(g, "b"));
-                case "LookAtPlayer" -> new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getFloat(g, "d"), getFloat(g, "e"), getBoolean(g, "i"));
+                case "LookAtPlayer" -> new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "d"), getFloat(g, "e"), getBoolean(g, "i"));
                 case "LookAtTradingPlayer" -> new PathfinderLookAtTradingPlayer((AbstractVillager) m);
                 case "MeleeAttack" -> new PathfinderMeleeAttack((Creature) m, getDouble(g, "b"), getBoolean(g, "c"));
                 case "MoveThroughVillage" -> new PathfinderMoveThroughVillage((Creature) m, getObject(g, "b", BooleanSupplier.class), getDouble(g, "b"), getInt(g, "g"), getBoolean(g, "e"));
@@ -1531,24 +1551,24 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 case "Perch" -> new PathfinderRideShoulder((Parrot) m);
                 case "RandomLookaround" -> new PathfinderRandomLook(m);
                 case "RandomStroll" -> new PathfinderRandomStroll((Creature) m, getDouble(g, "f"), getInt(g, "g"));
-                case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(RandomStrollGoal.class.cast(g), "f"), getFloat(g, "j"));
-                case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(RandomStrollGoal.class.cast(g), "f"), getInt(RandomStrollGoal.class.cast(g), "g"));
-                case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(RandomStrollGoal.class.cast(g), "f"));
-                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(MoveToBlockGoal.class.cast(g), "b"));
+                case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
+                case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
+                case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
+                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
                 case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
                 case "Sit" -> new PathfinderSit((Tameable) m);
-                case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(RandomStrollGoal.class.cast(g), "f"));
-                case "StrollVillageGolem" -> new PathfinderRandomStrollInVillage((Creature) m, getDouble(RandomStrollGoal.class.cast(g), "f"));
+                case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
+                case "StrollVillageGolem" -> new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
                 case "Swell" -> new PathfinderSwellCreeper((Creeper) m);
                 case "Tame" -> new PathfinderTameHorse((AbstractHorse) m);
                 case "Tempt" -> new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "m", Ingredient.class)));
                 case "TradeWithPlayer" -> new PathfinderTradePlayer((AbstractVillager) m);
                 case "UniversalAngerReset" -> new PathfinderResetAnger(m, getBoolean(g, "c"));
                 case "UseItem" -> new PathfinderUseItem(m, fromNMS(getObject(g, "b", net.minecraft.world.item.ItemStack.class)), en -> getObject(g, "c", Predicate.class).test(toNMS(en)), fromNMS(getObject(g, "d", SoundEvent.class)));
-                case "ZombieAttack" -> new PathfinderZombieAttack((Zombie) m, getDouble(MeleeAttackGoal.class.cast(g), "b"), getBoolean(MeleeAttackGoal.class.cast(g), "c"));
+                case "ZombieAttack" -> new PathfinderZombieAttack((Zombie) m, getDouble(g, "b"), getBoolean(g, "c"));
 
                 // Target
-                case "NearestAttackableTarget" -> new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(TargetGoal.class.cast(g), "f"), getBoolean(TargetGoal.class.cast(g), "d"));
+                case "NearestAttackableTarget" -> new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "d"));
                 case "DefendVillage" -> new PathfinderDefendVillage((IronGolem) m);
                 case "HurtByTarget" -> new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
