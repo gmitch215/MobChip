@@ -2,8 +2,12 @@ package me.gamercoder215.mobchip;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents an Entity's Body and Attributes
@@ -178,4 +182,24 @@ public interface EntityBody {
     @NotNull
     InteractionHand getMainHand();
 
+    /**
+     * Fetches the entity's current default drops.
+     * @return List of Default Drops
+     */
+    List<ItemStack> getDefaultDrops();
+
+    /**
+     * Sets the entity's current default drops.
+     * @param drops Array of Default Drops
+     */
+    void setDefaultDrops(@Nullable ItemStack... drops);
+
+    /**
+     * Sets the entity's current default drops.
+     * @param drops Collection of Default Drops
+     */
+    default void setDefaultDrops(@Nullable Collection<ItemStack> drops) {
+        if (drops == null) return;
+        setDefaultDrops(drops.toArray(new ItemStack[0]));
+    }
 }
