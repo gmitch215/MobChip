@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
@@ -10,11 +11,12 @@ import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
+import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftSound;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -23,6 +25,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.*;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
+import org.bukkit.World;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +39,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -983,7 +987,170 @@ public class ChipUtil1_16_R3 implements ChipUtil {
             if (nmsMob.getMainHand() == EnumMainHand.LEFT) return InteractionHand.OFF_HAND;
             return InteractionHand.MAIN_HAND;
         }
+
+        @Override
+        public List<ItemStack> getDefaultDrops() {
+            try {
+                Field dropsF = EntityLiving.class.getDeclaredField("drops");
+                dropsF.setAccessible(true);
+                List<ItemStack> drops = (List<ItemStack>) dropsF.get(nmsMob);
+                return new ArrayList<>(drops);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+        }
+
+        @Override
+        public void setDefaultDrops(@Nullable ItemStack... drops) {
+            try {
+                Field dropsF = EntityLiving.class.getDeclaredField("drops");
+                dropsF.setAccessible(true);
+                dropsF.set(nmsMob, drops == null ? new ArrayList<>() : Arrays.asList(drops));
+            } catch (Exception ignored) {}
+        }
     }
+
+    private static Activity toNMS(me.gamercoder215.mobchip.ai.schedule.Activity a) {
+        return IRegistry.ACTIVITY.get(new MinecraftKey(a.getKey().getKey()));
+    }
+
+    private static me.gamercoder215.mobchip.ai.schedule.Activity fromNMS(Activity a) {
+        MinecraftKey key = IRegistry.ACTIVITY.getKey(a);
+        return me.gamercoder215.mobchip.ai.schedule.Activity.getByKey(NamespacedKey.minecraft(key.getKey()));
+    }
+
+    private static me.gamercoder215.mobchip.ai.schedule.Schedule fromNMS(Schedule s) {
+        me.gamercoder215.mobchip.ai.schedule.Schedule.Builder b = me.gamercoder215.mobchip.ai.schedule.Schedule.builder();
+        for (int i = 0; i < 24000; i++) {
+            if (s.a(i) == null) continue;
+            me.gamercoder215.mobchip.ai.schedule.Activity a = fromNMS(s.a(i));
+            b.addActivity(i, a);
+        }
+
+        return b.build();
+    }
+
+    private static Schedule toNMS(me.gamercoder215.mobchip.ai.schedule.Schedule s) {
+        ScheduleBuilder b = new ScheduleBuilder(new Schedule());
+        for (int i = 0; i < 24000; i++) {
+            if (!s.contains(i)) continue;
+            Activity a = toNMS(s.get(i));
+            b.a(i, a);
+        }
+
+        return b.a();
+    }
+
+    private static <T extends EntityLiving> Behavior<T> toNMS(Consumer<Mob> en) {
+        return new Behavior<T>(Collections.emptyMap()) {
+            @Override
+            protected void d(WorldServer var0, T m, long var2) {
+                if (!(m instanceof EntityInsentient)) return;
+                en.accept(fromNMS((EntityInsentient) m));
+            }
+        };
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.schedule.Schedule getDefaultSchedule(String key) {
+        return fromNMS(IRegistry.SCHEDULE.get(new MinecraftKey(key)));
+    }
+
+    private static Set<me.gamercoder215.mobchip.ai.schedule.Activity> getActiveActivities(Mob m) {
+        EntityInsentient nmsMob = toNMS(m);
+
+        try {
+            Field active = nmsMob.getBehaviorController().getClass().getDeclaredField("j");
+            active.setAccessible(true);
+            Set<Activity> activities = (Set<Activity>) active.get(nmsMob.getBehaviorController());
+            return activities.stream().map(ChipUtil1_16_R3::fromNMS).collect(Collectors.toSet());
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
+
+        return Collections.emptySet();
+    }
+
+    @SuppressWarnings("deprecation")
+    private static final class EntityScheduleManager1_16_R3 implements EntityScheduleManager {
+
+        private final EntityInsentient nmsMob;
+        private final Mob m;
+
+        EntityScheduleManager1_16_R3(Mob m) {
+            this.m = m;
+            this.nmsMob = toNMS(m);
+        }
+
+
+        @Override
+        public @Nullable me.gamercoder215.mobchip.ai.schedule.Schedule getCurrentSchedule() {
+            return fromNMS(nmsMob.getBehaviorController().getSchedule());
+        }
+
+        @Override
+        public void setSchedule(@NotNull me.gamercoder215.mobchip.ai.schedule.Schedule s) {
+            nmsMob.getBehaviorController().setSchedule(toNMS(s));
+        }
+
+        @Override
+        public @NotNull Set<me.gamercoder215.mobchip.ai.schedule.Activity> getActiveActivities() {
+            return ChipUtil1_16_R3.getActiveActivities(m);
+        }
+
+        @Override
+        public void setDefaultActivity(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
+            nmsMob.getBehaviorController().b(toNMS(a));
+        }
+
+        @Override
+        public void useDefaultActivity() {
+            nmsMob.getBehaviorController().e();
+        }
+
+        @Override
+        public void setRunningActivity(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
+            nmsMob.getBehaviorController().a(toNMS(a));
+        }
+
+        @Override
+        public @Nullable me.gamercoder215.mobchip.ai.schedule.Activity getRunningActivity() {
+            return nmsMob.getBehaviorController().f().isPresent() ? fromNMS(nmsMob.getBehaviorController().f().get()) : null;
+        }
+
+        @Override
+        public boolean isRunning(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
+            return nmsMob.getBehaviorController().c(toNMS(a));
+        }
+
+        @Override
+        public int size() {
+            return nmsMob.getBehaviorController().d().size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return nmsMob.getBehaviorController().d().isEmpty();
+        }
+
+        @Nullable
+        @Override
+        public Consumer<Mob> put(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity key, Consumer<Mob> value) {
+            nmsMob.getBehaviorController().a(toNMS(key), 0, ImmutableList.of(toNMS(value)));
+            return value;
+        }
+
+        @Override
+        public void clear() {
+            // doesn't exist
+        }
+
+    }
+
+    @Override
+    public EntityScheduleManager getManager(Mob m) { return new EntityScheduleManager1_16_R3(m); }
 
     @Override
     public EntityController getController(Mob m) {

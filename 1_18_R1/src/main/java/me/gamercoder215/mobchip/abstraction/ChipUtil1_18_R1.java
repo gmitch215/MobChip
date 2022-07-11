@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
@@ -9,6 +10,9 @@ import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
+import me.gamercoder215.mobchip.ai.schedule.Activity;
+import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
@@ -36,16 +40,14 @@ import net.minecraft.world.entity.animal.ShoulderRidingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
@@ -66,6 +68,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -947,7 +950,142 @@ public class ChipUtil1_18_R1 implements ChipUtil {
             if (nmsMob.getMainArm() == HumanoidArm.LEFT) return InteractionHand.OFF_HAND;
             return InteractionHand.MAIN_HAND;
         }
+
+        @Override
+        public List<ItemStack> getDefaultDrops() {
+            return new ArrayList<>(nmsMob.drops);
+        }
+
+        @Override
+        public void setDefaultDrops(@Nullable ItemStack... drops) {
+            nmsMob.drops = new ArrayList<>(Arrays.asList(drops));
+        }
     }
+
+    private static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {
+        return Registry.ACTIVITY.get(new ResourceLocation(a.getKey().getKey()));
+    }
+
+    private static Activity fromNMS(net.minecraft.world.entity.schedule.Activity a) {
+        ResourceLocation key = Registry.ACTIVITY.getKey(a);
+        return Activity.getByKey(NamespacedKey.minecraft(key.getPath()));
+    }
+
+    private static Schedule fromNMS(net.minecraft.world.entity.schedule.Schedule s) {
+        Schedule.Builder b = Schedule.builder();
+        for (int i = 0; i < 24000; i++) {
+            if (s.getActivityAt(i) == null) continue;
+            Activity a = fromNMS(s.getActivityAt(i));
+            b.addActivity(i, a);
+        }
+
+        return b.build();
+    }
+
+    private static net.minecraft.world.entity.schedule.Schedule toNMS(Schedule s) {
+        net.minecraft.world.entity.schedule.ScheduleBuilder b = new ScheduleBuilder(new net.minecraft.world.entity.schedule.Schedule());
+        for (int i = 0; i < 24000; i++) {
+            if (!s.contains(i)) continue;
+            net.minecraft.world.entity.schedule.Activity a = toNMS(s.get(i));
+            b.changeActivityAt(i, a);
+        }
+
+        return b.build();
+    }
+
+    private static <T extends net.minecraft.world.entity.LivingEntity> Behavior<T> toNMS(Consumer<Mob> en) {
+        return new Behavior<>(Collections.emptyMap()) {
+            @Override
+            protected void tick(ServerLevel var0, T m, long var2) {
+                if (!(m instanceof net.minecraft.world.entity.Mob)) return;
+                en.accept(fromNMS((net.minecraft.world.entity.Mob) m));
+            }
+        };
+    }
+
+    @Override
+    public Schedule getDefaultSchedule(String key) {
+        return fromNMS(Registry.SCHEDULE.get(new ResourceLocation(key)));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static final class EntityScheduleManager1_18_R1 implements EntityScheduleManager {
+
+        private final net.minecraft.world.entity.Mob nmsMob;
+        private final Mob m;
+
+        EntityScheduleManager1_18_R1(Mob m) {
+            this.m = m;
+            this.nmsMob = toNMS(m);
+        }
+
+
+        @Override
+        public @Nullable Schedule getCurrentSchedule() {
+            return fromNMS(nmsMob.getBrain().getSchedule());
+        }
+
+        @Override
+        public void setSchedule(@NotNull Schedule s) {
+            nmsMob.getBrain().setSchedule(toNMS(s));
+        }
+
+        @Override
+        public @NotNull Set<Activity> getActiveActivities() {
+            return nmsMob.getBrain().getActiveActivities().stream().map(ChipUtil1_18_R1::fromNMS).collect(Collectors.toSet());
+        }
+
+        @Override
+        public void setDefaultActivity(@NotNull Activity a) {
+            nmsMob.getBrain().setDefaultActivity(toNMS(a));
+        }
+
+        @Override
+        public void useDefaultActivity() {
+            nmsMob.getBrain().useDefaultActivity();
+        }
+
+        @Override
+        public void setRunningActivity(@NotNull Activity a) {
+            nmsMob.getBrain().setActiveActivityIfPossible(toNMS(a));
+        }
+
+        @Override
+        public @Nullable Activity getRunningActivity() {
+            return nmsMob.getBrain().getActiveNonCoreActivity().isPresent() ? fromNMS(nmsMob.getBrain().getActiveNonCoreActivity().get()) : null;
+        }
+
+        @Override
+        public boolean isRunning(@NotNull Activity a) {
+            return nmsMob.getBrain().isActive(toNMS(a));
+        }
+
+        @Override
+        public int size() {
+            return nmsMob.getBrain().getRunningBehaviors().size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return nmsMob.getBrain().getRunningBehaviors().isEmpty();
+        }
+
+        @Nullable
+        @Override
+        public Consumer<Mob> put(@NotNull Activity key, Consumer<Mob> value) {
+            nmsMob.getBrain().addActivity(toNMS(key), 0, ImmutableList.of(toNMS(value)));
+            return value;
+        }
+
+        @Override
+        public void clear() {
+            nmsMob.getBrain().removeAllBehaviors();
+        }
+
+    }
+
+    @Override
+    public EntityScheduleManager getManager(Mob m) { return new EntityScheduleManager1_18_R1(m); }
 
     @Override
     public EntityController getController(Mob m) {
