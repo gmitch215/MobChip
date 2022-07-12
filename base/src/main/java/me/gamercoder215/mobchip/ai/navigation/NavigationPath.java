@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
+import me.gamercoder215.mobchip.util.Position;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a Path for an Entity
  */
-public interface NavigationPath extends Iterable<NavigationNode> {
+public interface NavigationPath extends Iterable<Position> {
 
     /**
      * Whether this NavigationPath is complete.
@@ -23,9 +24,9 @@ public interface NavigationPath extends Iterable<NavigationNode> {
      * @param coll Collection to test
      * @return true if contains, else false
      */
-    default boolean containsAll(Collection<? extends NavigationNode> coll) {
+    default boolean containsAll(Collection<? extends Position> coll) {
         AtomicBoolean state = new AtomicBoolean(true);
-        for (NavigationNode n : coll)
+        for (Position n : coll)
             if (!contains(n)) { state.set(false); break; }
 
         return state.get();
@@ -33,10 +34,10 @@ public interface NavigationPath extends Iterable<NavigationNode> {
 
     /**
      * Whether this Path contains this Navigation Node.
-     * @param node NavigationNode
+     * @param node Position
      * @return true if contains, else false
      */
-    boolean contains(@Nullable NavigationNode node);
+    boolean contains(@Nullable Position node);
 
     /**
      * Whether this NavigationPath is empty.
@@ -51,32 +52,32 @@ public interface NavigationPath extends Iterable<NavigationNode> {
 
     /**
      * Converts this NavigationPath into an Array of Nodes.
-     * @return Array of NavigationNode
+     * @return Array of Position
      */
-    NavigationNode[] toArray();
+    Position[] toArray();
 
     /**
      * Returns the index of this Navigation Node.
-     * @param o NavigationNode to fetch
+     * @param o Position to fetch
      * @return Index found
      * @see List#indexOf(Object)
      */
-    int indexOf(@Nullable NavigationNode o);
+    int indexOf(@Nullable Position o);
 
     /**
      * Returns the last index of this Navigation Node.
-     * @param o NavigationNode to fetch
+     * @param o Position to fetch
      * @return Index found
      * @see List#lastIndexOf(Object)
      */
-    int lastIndexOf(@Nullable NavigationNode o);
+    int lastIndexOf(@Nullable Position o);
 
     /**
      * Whether this NavigationPath contains all of these Navigation Nodes.
      * @param nodes Nodes to test
      * @return true if contains, else false
      */
-    default boolean containsAll(@Nullable NavigationNode... nodes) {
+    default boolean containsAll(@Nullable Position... nodes) {
         return containsAll(Arrays.asList(nodes));
     }
 

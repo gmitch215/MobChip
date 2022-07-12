@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
+import me.gamercoder215.mobchip.util.Position;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
  * <p>
  * As opposed to the {@link EntityController}'s movement methods, this type of movement is better for long distances and is easier to manage.
  * <p>
- * Navigation uses multiple "Nodes" (see {@link NavigationNode}), which are multiple locations to reach before having an end goal.
+ * Navigation uses multiple "Nodes" (see {@link Position}), which are multiple locations to reach before having an end goal.
  */
 public interface EntityNavigation extends SpeedModifier {
     
@@ -24,10 +25,10 @@ public interface EntityNavigation extends SpeedModifier {
 
     /**
      * Adds a Point
-     * @param point NavigationNode to add
+     * @param point Position to add
      * @return this class, for chaining
      */
-    EntityNavigation addPoint(@NotNull NavigationNode point);
+    EntityNavigation addPoint(@NotNull Position point);
 
     /**
      * Adds a Point from Location
@@ -35,7 +36,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation addPoint(@NotNull Location point) {
-        return addPoint(new NavigationNode(point));
+        return addPoint(new Position(point));
     }
 
     /**
@@ -46,7 +47,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation addPoint(int x, int y, int z) {
-        return addPoint(new NavigationNode(x, y, z));
+        return addPoint(new Position(x, y, z));
     }
 
     /**
@@ -61,19 +62,19 @@ public interface EntityNavigation extends SpeedModifier {
     /**
      * Adds a Point at the given index
      * @param index index of point
-     * @param point NavigationNode point to add
+     * @param point Position point to add
      * @return this class, for chaining
      */
-    EntityNavigation addPoint(int index, @NotNull NavigationNode point);
+    EntityNavigation addPoint(int index, @NotNull Position point);
 
     /**
      * Adds a Point at the given index
      * @param index index of point
-     * @param point NavigationNode point to add
+     * @param point Position point to add
      * @return this class, for chaining
      */
     default EntityNavigation addPoint(int index, @NotNull Location point) {
-        return addPoint(index, new NavigationNode(point));
+        return addPoint(index, new Position(point));
     }
 
     /**
@@ -92,7 +93,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @param point NavigationPoint to remove
      * @return this class, for chaining
      */
-    EntityNavigation removePoint(@NotNull NavigationNode point);
+    EntityNavigation removePoint(@NotNull Position point);
 
     /**
      * Removes a Point
@@ -107,7 +108,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation removePoint(@NotNull Location point) {
-        return removePoint(new NavigationNode(point));
+        return removePoint(new Position(point));
     }
 
     /**
@@ -118,15 +119,15 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation removePoint(int x, int y, int z) {
-        return removePoint(new NavigationNode(x, y, z));
+        return removePoint(new Position(x, y, z));
     }
 
     /**
      * Sets the final point of this EntityNavigation.
-     * @param node NavigationNode to set
+     * @param node Position to set
      * @return this class, for chaining
      */
-    EntityNavigation setFinalPoint(@NotNull NavigationNode node);
+    EntityNavigation setFinalPoint(@NotNull Position node);
 
     /**
      * Sets the final point of this EntityNavigation.
@@ -134,7 +135,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation setFinalPoint(@NotNull Location loc) {
-        return setFinalPoint(new NavigationNode(loc));
+        return setFinalPoint(new Position(loc));
     }
 
     /**
@@ -145,7 +146,7 @@ public interface EntityNavigation extends SpeedModifier {
      * @return this class, for chaining
      */
     default EntityNavigation setFinalPoint(int x, int y, int z) {
-        return setFinalPoint(new NavigationNode(x, y, z));
+        return setFinalPoint(new Position(x, y, z));
     }
 
     /**
