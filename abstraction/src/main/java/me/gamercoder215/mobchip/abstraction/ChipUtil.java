@@ -56,7 +56,7 @@ public interface ChipUtil {
 
     EntityScheduleManager getManager(Mob m);
 
-//    void setCustomPhase(EnderDragon a, CustomPhase c);
+    void setCustomPhase(EnderDragon a, CustomPhase c);
 
      <T>  void setMemory(Mob mob, Memory<T> m, T value);
 

@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
@@ -1299,6 +1300,45 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         else value = nmsValue;
 
         return value;
+    }
+
+    private static AbstractDragonController toNMS(CustomPhase c) {
+        return new AbstractDragonController(((CraftEnderDragon) c.getDragon()).getHandle()) {
+            @Override
+            public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
+                try {
+                    Method create = DragonControllerPhase.class.getDeclaredMethod("a");
+                    create.setAccessible(true);
+                    return (DragonControllerPhase<? extends IDragonController>) create.invoke(null, this.getClass(), c.getKey().getKey());
+                } catch (Exception ignored) {}
+                return DragonControllerPhase.HOVER;
+            }
+
+            public void d() { c.start(); }
+            public void e() { c.stop(); }
+            public boolean a() { return c.isSitting(); }
+            public void b() { c.clientTick(); }
+            public void c() { c.serverTick(); }
+            public void a(EntityEnderCrystal crystal, BlockPosition pos, DamageSource s, EntityHuman p) {
+                EnderCrystal bCrystal = (EnderCrystal) crystal.getBukkitEntity();
+                c.onCrystalDestroyed(bCrystal, fromNMS(s), p == null ? null : Bukkit.getPlayer(p.getUniqueID()));
+            }
+            public Vec3D g() {
+                Location l = c.getTargetLocation();
+                return new Vec3D(l.getX(), l.getY(), l.getZ());
+            }
+            public float f() { return c.getFlyingSpeed(); }
+            public float a(DamageSource s, float damage) { return c.onDamage(fromNMS(s), damage); }
+        };
+    }
+
+    @Override
+    public void setCustomPhase(EnderDragon a, CustomPhase c) {
+        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        AbstractDragonController nmsPhase = toNMS(c);
+        try {
+            new DragonControllerManager(nmsMob).setControllerPhase(nmsPhase.getControllerPhase());
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
     private static EntityDamageEvent.DamageCause fromNMS(DamageSource c) {

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.memories.Memory;
@@ -37,6 +38,11 @@ import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonPhaseInstance;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
+import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
+import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhaseManager;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -47,6 +53,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R1.CraftSound;
@@ -980,6 +987,45 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         }
 
         return b.build();
+    }
+
+    private static AbstractDragonPhaseInstance toNMS(CustomPhase c) {
+        return new AbstractDragonPhaseInstance(((CraftEnderDragon) c.getDragon()).getHandle()) {
+            @Override
+            public EnderDragonPhase<? extends DragonPhaseInstance> getPhase() {
+                try {
+                    Method create = EnderDragonPhase.class.getDeclaredMethod("a");
+                    create.setAccessible(true);
+                    return (EnderDragonPhase<? extends DragonPhaseInstance>) create.invoke(null, this.getClass(), c.getKey().getKey());
+                } catch (Exception ignored) {}
+                return EnderDragonPhase.HOVERING;
+            }
+
+            public void begin() { c.start(); }
+            public void end() { c.stop(); }
+            public boolean isSitting() { return c.isSitting(); }
+            public void doClientTick() { c.clientTick(); }
+            public void doServerTick() { c.serverTick(); }
+            public void onCrystalDestroyed(EndCrystal crystal, BlockPos pos, DamageSource s, net.minecraft.world.entity.player.Player p) {
+                EnderCrystal bCrystal = (EnderCrystal) crystal.getBukkitEntity();
+                c.onCrystalDestroyed(bCrystal, fromNMS(s), p == null ? null : Bukkit.getPlayer(p.getUUID()));
+            }
+            public Vec3 getFlyTargetLocation() {
+                Location l = c.getTargetLocation();
+                return new Vec3(l.getX(), l.getY(), l.getZ());
+            }
+            public float getFlySpeed() { return c.getFlyingSpeed(); }
+            public float onHurt(DamageSource s, float damage) { return c.onDamage(fromNMS(s), damage); }
+        };
+    }
+
+    @Override
+    public void setCustomPhase(EnderDragon a, CustomPhase c) {
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        AbstractDragonPhaseInstance nmsPhase = toNMS(c);
+        try {
+            new EnderDragonPhaseManager(nmsMob).setPhase(nmsPhase.getPhase());
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
     private static net.minecraft.world.entity.schedule.Schedule toNMS(Schedule s) {
