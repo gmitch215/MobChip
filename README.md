@@ -82,14 +82,14 @@ dependencies {
 
 ```kotlin
 repositories {
-    maven { url 'https://jitpack.io' }
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
     // Base Module - Used for Base Interfaces & Built-In Template Classes
-    implementation(com.github.GamerCoder215.MobChip:mobchip-base:[VERSION])
+    implementation("com.github.GamerCoder215.MobChip:mobchip-base:[VERSION]")
     // Bukkit Module - Used for Implmentation, Development & Events - Contains Base
-    implementation (com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION])
+    implementation ("com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION]")
 }
 ```
 </details>
@@ -109,6 +109,7 @@ Here's how to fetch a Pathfinder from the Goal Selector:
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
+import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
 
 // Bukkit Imports...
 
@@ -121,21 +122,18 @@ public class MyPlugin extends JavaPlugin {
         // Goal Selector
         EntityAI goal = brain.getGoalAI();
 
-        // EntityAI Interface extends Map<Integer, Pathfinder>, so you can use map keywords
+        // EntityAI Interface extends Set<WrappedPathfinder>, so you can use set keywords
         // Pathfinders each have a priority, and will go through each one from least priority to most priority
-
-        // Gets Pathfinder with the priority of 0
-
-        Pathfinder p = goal.get(0);
-        return p;
-
-        // Gets Pathfinder with the priority of 2
-        Pathfinder p2 = goal.get(2);
-        return p2;
-
-        // Gets Pathfinder from the Target Selector with the priority of 5
-        Pathfinder p3 = brian.getTargetAI().get(5);
-        return p3;
+        // In the past we used to use Maps but then we allowed support for Pathfinders to have the same priority
+        
+        final Pathfinder pathfinder;
+        
+        for (WrappedPathfinder p : goal.stream().filter(p -> p.getPriority() == 1).collect(Collections.toSet())) {
+            pathfinder = p.getPathfinder();
+            break;
+        }
+        
+        return pathfinder;
     }
 
 }
@@ -232,9 +230,7 @@ public class MyPathfinder extends CustomPathfinder {
         // do nothing
     }
 
-    // There's also canInterrupt(), canContinueToUse(), and updateEveryTick() boolean methods you can override.
-
-    // It is not recommended to override updateEveryTick().
+    // There's also canInterrupt() and canContinueToUse() boolean methods you can override.
 
     // canContinueToUse() defaults to canUse(), but is useful if you have a different check after the first time canUse() is called.
 
@@ -279,14 +275,14 @@ Navigation is a complex way of moving an entity.
 - Pauses between Movement Points
 
 #### Creating a Path
-A NavigationPath is a specific type of Path that contains many NavigationNodes, which are points of Locations that don't require a world.
+A NavigationPath is a specific type of Path that contains many Positions, which are points of Locations that don't require a world.
 
 Here's how to create a path:
 
 ```java
 import me.gamercoder215.mobchip.bukkit.BukkitBrain;
 import me.gamercoder215.mobchip.EntityBrain;
-import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
+import me.gamercoder215.mobchip.util.Position;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 
@@ -299,16 +295,16 @@ public class MyPlugin extends JavaPlugin {
         EntityNavigation navigation = brain.createNavigation();
 
         // Creates and adds a new Node at (100, 64, 128)
-        NavigationNode point1 = new NavigationNode(100, 64, 128);
+        Position point1 = new Position(100, 64, 128);
         navigation.addPoint(point1);
 
         // Creates and adds a new Node at (-162, 65, -278)
-        NavigationNode point2 = new NavigationNode(-162, 65, -278);
+        Position point2 = new Position(-162, 65, -278);
         navigation.addPoint(point2);
 
         // Creates and adds the final Node at (-178, 77, -300)
         // Final Points need to be explicitly specified
-        NavigationNode point3 = new NavigationNode(-178, 77, -300);
+        Position point3 = new Position(-178, 77, -300);
         navigation.setFinalPoint(point3);
 
         // Because we're going over large distances, we need to specify a large range
@@ -399,4 +395,47 @@ public class MyPlugin extends JavaPlugin {
     
 }
 
+```
+
+### Scheduling
+Schedules are actions that an Entity Performs every Minecraft Day between 0 and 24,000 ticks.
+
+```java
+import me.gamercoder215.mobchip.bukkit.BukkitBrain;
+import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.ai.scheduling.*;
+
+public class MyPlugin extends JavaPlugin {
+    
+    public void updateSchedule(Mob m) {
+        EntityBrain brain = BukkitBrain.getBrain(m);
+        
+        EntityScheduleManager manager = brain.getScheduleManager();
+        manager.setDefaultActivity(Activity.IDLE); // Set the default Activity to IDLE
+        
+        Schedule simple = DefaultSchedules.SIMPLE; // Default Built-In Schedules are available in the bukkit module
+        manager.setSchedule(simple);
+        
+        // Creates your own Custom Schedule
+        Schedule custom = Schedule.builder()
+                .addActivity(0, Activity.IDLE) // Idle at 0 ticks
+                .addActivity(11000, Activity.PLAY) // Play at 11,000 ticks
+                .addActivity(18000, Activity.REST) // Rest at 18,000 ticks
+                .build();
+        
+        // Schedules will be executed at their specified tick and will repeat the action according to the manager until another activity is available on that tick
+        manager.setSchedule(custom);
+        
+        // Add Actions for specified Activities
+        manager.put(Activity.PLAY, en -> Bukkit.getLogger().info("Playing!")); // Activities run EVERY TICK until another is available
+        
+        // Schedules run automatically
+        
+        // Overrides the current running activity from the schedule
+        manager.useDefaultActivity(); // Uses the default activity as the running activity
+        manager.setRunningActivity(Activity.REST); // Sets the running activity to REST
+        
+    }
+    
+}
 ```
