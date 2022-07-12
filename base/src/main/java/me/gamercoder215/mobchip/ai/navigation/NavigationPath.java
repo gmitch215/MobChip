@@ -38,6 +38,10 @@ public interface NavigationPath extends Iterable<NavigationNode> {
      */
     boolean contains(@Nullable NavigationNode node);
 
+    /**
+     * Whether this NavigationPath is empty.
+     * @return true if empty, else false
+     */
     boolean isEmpty();
 
     /**

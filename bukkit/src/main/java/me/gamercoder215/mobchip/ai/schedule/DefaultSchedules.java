@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class DefaultSchedules {
 
+    private DefaultSchedules() {};
+
     private static final ChipUtil wrapper = ChipUtil.getWrapper();
 
     /**
