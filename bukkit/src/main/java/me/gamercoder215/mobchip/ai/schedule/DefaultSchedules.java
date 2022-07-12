@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.ai.schedule;
 
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -32,7 +33,7 @@ public final class DefaultSchedules {
      * @param id ID of the Schedule
      * @return Schedule found, or {@link #EMPTY} if not found
      */
-    @Nullable
+    @NotNull
     public static Schedule get(@Nullable String id) {
         if (id == null) return EMPTY;
         Schedule s = wrapper.getDefaultSchedule(id);
