@@ -95,7 +95,7 @@ public final class Schedule {
      */
     public static final class Builder {
 
-        private Map<Integer, Activity> map;
+        private final Map<Integer, Activity> map;
 
         private Builder() {
             this.map = new HashMap<>();

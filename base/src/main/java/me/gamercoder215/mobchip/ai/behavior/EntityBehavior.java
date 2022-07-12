@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 /**
  * Represents Entity Behavior.
- * <p></p>
+ * <br><br>
  * Some of these may require {@link Memory}(ies) to be present or not present, so calling some of these methods will not always work.
  */
 public interface EntityBehavior {

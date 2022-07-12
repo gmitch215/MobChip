@@ -3,6 +3,7 @@ package me.gamercoder215.mobchip.abstraction;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
@@ -12,6 +13,7 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 
@@ -53,6 +55,8 @@ public interface ChipUtil {
     EntityBody getBody(Mob m);
 
     EntityScheduleManager getManager(Mob m);
+
+//    void setCustomPhase(EnderDragon a, CustomPhase c);
 
      <T>  void setMemory(Mob mob, Memory<T> m, T value);
 
