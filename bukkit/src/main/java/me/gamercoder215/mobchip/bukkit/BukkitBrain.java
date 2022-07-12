@@ -14,6 +14,7 @@ import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
@@ -23,22 +24,25 @@ import org.jetbrains.annotations.Nullable;
  * Bukkit Implementation of EntityBrain
  * @see EntityBrain
  */
-public final class BukkitBrain implements EntityBrain {
+public class BukkitBrain implements EntityBrain {
 	
-	private final Mob m;
+	final Mob m;
 
-	private BukkitBrain(@NotNull Mob m) {
+	BukkitBrain(@NotNull Mob m) {
 		this.m = m;
 	}
 
-	private static final ChipUtil wrapper = ChipUtil.getWrapper();
+	static final ChipUtil wrapper = ChipUtil.getWrapper();
 
 	/**
 	 * Get the EntityBrain of this Mob.
 	 * @param m Mob to get
 	 * @return EntityBrain
 	 */
-	public static EntityBrain getBrain(@NotNull Mob m) {
+	@Nullable
+	public static EntityBrain getBrain(@Nullable Mob m) {
+		if (m == null) return null;
+		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
 		return new BukkitBrain(m);
 	}
 
