@@ -38,6 +38,15 @@ public abstract class CustomPhase implements Keyed {
     }
 
     /**
+     * Fetches the Dragon associated with this Custom Phase.
+     * @return EnderDragon used in this phase
+     */
+    @NotNull
+    public final EnderDragon getDragon() {
+        return this.dragon;
+    }
+
+    /**
      * Fetches the target location of the Ender Dragon during this Phase.
      * @return Target Location during Phase
      */
@@ -79,8 +88,9 @@ public abstract class CustomPhase implements Keyed {
      * Called when the Dragon is damaged during this phase.
      * @param cause Damage Cause that damaged the Dragon
      * @param amount Amount of damage that was dealt
+     * @return the new damage amount
      */
-    public void onDamage(EntityDamageEvent.DamageCause cause, float amount) {}
+    public float onDamage(EntityDamageEvent.DamageCause cause, float amount) { return amount; }
 
     /**
      * Whether the Ender Dragon is currently sitting.
