@@ -100,4 +100,8 @@ public abstract class CustomPathfinder extends Pathfinder {
      */
     public boolean canContinueToUse() { return canStart(); }
 
+    public String getInternalName() {
+        return "CustomPathfinder";
+    }
+
 }
