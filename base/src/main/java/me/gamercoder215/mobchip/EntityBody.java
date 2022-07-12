@@ -1,5 +1,7 @@
 package me.gamercoder215.mobchip;
 
+import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents an Entity's Body and Attributes
@@ -202,4 +205,122 @@ public interface EntityBody {
         if (drops == null) return;
         setDefaultDrops(drops.toArray(new ItemStack[0]));
     }
+
+    /**
+     * Whether this Mob is currently in combat.
+     * @return true if mob is in combat, else false
+     */
+    boolean isInCombat();
+
+    /**
+     * Fetches the Mob's current flying speed.
+     * @return Current Flying Speed (between 0.0F and 1.0F)
+     */
+    float getFlyingSpeed();
+
+    /**
+     * Sets the Mob's current flying speed.
+     * @param speed Flying Speed to set
+     * @throws IllegalArgumentException if speed is not between 0.0F and 1.0F
+     */
+    void setFlyingSpeed(float speed) throws IllegalArgumentException;
+
+    /**
+     * Whether the Mob is currently forced to drop its loot.
+     * @return true if mob is forced to drop loot, else false
+     */
+    boolean isForcingDrops();
+
+    /**
+     * Sets if the Mob should be forced to drop its loot.
+     * @param drop true if mob is forced to drop loot, else false
+     */
+    void setForcingDrops(boolean drop);
+
+    /**
+     * Whether this Mob is currently moving.
+     * @return true if mob is moving, else false
+     */
+    boolean isMoving();
+
+    /**
+     * Fetches the Mob's current body rotation (between 0.0F and 360.0F)
+     * @return Current Body Rotation
+     */
+    float getBodyRotation();
+
+    /**
+     * Sets the Mob's current body rotation.
+     * <br><br>
+     * If the rotation is not between 0.0F and 360.0F, it will be wrapped to be between 0.0F and 360.0F (e.g. 480.0F = 120.0F).
+     * @param rotation Body Rotation to set
+     */
+    void setBodyRotation(float rotation);
+
+    /**
+     * Fetches the Mob's current head rotation (between 0.0F and 360.0F)
+     * @return Current Head Rotation
+     */
+    float getHeadRotation();
+
+    /**
+     * Sets the Mob's current head rotation.
+     * <br><br>
+     * If the rotation is not between 0.0F and 360.0F, it will be wrapped to be between 0.0F and 360.0F (e.g. 480.0F = 120.0F).
+     * @param rotation Head Rotation to set
+     */
+    void setHeadRotation(float rotation);
+
+    /**
+     * Fetches a set of all entities that this Mob will not collide with.
+     * @return Entities that this Mob will not collide with
+     */
+    Set<? extends Entity> getCollideExemptions();
+
+    /**
+     * Adds an entity that this Mob will not collide with.
+     * @param en Entity to add
+     * @throws IllegalArgumentException if entity is null
+     */
+    void addCollideExemption(@NotNull Entity en) throws IllegalArgumentException;
+
+    /**
+     * Removes an entity that this Mob will not collide with.
+     * @param en Entity to remove
+     * @throws IllegalArgumentException if entity is null
+     */
+    void removeCollideExemption(@NotNull Entity en) throws IllegalArgumentException;
+
+    /**
+     * Fetches the amount of experience this Mob will drop.
+     * @return Amount of Experience
+     */
+    int getDroppedExperience();
+
+    /**
+     * Sets the amount of experience this Mob will drop.
+     * @param exp Experience Dropped
+     * @throws IllegalArgumentException if experience is less than 0
+     */
+    void setDroppedExperience(int exp) throws IllegalArgumentException;
+
+    /**
+     * Makes this Mob perform an Animation.
+     * @param anim Animation to perform
+     */
+    void playAnimation(@NotNull EntityAnimation anim);
+
+    /**
+     * Fetches the Mob's current animation speed.
+     * @return Current Animation Speed
+     */
+    float getAnimationSpeed();
+
+    /**
+     * Sets the Mob's current animation speed.
+     * @param speed Animation Speed to set
+     * @throws IllegalArgumentException if speed is less than 0.0F
+     */
+    void setAnimationSpeed(float speed) throws IllegalArgumentException;
+
 }
