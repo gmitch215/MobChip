@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip.abstraction;
 
 import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.EntityBody;
+import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
@@ -9,7 +10,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
-import me.gamercoder215.mobchip.ai.navigation.NavigationNode;
+import me.gamercoder215.mobchip.util.Position;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
@@ -17,6 +18,7 @@ import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -644,7 +646,7 @@ public class ChipUtil1_18_R1 implements ChipUtil {
             this.handle = nms;
         }
 
-        private final List<NavigationNode> nodes = new ArrayList<>();
+        private final List<Position> nodes = new ArrayList<>();
 
         /**
          * Advances this path.
@@ -704,49 +706,49 @@ public class ChipUtil1_18_R1 implements ChipUtil {
 
         /**
          * Whether this Path contains this Navigation Node.
-         * @param o NavigationNode
+         * @param o Position
          * @return true if contains, else false
          */
         @Override
-        public boolean contains(@Nullable NavigationNode o) {
+        public boolean contains(@Nullable Position o) {
             return nodes.contains(o);
         }
 
         @Override
         @NotNull
-        public Iterator<NavigationNode> iterator() {
+        public Iterator<Position> iterator() {
             return nodes.iterator();
         }
 
         /**
          * Converts this NavigationPath into an Array of Nodes.
-         * @return Array of NavigationNode
+         * @return Array of Position
          */
         @NotNull
         @Override
-        public NavigationNode[] toArray() {
-            return nodes.toArray(new NavigationNode[0]);
+        public Position[] toArray() {
+            return nodes.toArray(new Position[0]);
         }
 
         /**
          * Returns the index of this Navigation Node.
-         * @param o NavigationNode to fetch
+         * @param o Position to fetch
          * @return Index found
          * @see List#indexOf(Object)
          */
         @Override
-        public int indexOf(@Nullable NavigationNode o) {
+        public int indexOf(@Nullable Position o) {
             return nodes.indexOf(o);
         }
 
         /**
          * Returns the last index of this Navigation Node.
-         * @param o NavigationNode to fetch
+         * @param o Position to fetch
          * @return Index found
          * @see List#lastIndexOf(Object)
          */
         @Override
-        public int lastIndexOf(@Nullable NavigationNode o) {
+        public int lastIndexOf(@Nullable Position o) {
             return nodes.lastIndexOf(o);
         }
     }
@@ -757,7 +759,7 @@ public class ChipUtil1_18_R1 implements ChipUtil {
 
         private int speedMod;
         private int range;
-        private final List<NavigationNode> points;
+        private final List<Position> points;
         private BlockPos finalPos;
 
         private final Mob m;
@@ -789,19 +791,19 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         }
 
         @Override
-        public EntityNavigation addPoint(@NotNull NavigationNode point) {
+        public EntityNavigation addPoint(@NotNull Position point) {
             this.points.add(point);
             return this;
         }
 
         @Override
-        public EntityNavigation addPoint(int index, @NotNull NavigationNode point) {
+        public EntityNavigation addPoint(int index, @NotNull Position point) {
             this.points.add(index, point);
             return this;
         }
 
         @Override
-        public EntityNavigation removePoint(@NotNull NavigationNode point) {
+        public EntityNavigation removePoint(@NotNull Position point) {
             this.points.remove(point);
             return this;
         }
@@ -819,7 +821,7 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         }
 
         @Override
-        public EntityNavigation setFinalPoint(@NotNull NavigationNode node) {
+        public EntityNavigation setFinalPoint(@NotNull Position node) {
             this.finalPos = new BlockPos(node.getX(), node.getY(), node.getZ());
             return this;
         }
@@ -966,6 +968,114 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         @Override
         public void setDefaultDrops(@Nullable ItemStack... drops) {
             nmsMob.drops = new ArrayList<>(Arrays.asList(drops));
+        }
+
+        @Override
+        public boolean isInCombat() {
+            return nmsMob.combatTracker.isInCombat();
+        }
+
+        @Override
+        public float getFlyingSpeed() {
+            return nmsMob.flyingSpeed;
+        }
+
+        @Override
+        public void setFlyingSpeed(float speed) throws IllegalArgumentException {
+            if (speed < 0 || speed > 1) throw new IllegalArgumentException("Flying speed must be between 0.0F and 1.0F");
+            nmsMob.flyingSpeed = speed;
+        }
+
+        @Override
+        public boolean isForcingDrops() {
+            return nmsMob.forceDrops;
+        }
+
+        @Override
+        public void setForcingDrops(boolean drop) {
+            nmsMob.forceDrops = drop;
+        }
+
+        @Override
+        public boolean isMoving() {
+            double x = nmsMob.getX() - nmsMob.xo;
+            double z = nmsMob.getZ() - nmsMob.zo;
+            return x * x + z * z > 2.500000277905201E-7D;
+        }
+
+        @Override
+        public float getBodyRotation() {
+            return nmsMob.yBodyRot;
+        }
+
+        @Override
+        public void setBodyRotation(float rotation) {
+            nmsMob.yBodyRot = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+        }
+
+        @Override
+        public float getHeadRotation() {
+            return nmsMob.yHeadRot;
+        }
+
+        @Override
+        public void setHeadRotation(float rotation) {
+            nmsMob.yHeadRot = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+        }
+
+        @Override
+        public Set<? extends Entity> getCollideExemptions() {
+            return nmsMob.collidableExemptions.stream().map(Bukkit::getEntity).filter(Objects::nonNull).collect(Collectors.toSet());
+        }
+
+        @Override
+        public void addCollideExemption(@NotNull Entity en) throws IllegalArgumentException {
+            if (en == null) throw new IllegalArgumentException("Entity cannot be null");
+            nmsMob.collidableExemptions.add(en.getUniqueId());
+        }
+
+        @Override
+        public void removeCollideExemption(@NotNull Entity en) throws IllegalArgumentException {
+            if (en == null) throw new IllegalArgumentException("Entity cannot be null");
+            nmsMob.collidableExemptions.remove(en.getUniqueId());
+        }
+
+        @Override
+        public int getDroppedExperience() {
+            return nmsMob.expToDrop;
+        }
+
+        @Override
+        public void setDroppedExperience(int exp) throws IllegalArgumentException {
+            if (exp < 0) throw new IllegalArgumentException("Experience cannot be negative");
+            nmsMob.expToDrop = exp;
+        }
+
+        @Override
+        public void playAnimation(@NotNull EntityAnimation anim) {
+            switch (anim) {
+                case SPAWN -> nmsMob.spawnAnim();
+                case DAMAGE -> nmsMob.animateHurt();
+                case CRITICAL_DAMAGE -> {
+                    ClientboundAnimatePacket pkt = new ClientboundAnimatePacket(nmsMob, 4);
+                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).connection.send(pkt);
+                }
+                case MAGICAL_CRITICAL_DAMAGE -> {
+                    ClientboundAnimatePacket pkt = new ClientboundAnimatePacket(nmsMob, 5);
+                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).connection.send(pkt);
+                }
+            }
+        }
+
+        @Override
+        public float getAnimationSpeed() {
+            return nmsMob.animationSpeed;
+        }
+
+        @Override
+        public void setAnimationSpeed(float speed) throws IllegalArgumentException {
+            if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
+            nmsMob.animationSpeed = speed;
         }
     }
 
