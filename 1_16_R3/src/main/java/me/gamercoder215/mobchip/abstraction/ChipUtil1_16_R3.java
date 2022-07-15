@@ -1,8 +1,12 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
+import me.gamercoder215.mobchip.ai.attribute.Attribute;
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
@@ -11,23 +15,23 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
-import me.gamercoder215.mobchip.util.Position;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftSound;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.attribute.CraftAttributeInstance;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.entity.*;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
-import org.bukkit.World;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -1915,7 +1919,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                 case "BreakDoor": return new PathfinderBreakDoor(m, getInt(g, "i"), d -> getObject(g, "h", Predicate.class).test(toNMS(d)));
                 case "Breath": return new PathfinderBreathAir((Creature) m);
                 case "Breed": return new PathfinderBreed((Animals) m, getDouble(g, "g"));
-                case "CatSitOnBed": return new PathfinderCatOnBed((Cat) m, getDouble(PathfinderGoalGotoTarget.class.cast(g), "b"), getInt(PathfinderGoalGotoTarget.class.cast(g), "l"));
+                case "CatSitOnBed": return new PathfinderCatOnBed((Cat) m, getDouble(g, "b"), getInt(g, "l"));
                 case "CrossbowAttack": return new PathfinderRangedCrossbowAttack((Pillager) m, getDouble(g, "d"), (float) Math.sqrt(getFloat(g, "e")));
                 case "DoorOpen": return new PathfinderOpenDoor(m, getBoolean(g, "a"));
                 case "WaterJump": return new PathfinderDolphinJump((Dolphin) m, getInt(g, "c"));
@@ -1946,24 +1950,24 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                 case "Perch": return new PathfinderRideShoulder((Parrot) m);
                 case "RandomLookaround": return new PathfinderRandomLook(m);
                 case "RandomStroll": return new PathfinderRandomStroll((Creature) m, getDouble(g, "f"), getInt(g, "g"));
-                case "RandomStrollLand": return new PathfinderRandomStrollLand((Creature) m, getDouble(PathfinderGoalRandomStroll.class.cast(g), "f"), getFloat(g, "j"));
-                case "RandomSwim": return new PathfinderRandomSwim((Creature) m, getDouble(PathfinderGoalRandomStroll.class.cast(g), "f"), getInt(PathfinderGoalRandomStroll.class.cast(g), "g"));
-                case "RandomFly": return new PathfinderRandomStrollFlying((Creature) m, getDouble(PathfinderGoalRandomStroll.class.cast(g), "f"));
-                case "RemoveBlock": return new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(PathfinderGoalGotoTarget.class.cast(g), "b"));
+                case "RandomStrollLand": return new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
+                case "RandomSwim": return new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
+                case "RandomFly": return new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
+                case "RemoveBlock": return new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
                 case "RestrictSun": return new PathfinderRestrictSun((Creature) m);
                 case "Sit": return new PathfinderSit((Tameable) m);
-                case "StrollVillage": return new PathfinderRandomStrollToVillage((Creature) m, getDouble(PathfinderGoalRandomStroll.class.cast(g), "f"));
-                case "StrollVillageGolem": return new PathfinderRandomStrollInVillage((Creature) m, getDouble(PathfinderGoalRandomStroll.class.cast(g), "f"));
+                case "StrollVillage": return new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
+                case "StrollVillageGolem": return new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
                 case "Swell": return new PathfinderSwellCreeper((Creeper) m);
                 case "Tame": return new PathfinderTameHorse((AbstractHorse) m);
                 case "Tempt": return new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "m", RecipeItemStack.class)));
                 case "TradeWithPlayer": return new PathfinderTradePlayer((AbstractVillager) m);
                 case "UniversalAngerReset": return new PathfinderResetAnger(m, getBoolean(g, "c"));
                 case "UseItem": return new PathfinderUseItem(m, fromNMS(getObject(g, "b", net.minecraft.server.v1_16_R3.ItemStack.class)), en -> getObject(g, "c", Predicate.class).test(toNMS(en)), fromNMS(getObject(g, "d", SoundEffect.class)));
-                case "ZombieAttack": return new PathfinderZombieAttack((Zombie) m, getDouble(PathfinderGoalMeleeAttack.class.cast(g), "b"), getBoolean(PathfinderGoalMeleeAttack.class.cast(g), "c"));
+                case "ZombieAttack": return new PathfinderZombieAttack((Zombie) m, getDouble(g, "b"), getBoolean(g, "c"));
 
                 // Target
-                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(PathfinderGoalTarget.class.cast(g), "f"), getBoolean(PathfinderGoalTarget.class.cast(g), "d"));
+                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "d"));
                 case "DefendVillage": return new PathfinderDefendVillage((IronGolem) m);
                 case "HurtByTarget": return new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
@@ -1972,6 +1976,162 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                 default: return custom(g);
             }
         } else return custom(g);
+    }
+
+    private static class Attribute1_16_R3 extends AttributeRanged implements Attribute {
+
+        private final NamespacedKey key;
+        private final double defaultV;
+        private final double min;
+        private final double max;
+
+        private static double getDouble(AttributeRanged r, String s) {
+            try {
+                Field f = r.getClass().getDeclaredField(s);
+                f.setAccessible(true);
+                return f.getDouble(r);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        public Attribute1_16_R3(AttributeRanged a) {
+            super(a.getName(), a.getDefault(), getDouble(a, "a"), a.maximum);
+            this.key = IRegistry.ATTRIBUTE.getKey(a) == null ? NamespacedKey.minecraft(a.getName()) : CraftNamespacedKey.fromMinecraft(IRegistry.ATTRIBUTE.getKey(a));
+            this.defaultV = a.getDefault();
+            this.min = getDouble(a, "a");
+            this.max = a.maximum;
+        }
+
+        public Attribute1_16_R3(NamespacedKey key, double defaultV, double min, double max, boolean clientSide) {
+            super("attribute.name." +  key.getKey().toLowerCase(), defaultV, min, max);
+            this.key = key;
+            this.min = min;
+            this.defaultV = defaultV;
+            this.max = max;
+            this.a(clientSide);
+        }
+
+        public double getMinValue() {
+            return this.min;
+        }
+
+        public double getDefaultValue() {
+            return this.defaultV;
+        }
+
+        public double getMaxValue() {
+            return this.max;
+        }
+
+        @Override
+        public boolean isClientSide() {
+            return b();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return this.key;
+        }
+    }
+
+    private static class AttributeInstance1_16_R3 implements AttributeInstance {
+
+        private final AttributeModifiable handle;
+        private final Attribute a;
+
+        AttributeInstance1_16_R3(Attribute a, AttributeModifiable handle) {
+            this.a = a;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull Attribute getGenericAttribute() {
+            return this.a;
+        }
+
+        @Override
+        public double getBaseValue() {
+            return handle.getBaseValue();
+        }
+
+        @Override
+        public void setBaseValue(double v) {
+            handle.setValue(v);
+        }
+
+        @NotNull
+        @Override
+        public Collection<org.bukkit.attribute.AttributeModifier> getModifiers() {
+            return handle.getModifiers().stream().map(CraftAttributeInstance::convert).collect(Collectors.toSet());
+        }
+
+        @Override
+        public void addModifier(@NotNull org.bukkit.attribute.AttributeModifier mod) {
+            Preconditions.checkArgument(mod != null, "modifier");
+            handle.addModifier(CraftAttributeInstance.convert(mod));
+        }
+
+        @Override
+        public void removeModifier(@NotNull AttributeModifier mod) {
+            Preconditions.checkArgument(mod != null, "modifier");
+            handle.removeModifier(CraftAttributeInstance.convert(mod));
+        }
+
+        @Override
+        public double getValue() {
+            return handle.getValue();
+        }
+
+        @Override
+        public double getDefaultValue() {
+            return handle.getAttribute().getDefault();
+        }
+    }
+
+    @Override
+    public Attribute registerAttribute(NamespacedKey key, double defaultV, double min, double max, boolean client) {
+        if (existsAttribute(key)) return null;
+
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<AttributeBase> writable = server.getCustomRegistry().b(IRegistry.y);
+        ResourceKey<AttributeBase> nmsKey = ResourceKey.a(IRegistry.y, toNMS(key));
+        Attribute1_16_R3 att = new Attribute1_16_R3(key, defaultV, min, max, client);
+        writable.a(nmsKey, att, Lifecycle.stable());
+        return att;
+    }
+
+    @Override
+    public boolean existsAttribute(NamespacedKey key) {
+        try {
+            DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+            RegistryMaterials<AttributeBase> registry = (RegistryMaterials<AttributeBase>) server.getCustomRegistry().b(IRegistry.y);
+
+            Field res = RegistryMaterials.class.getDeclaredField("bh");
+            res.setAccessible(true);
+            Map<MinecraftKey, AttributeBase> map = (Map<MinecraftKey, AttributeBase>) res.get(registry);
+            return map.containsKey(toNMS(key));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static MinecraftKey toNMS(NamespacedKey key) {
+        return CraftNamespacedKey.toMinecraft(key);
+    }
+
+    @Override
+    public Attribute getAttribute(NamespacedKey key) {
+        AttributeBase a = IRegistry.ATTRIBUTE.get(toNMS(key));
+        if (!(a instanceof AttributeRanged)) return null;
+        return new Attribute1_16_R3((AttributeRanged) a);
+    }
+
+    @Override
+    public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
+        AttributeBase nmsAttribute = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
+        return new AttributeInstance1_16_R3(a, toNMS(m).getAttributeInstance(nmsAttribute));
     }
     
 }
