@@ -44,6 +44,7 @@ import net.minecraft.world.entity.ai.goal.target.*;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
@@ -419,6 +420,14 @@ public class ChipUtil1_18_R1 implements ChipUtil {
             case "NearestAttackableTarget" -> {
                 PathfinderNearestAttackableTarget p = (PathfinderNearestAttackableTarget) b;
                 yield new NearestAttackableTargetGoal<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
+            }
+            case "NearestAttackableTargetRaider" -> {
+                PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
+                yield new NearestAttackableWitchTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
+            }
+            case "NearestHealableRaider" -> {
+                PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
+                yield new NearestHealableRaiderTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
             case "OwnerHurtByTarget" -> {
                 PathfinderOwnerHurtByTarget p = (PathfinderOwnerHurtByTarget) b;
@@ -1816,7 +1825,7 @@ public class ChipUtil1_18_R1 implements ChipUtil {
             return switch (name) {
                 case "AvoidTarget" -> new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"));
                 case "ArrowAttack" -> new PathfinderRangedAttack(m, getDouble(g, "e"), getFloat(g, "i"), getInt(g, "g"), getInt(g, "h"));
-                case "Beg" -> new PathfinderBeg((Wolf) m);
+                case "Beg" -> new PathfinderBeg((Wolf) m, getFloat(g, "d"));
                 case "BowShoot" -> new PathfinderRangedBowAttack(m, getDouble(g, "b"), (float) Math.sqrt(getFloat(g, "d")), getInt(g, "c"));
                 case "BreakDoor" -> new PathfinderBreakDoor(m, getInt(g, "i"), d -> getObject(g, "h", Predicate.class).test(toNMS(d)));
                 case "Breath" -> new PathfinderBreathAir((Creature) m);
@@ -1870,6 +1879,8 @@ public class ChipUtil1_18_R1 implements ChipUtil {
 
                 // Target
                 case "NearestAttackableTarget" -> new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "d"));
+                case "NearestAttackableTargetWitch" -> new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true, l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
+                case "NearestHealableRaider" -> new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), true,  l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
                 case "DefendVillage" -> new PathfinderDefendVillage((IronGolem) m);
                 case "HurtByTarget" -> new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);

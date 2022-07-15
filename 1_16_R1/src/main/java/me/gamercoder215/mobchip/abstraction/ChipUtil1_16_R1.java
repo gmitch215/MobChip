@@ -43,7 +43,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -482,6 +481,16 @@ public class ChipUtil1_16_R1 implements ChipUtil {
             case "NearestAttackableTarget": {
                 PathfinderNearestAttackableTarget p = (PathfinderNearestAttackableTarget) b;
                 g = new PathfinderGoalNearestAttackableTarget<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
+                break;
+            }
+            case "NearestAttackableTargetRaider": {
+                PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
+                g = new PathfinderGoalNearestAttackableTargetWitch<>((EntityRaider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
+                break;
+            }
+            case "NearestHealableRaider": {
+                PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
+                g = new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
                 break;
             }
             case "OwnerHurtByTarget": {
@@ -1934,62 +1943,63 @@ public class ChipUtil1_16_R1 implements ChipUtil {
             switch (name) {
                 case "AvoidTarget": return new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"));
                 case "ArrowAttack": return new PathfinderRangedAttack(m, getDouble(g, "e"), getFloat(g, "i"), getInt(g, "g"), getInt(g, "h"));
-                case "Beg": return new PathfinderBeg((Wolf) m);
+                case "Beg": return new PathfinderBeg((Wolf) m, getFloat(g, "d"));
                 case "BowShoot": return new PathfinderRangedBowAttack(m, getDouble(g, "b"), (float) Math.sqrt(getFloat(g, "d")), getInt(g, "c"));
-                case "BreakDoor": return new PathfinderBreakDoor(m, getInt(g, "i"), d -> getObject(g, "h", Predicate.class).test(toNMS(d)));
+                case "BreakDoor": return new PathfinderBreakDoor(m, getInt(g, "c"), d -> getObject(g, "g", Predicate.class).test(toNMS(d)));
                 case "Breath": return new PathfinderBreathAir((Creature) m);
                 case "Breed": return new PathfinderBreed((Animals) m, getDouble(g, "g"));
-                case "CatSitOnBed": return new PathfinderCatOnBed((Cat) m, getDouble(g, "b"), getInt(g, "l"));
-                case "CrossbowAttack": return new PathfinderRangedCrossbowAttack((Pillager) m, getDouble(g, "d"), (float) Math.sqrt(getFloat(g, "e")));
+                case "CatSitOnBed": return new PathfinderCatOnBed((Cat) m, getDouble(g, "b"), getInt(g, "i"));
+                case "CrossbowAttack": return new PathfinderRangedCrossbowAttack((Pillager) m, getDouble(g, "c"), (float) Math.sqrt(getFloat(g, "d")));
                 case "DoorOpen": return new PathfinderOpenDoor(m, getBoolean(g, "a"));
                 case "WaterJump": return new PathfinderDolphinJump((Dolphin) m, getInt(g, "c"));
                 case "EatTile": return new PathfinderEatTile(m);
                 case "Water": return new PathfinderFindWater((Creature) m);
+                case "FishSchool": return new PathfinderFollowFishLeader((Fish) m);
                 case "FleeSun": return new PathfinderFleeSun((Creature) m, getDouble(g, "e"));
                 case "Float": return new PathfinderFloat(m);
                 case "FollowBoat": return new PathfinderFollowBoat((Creature) m);
                 case "FollowEntity": return new PathfinderFollowMob(m, getDouble(g, "d"), getFloat(g, "g"), getFloat(g, "i"));
-                case "FollowOwner": return new PathfinderFollowOwner((Tameable) m, getDouble(g, "h"), getFloat(g, "l"), getFloat(g, "k"), getBoolean(g, "n"));
-                case "FollowParent": return new PathfinderFollowParent((Animals) m, getDouble(g, "f"));
+                case "FollowOwner": return new PathfinderFollowOwner((Tameable) m, getDouble(g, "d"), getFloat(g, "h"), getFloat(g, "g"));
+                case "FollowParent": return new PathfinderFollowParent((Animals) m, getDouble(g, "c"));
                 case "HorseTrap": return new PathfinderSkeletonTrap((SkeletonHorse) m);
                 case "LeapAtTarget": return new PathfinderLeapAtTarget(m, getFloat(g, "c"));
                 case "JumpOnBlock": return new PathfinderCatOnBlock((Cat) m, getDouble(g, "g"));
                 case "LlamaFollow": return new PathfinderLlamaFollowCaravan((Llama) m, getDouble(g, "b"));
-                case "LookAtPlayer": return new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getFloat(g, "d"), getFloat(g, "e"), getBoolean(g, "i"));
+                case "LookAtPlayer": return new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "d", Class.class), LivingEntity.class), getFloat(g, "c"), getFloat(g, "g"));
                 case "LookAtTradingPlayer": return new PathfinderLookAtTradingPlayer((AbstractVillager) m);
-                case "MeleeAttack": return new PathfinderMeleeAttack((Creature) m, getDouble(g, "b"), getBoolean(g, "c"));
-                case "MoveThroughVillage": return new PathfinderMoveThroughVillage((Creature) m, getObject(g, "b", BooleanSupplier.class), getDouble(g, "b"), getInt(g, "g"), getBoolean(g, "e"));
+                case "MeleeAttack": return new PathfinderMeleeAttack((Creature) m, getDouble(g, "d"), getBoolean(g, "e"));
+                case "MoveThroughVillage": return new PathfinderMoveThroughVillage((Creature) m, getBoolean(g, "e"), getDouble(g, "b"), getInt(g, "g"), getBoolean(g, "e"));
                 case "NearestVillage": return new PathfinderRandomStrollThroughVillage((Creature) m, getInt(g, "b"));
-                case "GotoTarget": return new PathfinderMoveToBlock((Creature) m, l -> (boolean) invoke(g, "a", toNMS(l.getWorld()), toNMS(l)), getDouble(g, "b"), getInt(g, "l"), getInt(g, "m"));
+                case "GotoTarget": return new PathfinderMoveToBlock((Creature) m, l -> fromNMS(getObject(g, "e", BlockPosition.class), m.getWorld()).equals(l), getDouble(g, "b"), getInt(g, "i"), getInt(g, "j"));
                 case "Raid": return new PathfinderMoveToRaid((Raider) m);
                 case "MoveTowardsRestriction": return new PathfinderMoveTowardsRestriction((Creature) m, getDouble(g, "e"));
                 case "MoveTowardsTarget": return new PathfinderMoveTowardsTarget((Creature) m, getDouble(g, "f"), getFloat(g, "g"));
                 case "OcelotAttack": return new PathfinderOcelotAttack((Ocelot) m);
                 case "OfferFlower": return new PathfinderOfferFlower((IronGolem) m);
-                case "Panic": return new PathfinderPanic((Creature) m, getDouble(g, "c"));
+                case "Panic": return new PathfinderPanic((Creature) m, getDouble(g, "b"));
                 case "Perch": return new PathfinderRideShoulder((Parrot) m);
                 case "RandomLookaround": return new PathfinderRandomLook(m);
-                case "RandomStroll": return new PathfinderRandomStroll((Creature) m, getDouble(g, "f"), getInt(g, "g"));
-                case "RandomStrollLand": return new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
-                case "RandomSwim": return new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
-                case "RandomFly": return new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
+                case "RandomStroll": return new PathfinderRandomStroll((Creature) m, getDouble(g, "e"), getInt(g, "f"));
+                case "RandomStrollLand": return new PathfinderRandomStrollLand((Creature) m, getDouble(g, "e"), getFloat(g, "h"));
+                case "RandomSwim": return new PathfinderRandomSwim((Creature) m, getDouble(g, "e"), getInt(g, "f"));
+                case "RandomFly": return new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "e"));
                 case "RemoveBlock": return new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock(getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
                 case "RestrictSun": return new PathfinderRestrictSun((Creature) m);
                 case "Sit": return new PathfinderSit((Tameable) m);
-                case "StrollVillage": return new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
-                case "StrollVillageGolem": return new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
+                case "StrollVillage": return new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "e"));
                 case "Swell": return new PathfinderSwellCreeper((Creeper) m);
                 case "Tame": return new PathfinderTameHorse((AbstractHorse) m);
-                case "Tempt": return new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "m", RecipeItemStack.class)));
+                case "Tempt": return new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "l", RecipeItemStack.class)));
                 case "TradeWithPlayer": return new PathfinderTradePlayer((AbstractVillager) m);
-                case "UniversalAngerReset": return new PathfinderResetAnger(m, getBoolean(g, "c"));
                 case "UseItem": return new PathfinderUseItem(m, fromNMS(getObject(g, "b", net.minecraft.server.v1_16_R1.ItemStack.class)), en -> getObject(g, "c", Predicate.class).test(toNMS(en)), fromNMS(getObject(g, "d", SoundEffect.class)));
-                case "ZombieAttack": return new PathfinderZombieAttack((Zombie) m, getDouble(g, "b"), getBoolean(g, "c"));
+                case "ZombieAttack": return new PathfinderZombieAttack((Zombie) m, getDouble(g, "d"), getBoolean(g, "e"));
 
                 // Target
-                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "d"));
+                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true);
+                case "NearestAttackableTargetWitch": return new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true, l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+                case "NearestHealableRaider": return new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), true,  l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
                 case "DefendVillage": return new PathfinderDefendVillage((IronGolem) m);
-                case "HurtByTarget": return new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
+                case "HurtByTarget": return new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "d", Class[].class)));
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget": return new PathfinderOwnerHurtTarget((Tameable) m);
 
