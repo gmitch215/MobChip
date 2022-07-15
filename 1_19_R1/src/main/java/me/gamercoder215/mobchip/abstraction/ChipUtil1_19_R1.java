@@ -1,8 +1,12 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
+import me.gamercoder215.mobchip.ai.attribute.Attribute;
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
@@ -15,11 +19,12 @@ import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.util.Position;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
+import net.minecraft.core.*;
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -29,6 +34,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.control.JumpControl;
 import net.minecraft.world.entity.ai.control.LookControl;
@@ -57,12 +63,15 @@ import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.attribute.CraftAttributeInstance;
 import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R1.entity.*;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -82,6 +91,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.bukkit.craftbukkit.v1_19_R1.attribute.CraftAttributeInstance.convert;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -1126,7 +1136,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
     public Schedule getDefaultSchedule(String key) {
         return fromNMS(Registry.SCHEDULE.get(new ResourceLocation(key)));
     }
-    
+
     @SuppressWarnings("deprecation")
     private static final class EntityScheduleManager1_19_R1 implements EntityScheduleManager {
 
@@ -1880,5 +1890,157 @@ public class ChipUtil1_19_R1 implements ChipUtil {
 
     private static ItemStack fromNMS(net.minecraft.world.item.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
+    public static <T> void changeRegistryLock(Registry<T> r, boolean isLocked) {
+        DedicatedServer srv = ((CraftServer) Bukkit.getServer()).getServer();
+        MappedRegistry<T> registry = (MappedRegistry<T>) srv.registryAccess().ownedRegistryOrThrow(r.key());
+        try {
+            Field frozen = registry.getClass().getDeclaredField("ca");
+            frozen.setAccessible(true);
+            frozen.set(registry, isLocked);
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
+    }
+
+    private static class Attribute1_19_R1 extends RangedAttribute implements Attribute {
+
+        private final NamespacedKey key;
+        private final double defaultV;
+        private final double min;
+        private final double max;
+
+        public Attribute1_19_R1(RangedAttribute a) {
+            super(a.getDescriptionId(), a.getDefaultValue(), a.getMinValue(), a.getMaxValue());
+            this.key = Registry.ATTRIBUTE.getKey(a) == null ? NamespacedKey.minecraft(a.getDescriptionId()) : CraftNamespacedKey.fromMinecraft(Registry.ATTRIBUTE.getKey(a));
+            this.defaultV = a.getDefaultValue();
+            this.min = a.getMinValue();
+            this.max = a.getMaxValue();
+        }
+
+        public Attribute1_19_R1(NamespacedKey key, double defaultV, double min, double max, boolean clientSide) {
+            super("attribute.name." +  key.getKey().toLowerCase(), defaultV, min, max);
+            this.key = key;
+            this.min = min;
+            this.defaultV = defaultV;
+            this.max = max;
+            this.setSyncable(clientSide);
+        }
+
+        public double getMinValue() {
+            return this.min;
+        }
+
+        public double getDefaultValue() {
+            return this.defaultV;
+        }
+
+        public double getMaxValue() {
+            return this.max;
+        }
+
+        @Override
+        public boolean isClientSide() {
+            return isClientSyncable();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return this.key;
+        }
+    }
+
+    private static class AttributeInstance1_19_R1 implements AttributeInstance {
+
+        private final net.minecraft.world.entity.ai.attributes.AttributeInstance handle;
+        private final Attribute a;
+
+        AttributeInstance1_19_R1(Attribute a, net.minecraft.world.entity.ai.attributes.AttributeInstance handle) {
+            this.a = a;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull Attribute getGenericAttribute() {
+            return this.a;
+        }
+
+        @Override
+        public double getBaseValue() {
+            return handle.getBaseValue();
+        }
+
+        @Override
+        public void setBaseValue(double v) {
+            handle.setBaseValue(v);
+        }
+
+        @NotNull
+        @Override
+        public Collection<AttributeModifier> getModifiers() {
+            return handle.getModifiers().stream().map(CraftAttributeInstance::convert).collect(Collectors.toSet());
+        }
+
+        @Override
+        public void addModifier(@NotNull AttributeModifier mod) {
+            Preconditions.checkArgument(mod != null, "modifier");
+            handle.addPermanentModifier(convert(mod));
+        }
+
+        @Override
+        public void removeModifier(@NotNull AttributeModifier mod) {
+            Preconditions.checkArgument(mod != null, "modifier");
+            handle.removeModifier(convert(mod));
+        }
+
+        @Override
+        public double getValue() {
+            return handle.getValue();
+        }
+
+        @Override
+        public double getDefaultValue() {
+            return handle.getAttribute().getDefaultValue();
+        }
+    }
+
+    @Override
+    public Attribute registerAttribute(NamespacedKey key, double defaultV, double min, double max, boolean client) {
+        if (existsAttribute(key)) return null;
+        changeRegistryLock(Registry.ATTRIBUTE, false);
+
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> writable = (WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute>) server.registryAccess().ownedRegistryOrThrow(Registry.ATTRIBUTE_REGISTRY);
+        ResourceKey<net.minecraft.world.entity.ai.attributes.Attribute> nmsKey = ResourceKey.create(Registry.ATTRIBUTE_REGISTRY, toNMS(key));
+        Attribute1_19_R1 att = new Attribute1_19_R1(key, defaultV, min, max, client);
+        writable.register(nmsKey, att, Lifecycle.stable());
+
+        changeRegistryLock(Registry.ATTRIBUTE, true);
+        return att;
+    }
+
+    @Override
+    public boolean existsAttribute(NamespacedKey key) {
+        return Registry.ATTRIBUTE.containsKey(toNMS(key));
+    }
+
+    private static ResourceLocation toNMS(NamespacedKey key) {
+        return CraftNamespacedKey.toMinecraft(key);
+    }
+
+    @Override
+    public Attribute getAttribute(NamespacedKey key) {
+        net.minecraft.world.entity.ai.attributes.Attribute a = Registry.ATTRIBUTE.get(toNMS(key));
+        if (!(a instanceof RangedAttribute)) return null;
+        return new Attribute1_19_R1((RangedAttribute) a);
+    }
+
+    @Override
+    public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
+        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = Registry.ATTRIBUTE.get(toNMS(a.getKey()));
+        return new AttributeInstance1_19_R1(a, toNMS(m).getAttribute(nmsAttribute));
+    }
 }
 
