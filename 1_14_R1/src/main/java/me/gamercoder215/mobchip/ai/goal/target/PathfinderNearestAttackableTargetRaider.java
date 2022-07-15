@@ -65,4 +65,9 @@ public final class PathfinderNearestAttackableTargetRaider<T extends LivingEntit
         super(m, filter, interval, mustSee, reach, conditions);
     }
 
+    @Override
+    public String getInternalName() {
+        return "PathfinderGoalNearestAttackableTargetWitch";
+    }
+
 }
