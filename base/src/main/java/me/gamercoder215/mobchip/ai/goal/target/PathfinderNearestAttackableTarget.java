@@ -69,7 +69,7 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
 
         this.filter = filter;
         this.interval = interval;
-        this.conditions = conditions;
+        this.conditions = conditions == null ? e -> true : conditions;
     }
 
     
