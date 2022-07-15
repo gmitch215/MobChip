@@ -1,6 +1,8 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import me.gamercoder215.mobchip.EntityBody;
+import me.gamercoder215.mobchip.ai.attribute.Attribute;
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
@@ -13,6 +15,7 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
@@ -85,6 +88,14 @@ public interface ChipUtil {
     boolean canSee(Mob m, Entity en);
 
     Schedule getDefaultSchedule(String key);
+
+    Attribute registerAttribute(NamespacedKey key, double defaultV, double min, double max, boolean client);
+
+    boolean existsAttribute(NamespacedKey key);
+
+    Attribute getAttribute(NamespacedKey key);
+
+    AttributeInstance getAttributeInstance(Mob m, Attribute a);
 
     default void updateGoals(Map<Integer, Pathfinder> goals, Map<Integer, Boolean> target) {
         try {
