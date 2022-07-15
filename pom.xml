@@ -56,6 +56,11 @@
 		<system>GitHub Actions</system>
 		<url>https://github.com/${github}/actions</url>
 	</ciManagement>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/${github}/issues/</url>
+	</issueManagement>
 	
 	<modules>
 		<module>base</module>
