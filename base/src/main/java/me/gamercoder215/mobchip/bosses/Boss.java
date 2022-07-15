@@ -1,9 +1,10 @@
 package me.gamercoder215.mobchip.bosses;
 
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.bosses.annotations.Repeatable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -24,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * Represents a Boss Entity.
@@ -233,17 +233,19 @@ public abstract class Boss<T extends Mob> {
                             try {
                                 m.invoke(inst);
                             } catch (InvocationTargetException e) {
-                                Logger.getGlobal().severe(e.getCause().getMessage());
+                                Bukkit.getLogger().severe(e.getCause().getClass().getSimpleName());
+                                Bukkit.getLogger().severe(e.getCause().getMessage());
+                                for (StackTraceElement s : e.getCause().getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             } catch (Exception e) {
-                                Logger.getGlobal().severe(e.getMessage());
+                                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                                Bukkit.getLogger().severe(e.getMessage());
+                                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             }
                         }
                     }.runTaskTimer(plugin, r.delay(), r.interval());
                 }
             }
-        } catch (Exception e) {
-            // do nothing
-        }
+        } catch (Exception ignored) {}
 
         CreatureSpawnEvent event = new CreatureSpawnEvent(mob, SpawnReason.CUSTOM);
         onSpawn(event);
