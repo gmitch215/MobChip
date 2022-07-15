@@ -77,9 +77,7 @@ jobs:
 
       - name: Extract Development
         id: project
-        run: |
-          mvn help:evaluate -Dexpression=development -q -DforceStdout
-          echo ::set-output name=dev::$(mvn help:evaluate -Dexpression=development -q -DforceStdout)
+        run: echo ::set-output name=dev::$(mvn help:evaluate -Dexpression=development -q -DforceStdout)
 
       - name: Build Project
         if: ${{ !steps.project.outputs.dev }}
