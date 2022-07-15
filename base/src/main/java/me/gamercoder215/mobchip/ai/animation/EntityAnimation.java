@@ -41,9 +41,7 @@ public enum EntityAnimation implements Keyed {
 
     @Override
     @NotNull
-    public NamespacedKey getKey() {
-        return this.key;
-    }
+    public NamespacedKey getKey() { return this.key; }
 
     /**
      * Fetches an EntityAnimation by its NamespacedKey.
