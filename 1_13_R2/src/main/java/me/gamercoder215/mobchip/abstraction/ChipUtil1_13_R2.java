@@ -11,6 +11,8 @@ import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
+import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
+import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -1735,6 +1737,44 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = (AttributeBase) CUSTOM_ATTRIBUTE_MAP.get(a.getKey());
         return new AttributeInstance1_13_R2(a, toNMS(m).getAttributeInstance(nmsAttribute));
+    }
+
+    private static class EntityGossipContainer1_13_R2 implements EntityGossipContainer {
+
+        EntityGossipContainer1_13_R2(Villager v) {
+            // doesn't exist
+        }
+
+        @Override
+        public void decay() {
+            // doesn't exist
+        }
+
+        @Override
+        public int getReputation(@NotNull Entity en, @Nullable GossipType... types) throws IllegalArgumentException {
+            // doesn't exist
+            return 0;
+        }
+
+        @Override
+        public void put(@NotNull Entity en, @NotNull GossipType type, int maxCap) throws IllegalArgumentException {
+            // doesn't exist
+        }
+
+        @Override
+        public void remove(@NotNull Entity en, @NotNull GossipType type) throws IllegalArgumentException {
+            // doesn't exist
+        }
+
+        @Override
+        public void removeAll(@NotNull GossipType type) throws IllegalArgumentException {
+            // doesn't exist
+        }
+    }
+
+    @Override
+    public EntityGossipContainer getGossipContainer(Villager v) {
+        return new EntityGossipContainer1_13_R2(v);
     }
 
 }

@@ -13,6 +13,8 @@ import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
+import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
+import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -2142,6 +2144,83 @@ public class ChipUtil1_16_R3 implements ChipUtil {
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
         return new AttributeInstance1_16_R3(a, toNMS(m).getAttributeInstance(nmsAttribute));
+    }
+
+    private static ReputationType toNMS(GossipType t) {
+        return ReputationType.a(t.getKey().getKey());
+    }
+
+    private static GossipType fromNMS(ReputationType t) {
+        return GossipType.getByKey(NamespacedKey.minecraft(t.f));
+    }
+
+    private static class EntityGossipContainer1_16_R3 implements EntityGossipContainer {
+        private final Reputation handle;
+
+        EntityGossipContainer1_16_R3(Villager v) {
+            this.handle = ((CraftVillager) v).getHandle().fj();
+        }
+
+        @Override
+        public void decay() {
+            handle.b();
+        }
+
+        @Override
+        public int getReputation(@NotNull Entity en, @Nullable GossipType... types) throws IllegalArgumentException {
+            return handle.a(en.getUniqueId(), g -> Arrays.asList(types).contains(fromNMS(g)));
+        }
+
+        @Override
+        public void put(@NotNull Entity en, @NotNull GossipType type, int maxCap) throws IllegalArgumentException {
+            handle.a(en.getUniqueId(), toNMS(type), maxCap);
+        }
+
+        @Override
+        public void remove(@NotNull Entity en, @NotNull GossipType type) throws IllegalArgumentException {
+            try {
+                Field map = Reputation.class.getDeclaredField("a");
+                map.setAccessible(true);
+                Map<UUID, ?> data = new HashMap<>((Map<UUID, ?>) map.get(handle));
+                data.remove(en.getUniqueId());
+                map.set(handle, data);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+        }
+
+        @Override
+        public void removeAll(@NotNull GossipType type) throws IllegalArgumentException {
+            try {
+                Field map = Reputation.class.getDeclaredField("a");
+                map.setAccessible(true);
+                Map<UUID, ?> data = new HashMap<>((Map<UUID, ?>) map.get(handle));
+
+                for (UUID uuid : data.keySet()) {
+                    Object o = data.get(uuid);
+
+                    Method m = o.getClass().getDeclaredMethod("b", ReputationType.class);
+                    m.setAccessible(true);
+                    m.invoke(o, toNMS(type));
+
+                    Method empty = o.getClass().getDeclaredMethod("b");
+                    empty.setAccessible(true);
+                    if ((boolean) empty.invoke(o)) data.remove(uuid);
+                }
+                map.set(handle, data);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+        }
+    }
+
+    @Override
+    public EntityGossipContainer getGossipContainer(Villager v) {
+        return new EntityGossipContainer1_16_R3(v);
     }
     
 }

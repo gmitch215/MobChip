@@ -12,6 +12,8 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
+import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
+import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -41,6 +43,7 @@ import net.minecraft.world.entity.ai.control.LookControl;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.*;
+import net.minecraft.world.entity.ai.gossip.GossipContainer;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -2052,6 +2055,52 @@ public class ChipUtil1_19_R1 implements ChipUtil {
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = Registry.ATTRIBUTE.get(toNMS(a.getKey()));
         return new AttributeInstance1_19_R1(a, toNMS(m).getAttribute(nmsAttribute));
+    }
+
+    private static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
+        return net.minecraft.world.entity.ai.gossip.GossipType.byId(t.getKey().getKey());
+    }
+
+    private static GossipType fromNMS(net.minecraft.world.entity.ai.gossip.GossipType t) {
+        return GossipType.getByKey(NamespacedKey.minecraft(t.id));
+    }
+
+    private static class EntityGossipContainer1_19_R1 implements EntityGossipContainer {
+        private final GossipContainer handle;
+
+        EntityGossipContainer1_19_R1(Villager v) {
+            this.handle = ((CraftVillager) v).getHandle().getGossips();
+        }
+
+        @Override
+        public void decay() {
+            handle.decay();
+        }
+
+        @Override
+        public int getReputation(@NotNull Entity en, @Nullable GossipType... types) throws IllegalArgumentException {
+            return handle.getReputation(en.getUniqueId(), g -> Arrays.asList(types).contains(fromNMS(g)));
+        }
+
+        @Override
+        public void put(@NotNull Entity en, @NotNull GossipType type, int maxCap) throws IllegalArgumentException {
+            handle.add(en.getUniqueId(), toNMS(type), maxCap);
+        }
+
+        @Override
+        public void remove(@NotNull Entity en, @NotNull GossipType type) throws IllegalArgumentException {
+            handle.remove(en.getUniqueId(), toNMS(type));
+        }
+
+        @Override
+        public void removeAll(@NotNull GossipType type) throws IllegalArgumentException {
+            handle.remove(toNMS(type));
+        }
+    }
+
+    @Override
+    public EntityGossipContainer getGossipContainer(Villager v) {
+        return new EntityGossipContainer1_19_R1(v);
     }
 }
 
