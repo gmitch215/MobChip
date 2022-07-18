@@ -33,7 +33,7 @@ echo "[MobChip JavaDoc Builder] Committing..."
 git add .
 git branch -D gh-pages
 git branch -m gh-pages
-git commit -m "Update Javadocs"
+git commit -m "Update Javadocs ($1)"
 git push -f origin gh-pages
 
 echo "[MobChip JavaDoc Builder] Done!"
