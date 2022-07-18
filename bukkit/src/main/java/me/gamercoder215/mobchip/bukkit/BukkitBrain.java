@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Villager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public class BukkitBrain implements EntityBrain {
 		this.m = m;
 	}
 
-	static final ChipUtil wrapper = ChipUtil.getWrapper();
+	static final ChipUtil w = ChipUtil.getWrapper();
 
 	/**
 	 * Get the EntityBrain of this Mob.
@@ -43,6 +44,7 @@ public class BukkitBrain implements EntityBrain {
 	public static EntityBrain getBrain(@Nullable Mob m) {
 		if (m == null) return null;
 		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
+		if (m instanceof Villager) return new BukkitVillagerBrain((Villager) m);
 		return new BukkitBrain(m);
 	}
 
@@ -70,7 +72,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityNavigation createNavigation() {
-		return wrapper.getNavigation(m);
+		return w.getNavigation(m);
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityController getController() {
-		return wrapper.getController(m);
+		return w.getController(m);
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class BukkitBrain implements EntityBrain {
 	 * @return EntityScheduleManager
 	 */
 	@Override
-	public @NotNull EntityScheduleManager getScheduleManager() { return wrapper.getManager(m); }
+	public @NotNull EntityScheduleManager getScheduleManager() { return w.getManager(m); }
 
 	/**
 	 * Get the Entity's Scheduling Manager associated with this Brain.
@@ -113,7 +115,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public @NotNull EntityBody getBody() {
-		return wrapper.getBody(m);
+		return w.getBody(m);
 	}
 
 	/**
@@ -126,7 +128,7 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value) throws IllegalArgumentException {
 		Object old = getMemory(memory);
-		wrapper.setMemory(m, memory, value);
+		w.setMemory(m, memory, value);
 
 		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
@@ -145,7 +147,7 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException {
 		Object old = getMemory(memory);
-		wrapper.setMemory(m, memory, value, expire);
+		w.setMemory(m, memory, value, expire);
 
 		MemoryChangeEvent event = new MemoryChangeEvent(this, (EntityMemory<?>) memory, old, value);
 		Bukkit.getPluginManager().callEvent(event);
@@ -159,7 +161,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public <T> @Nullable T getMemory(@NotNull Memory<T> memory) {
-		return wrapper.getMemory(m, memory);
+		return w.getMemory(m, memory);
 	}
 
 	/**
@@ -169,7 +171,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public long getExpiration(@NotNull Memory<?> memory) {
-		return wrapper.getExpiry(m, memory);
+		return w.getExpiry(m, memory);
 	}
 
 	/**
@@ -179,12 +181,12 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean containsMemory(@NotNull Memory<?> memory) {
-		return wrapper.contains(m, memory);
+		return w.contains(m, memory);
 	}
 
 	@Override
 	public void removeMemory(@NotNull Memory<?> memory) {
-		wrapper.removeMemory(m, memory);
+		w.removeMemory(m, memory);
 	}
 
 	/**
@@ -193,7 +195,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean isInRestriction() {
-		return wrapper.isRestricted(m);
+		return w.isRestricted(m);
 	}
 
 	/**
@@ -209,7 +211,7 @@ public class BukkitBrain implements EntityBrain {
 		Location newCenter = event.getNewCenter();
 		int newRadius = event.getNewRadius();
 
-		wrapper.restrictTo(m, newCenter.getX(), newCenter.getY(), newCenter.getZ(), newRadius);
+		w.restrictTo(m, newCenter.getX(), newCenter.getY(), newCenter.getZ(), newRadius);
 	}
 
 	/**
@@ -217,7 +219,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public void clearRestrictionArea() {
-		wrapper.clearRestriction(m);
+		w.clearRestriction(m);
 	}
 
 	/**
@@ -226,7 +228,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public Location getRestrictionArea() {
-		return wrapper.getRestriction(m);
+		return w.getRestriction(m);
 	}
 
 	/**
@@ -235,7 +237,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean hasRestriction() {
-		return wrapper.hasRestriction(m);
+		return w.hasRestriction(m);
 	}
 
 	/**
@@ -244,7 +246,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public int getRestrictionRadius() {
-		return wrapper.getRestrictionRadius(m);
+		return w.getRestrictionRadius(m);
 	}
 
 	/**
@@ -254,7 +256,7 @@ public class BukkitBrain implements EntityBrain {
 	 */
 	@Override
 	public boolean canSee(@Nullable Entity en) {
-		return wrapper.canSee(m, en);
+		return w.canSee(m, en);
 	}
 
 	/**

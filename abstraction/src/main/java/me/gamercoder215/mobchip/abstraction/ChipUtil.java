@@ -9,6 +9,7 @@ import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
+import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
@@ -19,6 +20,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Villager;
 
 import java.util.Collection;
 import java.util.Map;
@@ -58,6 +60,8 @@ public interface ChipUtil {
     EntityBody getBody(Mob m);
 
     EntityScheduleManager getManager(Mob m);
+
+    EntityGossipContainer getGossipContainer(Villager v);
 
     void setCustomPhase(EnderDragon a, CustomPhase c);
 
