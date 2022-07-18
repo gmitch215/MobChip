@@ -16,6 +16,6 @@ class BukkitDragonBrain extends BukkitBrain implements DragonBrain {
 
     @Override
     public void setCustomPhase(@NotNull CustomPhase phase) throws IllegalArgumentException {
-        wrapper.setCustomPhase(m, phase);
+        w.setCustomPhase(m, phase);
     }
 }

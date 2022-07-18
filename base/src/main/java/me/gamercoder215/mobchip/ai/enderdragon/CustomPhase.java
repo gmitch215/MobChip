@@ -38,6 +38,16 @@ public abstract class CustomPhase implements Keyed {
     }
 
     /**
+     * Fetches the unique ID of this phase.
+     * @return NamespacedKey of this CustomPhase
+     */
+    @Override
+    @NotNull
+    public final NamespacedKey getKey() {
+        return this.key;
+    }
+
+    /**
      * Fetches the Dragon associated with this Custom Phase.
      * @return EnderDragon used in this phase
      */
