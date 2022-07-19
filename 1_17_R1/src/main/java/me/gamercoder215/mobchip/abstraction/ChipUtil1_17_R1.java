@@ -21,53 +21,60 @@ import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.util.Position;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.WritableRegistry;
-import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.core.*;
+import net.minecraft.core.IRegistry;
+import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.MinecraftKey;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.Difficulty;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.sounds.SoundEffect;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.EnumHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeBase;
+import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
+import net.minecraft.world.entity.ai.attributes.AttributeRanged;
 import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.world.entity.ai.control.JumpControl;
-import net.minecraft.world.entity.ai.control.LookControl;
-import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.control.ControllerJump;
+import net.minecraft.world.entity.ai.control.ControllerLook;
+import net.minecraft.world.entity.ai.control.ControllerMove;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.*;
-import net.minecraft.world.entity.ai.gossip.GossipContainer;
+import net.minecraft.world.entity.ai.gossip.Reputation;
+import net.minecraft.world.entity.ai.gossip.ReputationType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.memory.WalkTarget;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.animal.AbstractSchoolingFish;
-import net.minecraft.world.entity.animal.ShoulderRidingEntity;
-import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
-import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonPhaseInstance;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
-import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
-import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhaseManager;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.ai.memory.MemoryTarget;
+import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
+import net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition;
+import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.animal.horse.EntityHorseAbstract;
+import net.minecraft.world.entity.animal.horse.EntityLlama;
+import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
+import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonController;
+import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
+import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.entity.monster.EntityCreeper;
+import net.minecraft.world.entity.monster.EntityMonster;
+import net.minecraft.world.entity.monster.EntityZombie;
+import net.minecraft.world.entity.monster.IRangedEntity;
+import net.minecraft.world.entity.npc.EntityVillager;
+import net.minecraft.world.entity.npc.EntityVillagerAbstract;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.world.entity.raid.EntityRaider;
 import net.minecraft.world.entity.schedule.ScheduleBuilder;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.crafting.RecipeItemStack;
+import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.pathfinder.Node;
-import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.pathfinder.PathPoint;
+import net.minecraft.world.level.pathfinder.PathEntity;
+import net.minecraft.world.phys.Vec3D;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
@@ -79,6 +86,7 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.*;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -106,30 +114,30 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
         Mob m = p.getEntity();
-        net.minecraft.world.entity.Mob mob = toNMS(m);
-        GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
+        EntityInsentient mob = toNMS(m);
+        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
 
-        Goal g = new Goal() {
+        PathfinderGoal g = new PathfinderGoal() {
             @Override
-            public boolean canUse() {
+            public boolean a() {
                 return p.canStart();
             }
             @Override
-            public boolean canContinueToUse() {
+            public boolean b() {
                 return p.canContinueToUse();
             }
             @Override
-            public boolean isInterruptable() {
+            public boolean C_() {
                 return p.canInterrupt();
             }
 
             @Override
-            public void start() {
+            public void c() {
                 p.start();
             }
 
             @Override
-            public void tick() {
+            public void e() {
                 p.tick();
             }
 
@@ -137,47 +145,47 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
-            EnumSet<Goal.Flag> nmsFlags = g.getFlags() == null ? EnumSet.allOf(Goal.Flag.class) : EnumSet.copyOf(g.getFlags());
+            EnumSet<PathfinderGoal.Type> nmsFlags = g.i() == null ? EnumSet.allOf(PathfinderGoal.Type.class) : EnumSet.copyOf(g.i());
             nmsFlags.add(toNMS(f));
-            g.setFlags(nmsFlags);
+            g.a(nmsFlags);
         }
 
-        s.addGoal(priority, g);
+        s.a(priority, g);
     }
 
     @Override
     public Set<WrappedPathfinder> getGoals(Mob m, boolean target) {
-        net.minecraft.world.entity.Mob mob = toNMS(m);
-        GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
+        EntityInsentient mob = toNMS(m);
+        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
 
         Set<WrappedPathfinder> pF = new HashSet<>();
-        s.getAvailableGoals().forEach(w -> pF.add(new WrappedPathfinder(fromNMS(w.getGoal()), w.getPriority())));
+        s.c().forEach(w -> pF.add(new WrappedPathfinder(fromNMS(w.j()), w.h())));
 
         return pF;
     }
 
     @Override
     public Collection<WrappedPathfinder> getRunningGoals(Mob m, boolean target) {
-        net.minecraft.world.entity.Mob mob = toNMS(m);
-        GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
+        EntityInsentient mob = toNMS(m);
+        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
 
         Collection<WrappedPathfinder> l = new HashSet<>();
-        s.getRunningGoals().forEach(w -> l.add(new WrappedPathfinder(fromNMS(w.getGoal()), w.getPriority())));
+        s.d().forEach(w -> l.add(new WrappedPathfinder(fromNMS(w.j()), w.h())));
 
         return l;
     }
 
     @Override
     public void setFlag(Mob m, Pathfinder.PathfinderFlag flag, boolean target, boolean value) {
-        net.minecraft.world.entity.Mob mob = toNMS(m);
-        GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
-        if (value) s.enableControlFlag(toNMS(flag)); else s.disableControlFlag(toNMS(flag));
+        EntityInsentient mob = toNMS(m);
+        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
+        s.a(toNMS(flag), value);
     }
 
-    private static Class<? extends net.minecraft.world.entity.LivingEntity> toNMS(Class<? extends LivingEntity> clazz) {
+    private static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
         try {
             Method m = clazz.getDeclaredMethod("getHandle");
-            return m.getReturnType().asSubclass(net.minecraft.world.entity.LivingEntity.class);
+            return m.getReturnType().asSubclass(EntityLiving.class);
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
@@ -190,283 +198,283 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         return CraftItemStack.asNMSCopy(i);
     }
 
-    private static SoundEvent toNMS(Sound s) {
+    private static SoundEffect toNMS(Sound s) {
         return CraftSound.getSoundEffect(s);
     }
 
-    private static Goal toNMS(Pathfinder b) {
+    private static PathfinderGoal toNMS(Pathfinder b) {
         Mob mob = b.getEntity();
-        net.minecraft.world.entity.Mob m = toNMS(mob);
+        EntityInsentient m = toNMS(mob);
 
         return switch (b.getInternalName()) {
             case "AvoidTarget" -> {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
-                yield new AvoidEntityGoal<>((PathfinderMob) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
+                yield new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
             }
             case "ArrowAttack" -> {
                 PathfinderRangedAttack p = (PathfinderRangedAttack) b;
-                yield new RangedAttackGoal((RangedAttackMob) m, p.getSpeedModifier(), p.getMinAttackInterval(), p.getMaxAttackInterval(), p.getRange());
+                yield new PathfinderGoalArrowAttack((IRangedEntity) m, p.getSpeedModifier(), p.getMinAttackInterval(), p.getMaxAttackInterval(), p.getRange());
             }
             case "Beg" -> {
                 PathfinderBeg p = (PathfinderBeg) b;
-                yield new BegGoal((net.minecraft.world.entity.animal.Wolf) m, p.getRange());
+                yield new PathfinderGoalBeg((EntityWolf) m, p.getRange());
             }
             case "BowShoot" -> {
                 PathfinderRangedBowAttack p = (PathfinderRangedBowAttack) b;
-                yield new RangedBowAttackGoal((net.minecraft.world.entity.monster.Monster) m, p.getSpeedModifier(), p.getInterval(), p.getRange());
+                yield new PathfinderGoalBowShoot((EntityMonster) m, p.getSpeedModifier(), p.getInterval(), p.getRange());
             }
             case "BreakDoor" -> {
                 PathfinderBreakDoor p = (PathfinderBreakDoor) b;
-                yield new BreakDoorGoal(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
+                yield new PathfinderGoalBreakDoor(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
             }
             case "Breath" -> {
                 PathfinderBreathAir p = (PathfinderBreathAir) b;
-                yield new BreathAirGoal((PathfinderMob) m);
+                yield new PathfinderGoalBreath((EntityCreature) m);
             }
             case "Breed" -> {
                 PathfinderBreed p = (PathfinderBreed) b;
-                yield new BreedGoal((net.minecraft.world.entity.animal.Animal) m, p.getSpeedModifier());
+                yield new PathfinderGoalBreed((EntityAnimal) m, p.getSpeedModifier());
             }
             case "CatSitOnBed" -> {
                 PathfinderCatOnBed p = (PathfinderCatOnBed) b;
-                yield new CatLieOnBedGoal((net.minecraft.world.entity.animal.Cat) m, p.getSpeedModifier(), Math.min((int) p.getRange(), 1));
+                yield new PathfinderGoalCatSitOnBed((EntityCat) m, p.getSpeedModifier(), Math.min((int) p.getRange(), 1));
             }
             case "CrossbowAttack" -> {
                 PathfinderRangedCrossbowAttack p = (PathfinderRangedCrossbowAttack) b;
-                yield new RangedCrossbowAttackGoal((net.minecraft.world.entity.monster.Monster) m, p.getSpeedModifier(), p.getRange());
+                yield new PathfinderGoalCrossbowAttack((EntityMonster) m, p.getSpeedModifier(), p.getRange());
             }
             case "DoorOpen" -> {
                 PathfinderOpenDoor p = (PathfinderOpenDoor) b;
-                yield new OpenDoorGoal(m, p.mustClose());
+                yield new PathfinderGoalDoorOpen(m, p.mustClose());
             }
             case "EatTile" -> {
                 PathfinderEatTile p = (PathfinderEatTile) b;
-                yield new EatBlockGoal(m);
+                yield new PathfinderGoalEatTile(m);
             }
             case "FishSchool" -> {
                 PathfinderFollowFishLeader p = (PathfinderFollowFishLeader) b;
-                yield new FollowFlockLeaderGoal((AbstractSchoolingFish) m);
+                yield new PathfinderGoalFishSchool((EntityFishSchool) m);
             }
             case "FleeSun" -> {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
-                yield new FleeSunGoal((PathfinderMob) m, p.getSpeedModifier());
+                yield new PathfinderGoalFleeSun((EntityCreature) m, p.getSpeedModifier());
             }
             case "Float" -> {
                 PathfinderFloat p = (PathfinderFloat) b;
-                yield new FloatGoal(m);
+                yield new PathfinderGoalFloat(m);
             }
             case "FollowBoat" -> {
                 PathfinderFollowBoat p = (PathfinderFollowBoat) b;
-                yield new FollowBoatGoal((PathfinderMob) m);
+                yield new PathfinderGoalFollowBoat((EntityCreature) m);
             }
             case "FollowEntity" -> {
                 PathfinderFollowMob p = (PathfinderFollowMob) b;
-                yield new FollowMobGoal(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
+                yield new PathfinderGoalFollowEntity(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
             }
             case "FollowOwner" -> {
                 PathfinderFollowOwner p = (PathfinderFollowOwner) b;
-                yield new FollowOwnerGoal((TamableAnimal) m, p.getSpeedModifier(), p.getStartDistance(), p.getStopDistance(), p.canFly());
+                yield new PathfinderGoalFollowOwner((EntityTameableAnimal) m, p.getSpeedModifier(), p.getStartDistance(), p.getStopDistance(), p.canFly());
             }
             case "FollowParent" -> {
                 PathfinderFollowParent p = (PathfinderFollowParent) b;
-                yield new FollowParentGoal((TamableAnimal) m, p.getSpeedModifier());
+                yield new PathfinderGoalFollowParent((EntityTameableAnimal) m, p.getSpeedModifier());
             }
             case "JumpOnBlock" -> {
                 PathfinderCatOnBlock p = (PathfinderCatOnBlock) b;
-                yield new CatSitOnBlockGoal((net.minecraft.world.entity.animal.Cat) m, p.getSpeedModifier());
+                yield new PathfinderGoalJumpOnBlock((EntityCat) m, p.getSpeedModifier());
             }
             case "LeapAtTarget" -> {
                 PathfinderLeapAtTarget p = (PathfinderLeapAtTarget) b;
-                yield new LeapAtTargetGoal(m, p.getHeight());
+                yield new PathfinderGoalLeapAtTarget(m, p.getHeight());
             }
             case "LlamaFollow" -> {
                 PathfinderLlamaFollowCaravan p = (PathfinderLlamaFollowCaravan) b;
-                yield new LlamaFollowCaravanGoal((net.minecraft.world.entity.animal.horse.Llama) m, p.getSpeedModifier());
+                yield new PathfinderGoalLlamaFollow((EntityLlama) m, p.getSpeedModifier());
             }
             case "LookAtPlayer" -> {
                 PathfinderLookAtEntity<?> p = (PathfinderLookAtEntity) b;
-                yield new LookAtPlayerGoal(m, toNMS(p.getFilter()), p.getRange(), p.getProbability(), p.isHorizontal());
+                yield new PathfinderGoalLookAtPlayer(m, toNMS(p.getFilter()), p.getRange(), p.getProbability(), p.isHorizontal());
             }
             case "LookAtTradingPlayer" -> {
                 PathfinderLookAtTradingPlayer p = (PathfinderLookAtTradingPlayer) b;
-                yield new LookAtTradingPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
+                yield new PathfinderGoalLookAtTradingPlayer((EntityVillagerAbstract) m);
             }
             case "MeleeAttack" -> {
                 PathfinderMeleeAttack p = (PathfinderMeleeAttack) b;
-                yield new MeleeAttackGoal((PathfinderMob) m, p.getSpeedModifier(), p.mustSee());
+                yield new PathfinderGoalMeleeAttack((EntityCreature) m, p.getSpeedModifier(), p.mustSee());
             }
             case "MoveThroughVillage" -> {
                 PathfinderMoveThroughVillage p = (PathfinderMoveThroughVillage) b;
-                yield new MoveThroughVillageGoal((net.minecraft.world.entity.npc.Villager) m, p.getSpeedModifier(), p.mustBeNight(), p.getMinDistance(), p.canUseDoors());
+                yield new PathfinderGoalMoveThroughVillage((EntityVillager) m, p.getSpeedModifier(), p.mustBeNight(), p.getMinDistance(), p.canUseDoors());
             }
             case "MoveTowardsRestriction" -> {
                 PathfinderMoveTowardsRestriction p = (PathfinderMoveTowardsRestriction) b;
-                yield new MoveTowardsRestrictionGoal((PathfinderMob) m, p.getSpeedModifier());
+                yield new PathfinderGoalMoveTowardsRestriction((EntityCreature) m, p.getSpeedModifier());
             }
             case "MoveTowardsTarget" -> {
                 PathfinderMoveTowardsTarget p = (PathfinderMoveTowardsTarget) b;
-                yield new MoveTowardsTargetGoal((PathfinderMob) m, p.getSpeedModifier(), p.getRange());
+                yield new PathfinderGoalMoveTowardsTarget((EntityCreature) m, p.getSpeedModifier(), p.getRange());
             }
             case "NearestVillage" -> {
                 PathfinderRandomStrollThroughVillage p = (PathfinderRandomStrollThroughVillage) b;
-                yield new StrollThroughVillageGoal((PathfinderMob) m, p.getInterval());
+                yield new PathfinderGoalNearestVillage((EntityCreature) m, p.getInterval());
             }
             case "OcelotAttack" -> {
                 PathfinderOcelotAttack p = (PathfinderOcelotAttack) b;
-                yield new OcelotAttackGoal(m);
+                yield new PathfinderGoalOcelotAttack(m);
             }
             case "OfferFlower" -> {
                 PathfinderOfferFlower p = (PathfinderOfferFlower) b;
-                yield new OfferFlowerGoal((net.minecraft.world.entity.animal.IronGolem) m);
+                yield new PathfinderGoalOfferFlower((EntityIronGolem) m);
             }
             case "Panic" -> {
                 PathfinderPanic p = (PathfinderPanic) b;
-                yield new PanicGoal((PathfinderMob) m, p.getSpeedModifier());
+                yield new PathfinderGoalPanic((EntityCreature) m, p.getSpeedModifier());
             }
             case "Perch" -> {
                 PathfinderRideShoulder p = (PathfinderRideShoulder) b;
-                yield new LandOnOwnersShoulderGoal((ShoulderRidingEntity) m);
+                yield new PathfinderGoalPerch((EntityPerchable) m);
             }
             case "Raid" -> {
                 PathfinderMoveToRaid p = (PathfinderMoveToRaid) b;
-                yield new PathfindToRaidGoal<>((net.minecraft.world.entity.raid.Raider) m);
+                yield new PathfinderGoalRaid<>((EntityRaider) m);
             }
             case "RandomFly" -> {
                 PathfinderRandomStrollFlying p = (PathfinderRandomStrollFlying) b;
-                yield new WaterAvoidingRandomFlyingGoal((PathfinderMob) m, p.getSpeedModifier());
+                yield new PathfinderGoalRandomFly((EntityCreature) m, p.getSpeedModifier());
             }
             case "RandomLookaround" -> {
                 PathfinderRandomLook p = (PathfinderRandomLook) b;
-                yield new RandomLookAroundGoal(m);
+                yield new PathfinderGoalRandomLookaround(m);
             }
             case "RandomStroll" -> {
                 PathfinderRandomStroll p = (PathfinderRandomStroll) b;
-                yield new RandomStrollGoal((PathfinderMob) m, p.getSpeedModifier(), p.getInterval());
+                yield new PathfinderGoalRandomStroll((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
             }
             case "RandomStrollLand" -> {
                 PathfinderRandomStrollLand p = (PathfinderRandomStrollLand) b;
-                yield new WaterAvoidingRandomStrollGoal((PathfinderMob) m, p.getSpeedModifier(), p.getProbability());
+                yield new PathfinderGoalRandomStrollLand((EntityCreature) m, p.getSpeedModifier(), p.getProbability());
             }
             case "RandomSwim" -> {
                 PathfinderRandomSwim p = (PathfinderRandomSwim) b;
-                yield new RandomSwimmingGoal((PathfinderMob) m, p.getSpeedModifier(), p.getInterval());
+                yield new PathfinderGoalRandomSwim((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
             }
             case "RemoveBlock" -> {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                yield new RemoveBlockGoal(((CraftBlock) p.getBlock()).getNMS().getBlock(), (PathfinderMob) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                yield new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
             }
             case "RestrictSun" -> {
                 PathfinderRestrictSun p = (PathfinderRestrictSun) b;
-                yield new RestrictSunGoal((PathfinderMob) m);
+                yield new PathfinderGoalRestrictSun((EntityCreature) m);
             }
             case "Sit" -> {
                 PathfinderSit p = (PathfinderSit) b;
-                yield new SitWhenOrderedToGoal((TamableAnimal) m);
+                yield new PathfinderGoalSit((EntityTameableAnimal) m);
             }
             case "StrollVillage" -> {
                 PathfinderRandomStrollToVillage p = (PathfinderRandomStrollToVillage) b;
-                yield new MoveBackToVillageGoal((PathfinderMob) m, p.getSpeedModifier(), true);
+                yield new PathfinderGoalStrollVillage((EntityCreature) m, p.getSpeedModifier(), true);
             }
             case "StrollVillageGolem" -> {
                 PathfinderRandomStrollInVillage p = (PathfinderRandomStrollInVillage) b;
-                yield new GolemRandomStrollInVillageGoal((PathfinderMob) m, p.getSpeedModifier());
+                yield new PathfinderGoalStrollVillageGolem((EntityCreature) m, p.getSpeedModifier());
             }
             case "Swell" -> {
                 PathfinderSwellCreeper p = (PathfinderSwellCreeper) b;
-                yield new SwellGoal((net.minecraft.world.entity.monster.Creeper) m);
+                yield new PathfinderGoalSwell((EntityCreeper) m);
             }
             case "Tame" -> {
                 PathfinderTameHorse p = (PathfinderTameHorse) b;
-                yield new RunAroundLikeCrazyGoal((net.minecraft.world.entity.animal.horse.AbstractHorse) m, p.getSpeedModifier());
+                yield new PathfinderGoalTame((EntityHorseAbstract) m, p.getSpeedModifier());
             }
             case "Tempt" -> {
                 PathfinderTempt p = (PathfinderTempt) b;
-                yield new TemptGoal((PathfinderMob) m, p.getSpeedModifier(), Ingredient.of(p.getItems().stream().map(CraftItemStack::asNMSCopy)), true);
+                yield new PathfinderGoalTempt((EntityCreature) m, p.getSpeedModifier(), RecipeItemStack.a(p.getItems().stream().map(CraftItemStack::asNMSCopy)), true);
             }
             case "TradeWithPlayer" -> {
                 PathfinderTradePlayer p = (PathfinderTradePlayer) b;
-                yield new TradeWithPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
+                yield new PathfinderGoalTradeWithPlayer((EntityVillagerAbstract) m);
             }
             case "UseItem" -> {
                 PathfinderUseItem p = (PathfinderUseItem) b;
-                yield new UseItemGoal<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
+                yield new PathfinderGoalUseItem<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
             }
             case "Water" -> {
                 PathfinderFindWater p = (PathfinderFindWater) b;
-                yield new TryFindWaterGoal((PathfinderMob) m);
+                yield new PathfinderGoalWater((EntityCreature) m);
             }
             case "WaterJump" -> {
                 PathfinderDolphinJump p = (PathfinderDolphinJump) b;
-                yield new DolphinJumpGoal((net.minecraft.world.entity.animal.Dolphin) m, p.getInterval());
+                yield new PathfinderGoalWaterJump((EntityDolphin) m, p.getInterval());
             }
             case "ZombieAttack" -> {
                 PathfinderZombieAttack p = (PathfinderZombieAttack) b;
-                yield new ZombieAttackGoal((net.minecraft.world.entity.monster.Zombie) m, p.getSpeedModifier(), p.mustSee());
+                yield new PathfinderGoalZombieAttack((EntityZombie) m, p.getSpeedModifier(), p.mustSee());
             }
             case "UniversalAngerReset" -> {
                 PathfinderResetAnger p = (PathfinderResetAnger) b;
-                yield new ResetUniversalAngerTargetGoal<>((net.minecraft.world.entity.Mob & NeutralMob) m, p.isAlertingOthers());
+                yield new PathfinderGoalUniversalAngerReset<>((EntityInsentient & IEntityAngerable) m, p.isAlertingOthers());
             }
 
             // Target
 
             case "DefendVillage" -> {
                 PathfinderDefendVillage p = (PathfinderDefendVillage) b;
-                yield new DefendVillageTargetGoal((net.minecraft.world.entity.animal.IronGolem) m);
+                yield new PathfinderGoalDefendVillage((EntityIronGolem) m);
             }
             case "HurtByTarget" -> {
                 PathfinderHurtByTarget p = (PathfinderHurtByTarget) b;
-                List<Class<? extends net.minecraft.world.entity.LivingEntity>> classes = new ArrayList<>();
+                List<Class<? extends EntityLiving>> classes = new ArrayList<>();
                 p.getIgnoring().stream().map(EntityType::getEntityClass).forEach(c -> classes.add(toNMS(c.asSubclass(LivingEntity.class))));
 
-                yield new HurtByTargetGoal((PathfinderMob) m, classes.toArray(new Class[0]));
+                yield new PathfinderGoalHurtByTarget((EntityCreature) m, classes.toArray(new Class[0]));
             }
             case "NearestAttackableTarget" -> {
                 PathfinderNearestAttackableTarget p = (PathfinderNearestAttackableTarget) b;
-                yield new NearestAttackableTargetGoal<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
+                yield new PathfinderGoalNearestAttackableTarget<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
             }
-            case "NearestAttackableTargetRaider" -> {
+            case "NearestAttackableTargetWitch" -> {
                 PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
-                yield new NearestAttackableWitchTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
+                yield new PathfinderGoalNearestAttackableTargetWitch<>((EntityRaider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
             }
             case "NearestHealableRaider" -> {
                 PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
-                yield new NearestHealableRaiderTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
+                yield new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
             case "OwnerHurtByTarget" -> {
                 PathfinderOwnerHurtByTarget p = (PathfinderOwnerHurtByTarget) b;
-                yield new OwnerHurtByTargetGoal((TamableAnimal) m);
+                yield new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
             }
             case "OwnerHurtTarget" -> {
                 PathfinderOwnerHurtTarget p = (PathfinderOwnerHurtTarget) b;
-                yield new OwnerHurtTargetGoal((TamableAnimal) m);
+                yield new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
             }
 
             default -> {
                 if (b instanceof CustomPathfinder p) {
-                    yield new Goal() {
+                    yield new PathfinderGoal() {
                         @Override
-                        public boolean canUse() {
+                        public boolean a() {
                             return p.canStart();
                         }
 
                         @Override
-                        public boolean canContinueToUse() {
+                        public boolean b() {
                             return p.canContinueToUse();
                         }
 
                         @Override
-                        public boolean isInterruptable() {
+                        public boolean C_() {
                             return p.canInterrupt();
                         }
 
                         @Override
-                        public void start() {
+                        public void c() {
                             p.start();
                         }
 
                         @Override
-                        public void tick() {
+                        public void e() {
                             p.tick();
                         }
                     };
@@ -478,71 +486,70 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public void addPathfinder(Pathfinder b, int priority, boolean target) {
         Mob mob = b.getEntity();
-        net.minecraft.world.entity.Mob m = toNMS(mob);
-        GoalSelector s = target ? m.targetSelector : m.goalSelector;
+        EntityInsentient m = toNMS(mob);
+        PathfinderGoalSelector s = target ? m.bP : m.bO;
 
         String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
 
-        final Goal g = toNMS(b);
+        final PathfinderGoal g = toNMS(b);
 
         if (g == null) return;
-        s.addGoal(priority, g);
+        s.a(priority, g);
     }
 
     @Override
     public void removePathfinder(Pathfinder b, boolean target) {
         Mob mob = b.getEntity();
-        net.minecraft.world.entity.Mob m = toNMS(mob);
-        GoalSelector s = target ? m.targetSelector : m.goalSelector;
+        EntityInsentient m = toNMS(mob);
+        PathfinderGoalSelector s = target ? m.bP : m.bO;
 
-        final Goal g = toNMS(b);
+        final PathfinderGoal g = toNMS(b);
         if (g == null) return;
-        s.removeGoal(g);
+        s.a(g);
     }
 
     @Override
     public void clearPathfinders(Mob mob, boolean target) {
-        net.minecraft.world.entity.Mob m = toNMS(mob);
-        GoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        s.removeAllGoals();
+        EntityInsentient m = toNMS(mob);
+        PathfinderGoalSelector s = target ? m.bP : m.bO;
+        s.a();
     }
 
     private static BehaviorResult.Status fromNMS(Behavior.Status status) {
-        if (status == Behavior.Status.STOPPED) return BehaviorResult.Status.STOPPED;
+        if (status == Behavior.Status.a) return BehaviorResult.Status.STOPPED;
         return BehaviorResult.Status.RUNNING;
     }
 
     private static final class BehaviorResult1_17_R1 extends BehaviorResult {
-        private final Behavior<? super net.minecraft.world.entity.LivingEntity> b;
-        private final net.minecraft.world.entity.Mob mob;
-        private final ServerLevel l;
+        private final Behavior<? super EntityLiving> b;
+        private final EntityInsentient mob;
+        private final WorldServer l;
 
-        private BehaviorResult1_17_R1(Behavior<? super net.minecraft.world.entity.LivingEntity> b, net.minecraft.world.entity.Mob mob) {
+        private BehaviorResult1_17_R1(Behavior<? super EntityLiving> b, EntityInsentient mob) {
             this.b = b;
             this.mob = mob;
-            this.l = toNMS(Bukkit.getWorld(mob.level.getWorld().getUID()));
+            this.l = toNMS(Bukkit.getWorld(mob.t.getWorld().getUID()));
 
-            b.tryStart(l, mob, 0);
+            b.e(l, mob, 0);
         }
 
         @Override
         public @NotNull Status getStatus() {
-            return fromNMS(b.getStatus());
+            return fromNMS(b.a());
         }
 
         @Override
         public void stop() {
-            b.doStop(l, mob, 0);
+            b.g(l, mob, 0);
         }
     }
 
-    private static LivingEntity fromNMS(net.minecraft.world.entity.LivingEntity l) {
+    private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
     }
 
     private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(mem.getKey().getKey()));
+        return IRegistry.ar.get(new MinecraftKey(mem.getKey().getKey()));
     }
 
     @Override
@@ -552,7 +559,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
+        EntityInsentient nms = toNMS(m);
         String packageN = packageName.replace("{V}", "v1_17_R1");
 
         for (int i = 0; i < args.length; i++) {
@@ -561,13 +568,13 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             if (o instanceof Memory<?>) args[i] = toNMS((Memory<?>) o);
 
             if (o instanceof Predicate) args[i] = (Predicate) obj -> {
-                if (obj instanceof net.minecraft.world.entity.Mob) return ((Predicate<Mob>) o).test(fromNMS((net.minecraft.world.entity.Mob) obj));
+                if (obj instanceof EntityInsentient) return ((Predicate<Mob>) o).test(fromNMS((EntityInsentient) obj));
 
                 return ((Predicate) o).test(obj);
             };
 
             if (o instanceof Function) args[i] = (Function) obj -> {
-                if (obj instanceof net.minecraft.world.entity.LivingEntity) return ((Function<LivingEntity, ?>) o).apply(fromNMS((net.minecraft.world.entity.LivingEntity) obj));
+                if (obj instanceof EntityLiving) return ((Function<LivingEntity, ?>) o).apply(fromNMS((EntityLiving) obj));
 
                 return ((Function) o).apply(obj);
             };
@@ -576,7 +583,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         try {
             Class<?> bClass = Class.forName(packageName + "." + behaviorName);
             Constructor<?> c = bClass.getConstructor(Arrays.stream(args).map(Object::getClass).toArray(Class[]::new));
-            Behavior<? super net.minecraft.world.entity.LivingEntity> b = (Behavior<? super net.minecraft.world.entity.LivingEntity>) c.newInstance(args);
+            Behavior<? super EntityLiving> b = (Behavior<? super EntityLiving>) c.newInstance(args);
             return new BehaviorResult1_17_R1(b, nms);
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
@@ -585,28 +592,28 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         }
     }
 
-    private static ServerPlayer toNMS(Player p) { return ((CraftPlayer) p).getHandle(); }
+    private static EntityPlayer toNMS(Player p) { return ((CraftPlayer) p).getHandle(); }
 
     private static final class EntityController1_17_R1 implements EntityController {
 
-        private final JumpControl jumpC;
-        private final MoveControl moveC;
-        private final LookControl lookC;
+        private final ControllerJump jumpC;
+        private final ControllerMove moveC;
+        private final ControllerLook lookC;
 
         private final Mob m;
 
         public EntityController1_17_R1(Mob m) {
-            net.minecraft.world.entity.Mob nms = toNMS(m);
-            this.lookC = nms.getLookControl();
-            this.moveC = nms.getMoveControl();
-            this.jumpC = nms.getJumpControl();
+            EntityInsentient nms = toNMS(m);
+            this.lookC = nms.getControllerLook();
+            this.moveC = nms.getControllerMove();
+            this.jumpC = nms.getControllerJump();
             this.m = m;
         }
 
         @Override
         public EntityController jump() {
             jumpC.jump();
-            jumpC.tick();
+            jumpC.b();
             return this;
         }
 
@@ -616,42 +623,42 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             int x = dir.getBlockX();
             int y = dir.getBlockY();
             int z = dir.getBlockZ();
-            return lookC.getWantedX() == x && lookC.getWantedY() == y && lookC.getWantedZ() == z;
+            return lookC.e() == x && lookC.f() == y && lookC.g() == z;
         }
 
         @Override
         public EntityController moveTo(double x, double y, double z, double speedMod) {
-            moveC.setWantedPosition(x, y, z, speedMod);
-            moveC.tick();
+            moveC.a(x, y, z, speedMod);
+            moveC.a();
             return this;
         }
 
         @Override
         public EntityController strafe(float fwd, float right) {
-            moveC.strafe(fwd, right);
-            moveC.tick();
+            moveC.a(fwd, right);
+            moveC.a();
             return this;
         }
 
         @Override
         public double getCurrentSpeedModifier() {
-            return moveC.getSpeedModifier();
+            return moveC.c();
         }
 
         @Override
         public Location getTargetMoveLocation() {
-            return new Location(m.getWorld(), moveC.getWantedX(), moveC.getWantedY(), moveC.getWantedZ());
+            return new Location(m.getWorld(), moveC.d(), moveC.e(), moveC.f());
         }
 
         @Override
         public Location getTargetLookLocation() {
-            return new Location(m.getWorld(), lookC.getWantedX(), lookC.getWantedY(), lookC.getWantedZ());
+            return new Location(m.getWorld(), lookC.e(), lookC.f(), lookC.g());
         }
 
         @Override
         public EntityController lookAt(double x, double y, double z) {
-            lookC.setLookAt(x, y, z);
-            lookC.tick();
+            lookC.a(x, y, z);
+            lookC.a();
             return this;
         }
 
@@ -660,9 +667,9 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     private static final class NavigationPath1_17_R1 implements NavigationPath {
         private String name;
         private final Mob m;
-        private final Path handle;
+        private final PathEntity handle;
 
-        NavigationPath1_17_R1(@NotNull Path nms, @NotNull Mob m) {
+        NavigationPath1_17_R1(@NotNull PathEntity nms, @NotNull Mob m) {
             this.m = m;
             this.name = "bukkitpath";
             this.handle = nms;
@@ -675,9 +682,9 @@ public class ChipUtil1_17_R1 implements ChipUtil {
          */
         @Override
         public void advance() {
-            this.getHandle().advance();
-            Node n = handle.getNextNode();
-            new EntityController1_17_R1(m).moveTo(n.x, n.y, n.z);
+            this.handle.a();
+            PathPoint n = handle.h();
+            new EntityController1_17_R1(m).moveTo(n.a, n.b, n.c);
         }
 
         /**
@@ -696,17 +703,13 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             this.name = name;
         }
 
-        public Path getHandle() {
-            return this.handle;
-        }
-
         /**
          * Whether this NavigationPath is complete.
          * @return true if complete, else false
          */
         @Override
         public boolean isDone() {
-            return this.handle.isDone();
+            return this.handle.c();
         }
 
         /**
@@ -777,12 +780,12 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static final class EntityNavigation1_17_R1 implements EntityNavigation {
 
-        private final PathNavigation handle;
+        private final NavigationAbstract handle;
 
         private int speedMod;
         private int range;
         private final List<Position> points;
-        private BlockPos finalPos;
+        private BlockPosition finalPos;
 
         private final Mob m;
 
@@ -808,7 +811,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public EntityNavigation recompute() {
-            this.handle.recomputePath();
+            this.handle.j();
             return this;
         }
 
@@ -839,12 +842,12 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         @Override
         @NotNull
         public NavigationPath buildPath() {
-            return new NavigationPath1_17_R1(handle.createPath(finalPos, range, speedMod), m);
+            return new NavigationPath1_17_R1(handle.a(finalPos, range, speedMod), m);
         }
 
         @Override
         public EntityNavigation setFinalPoint(@NotNull Position node) {
-            this.finalPos = new BlockPos(node.getX(), node.getY(), node.getZ());
+            this.finalPos = new BlockPosition(node.getX(), node.getY(), node.getZ());
             return this;
         }
 
@@ -856,7 +859,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     private static final class EntityBody1_17_R1 implements EntityBody {
-        private final net.minecraft.world.entity.Mob nmsMob;
+        private final EntityInsentient nmsMob;
 
         EntityBody1_17_R1(Mob nmsMob) {
             this.nmsMob = toNMS(nmsMob);
@@ -884,17 +887,17 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public boolean canBreatheUnderwater() {
-            return nmsMob.canBreatheUnderwater();
+            return nmsMob.dr();
         }
 
         @Override
         public boolean shouldDiscardFriction() {
-            return nmsMob.shouldDiscardFriction();
+            return nmsMob.dL();
         }
 
         @Override
         public void setDiscardFriction(boolean discard) {
-            nmsMob.setDiscardFriction(discard);
+            nmsMob.p(discard);
         }
 
         /**
@@ -906,28 +909,28 @@ public class ChipUtil1_17_R1 implements ChipUtil {
          */
         @Override
         public InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand) {
-            final net.minecraft.world.InteractionHand h;
+            final EnumHand h;
 
-            if (hand == InteractionHand.OFF_HAND) h = net.minecraft.world.InteractionHand.OFF_HAND;
-            else h = net.minecraft.world.InteractionHand.MAIN_HAND;
+            if (hand == InteractionHand.OFF_HAND) h = EnumHand.b;
+            else h = EnumHand.a;
 
-            return switch (nmsMob.interact(toNMS(p), h)) {
-                case SUCCESS -> InteractionResult.SUCCESS;
-                case CONSUME -> InteractionResult.CONSUME;
-                case CONSUME_PARTIAL -> InteractionResult.CONSUME_PARTIAL;
-                case FAIL -> InteractionResult.FAIL;
+            return switch (nmsMob.a(toNMS(p), h)) {
+                case a -> InteractionResult.SUCCESS;
+                case b -> InteractionResult.CONSUME;
+                case c -> InteractionResult.CONSUME_PARTIAL;
+                case e -> InteractionResult.FAIL;
                 default -> InteractionResult.PASS;
             };
         }
 
         @Override
         public boolean isSensitiveToWater() {
-            return nmsMob.isSensitiveToWater();
+            return nmsMob.ew();
         }
 
         @Override
         public boolean isAffectedByPotions() {
-            return nmsMob.isAffectedByPotions();
+            return nmsMob.eP();
         }
 
         @Override
@@ -937,48 +940,48 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public float getArmorCoverPercentage() {
-            return nmsMob.getArmorCoverPercentage();
+            return nmsMob.en();
         }
 
         @Override
         public void useItem(@Nullable InteractionHand hand) {
             if (hand == null) return;
 
-            final net.minecraft.world.InteractionHand h;
-            if (hand == InteractionHand.OFF_HAND) h = net.minecraft.world.InteractionHand.OFF_HAND;
-            else h = net.minecraft.world.InteractionHand.MAIN_HAND;
+            final EnumHand h;
+            if (hand == InteractionHand.OFF_HAND) h = EnumHand.b;
+            else h = EnumHand.a;
 
-            nmsMob.startUsingItem(h);
+            nmsMob.c(h);
         }
 
         @Override
         public boolean isUsingItem() {
-            return nmsMob.isUsingItem();
+            return nmsMob.isHandRaised();
         }
 
         @Override
         public boolean isFireImmune() {
-            return nmsMob.fireImmune();
+            return nmsMob.isFireProof();
         }
 
         @Override
         public boolean isSwinging() {
-            return nmsMob.swinging;
+            return nmsMob.aF;
         }
 
         @Override
         public boolean canRideUnderwater() {
-            return nmsMob.rideableUnderWater();
+            return nmsMob.bC();
         }
 
         @Override
         public boolean isInvisibleTo(@Nullable Player p) {
-            return nmsMob.isInvisibleTo(toNMS(p));
+            return nmsMob.c((EntityHuman) toNMS(p));
         }
 
         @Override
         public @NotNull InteractionHand getMainHand() {
-            if (nmsMob.getMainArm() == HumanoidArm.LEFT) return InteractionHand.OFF_HAND;
+            if (nmsMob.getMainHand() == EnumMainHand.a) return InteractionHand.OFF_HAND;
             return InteractionHand.MAIN_HAND;
         }
 
@@ -994,18 +997,18 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public boolean isInCombat() {
-            return nmsMob.combatTracker.isInCombat();
+            return nmsMob.getCombatTracker().e();
         }
 
         @Override
         public float getFlyingSpeed() {
-            return nmsMob.flyingSpeed;
+            return nmsMob.bb;
         }
 
         @Override
         public void setFlyingSpeed(float speed) throws IllegalArgumentException {
             if (speed < 0 || speed > 1) throw new IllegalArgumentException("Flying speed must be between 0.0F and 1.0F");
-            nmsMob.flyingSpeed = speed;
+            nmsMob.bb = speed;
         }
 
         @Override
@@ -1020,29 +1023,29 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public boolean isMoving() {
-            double x = nmsMob.getX() - nmsMob.xo;
-            double z = nmsMob.getZ() - nmsMob.zo;
+            double x = nmsMob.locX() - nmsMob.u;
+            double z = nmsMob.locZ() - nmsMob.w;
             return x * x + z * z > 2.500000277905201E-7D;
         }
 
         @Override
         public float getBodyRotation() {
-            return nmsMob.yBodyRot;
+            return nmsMob.aX;
         }
 
         @Override
         public void setBodyRotation(float rotation) {
-            nmsMob.yBodyRot = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aX = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
         }
 
         @Override
         public float getHeadRotation() {
-            return nmsMob.yHeadRot;
+            return nmsMob.aZ;
         }
 
         @Override
         public void setHeadRotation(float rotation) {
-            nmsMob.yHeadRot = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aZ = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
         }
 
         @Override
@@ -1076,45 +1079,45 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         @Override
         public void playAnimation(@NotNull EntityAnimation anim) {
             switch (anim) {
-                case SPAWN -> nmsMob.spawnAnim();
-                case DAMAGE -> nmsMob.animateHurt();
+                case SPAWN -> nmsMob.doSpawnEffect();
+                case DAMAGE -> nmsMob.bv();
                 case CRITICAL_DAMAGE -> {
-                    ClientboundAnimatePacket pkt = new ClientboundAnimatePacket(nmsMob, 4);
-                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).connection.send(pkt);
+                    PacketPlayOutAnimation pkt = new PacketPlayOutAnimation(nmsMob, 4);
+                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).b.sendPacket(pkt);
                 }
                 case MAGICAL_CRITICAL_DAMAGE -> {
-                    ClientboundAnimatePacket pkt = new ClientboundAnimatePacket(nmsMob, 5);
-                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).connection.send(pkt);
+                    PacketPlayOutAnimation pkt = new PacketPlayOutAnimation(nmsMob, 5);
+                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).b.sendPacket(pkt);
                 }
             }
         }
 
         @Override
         public float getAnimationSpeed() {
-            return nmsMob.animationSpeed;
+            return nmsMob.aS;
         }
 
         @Override
         public void setAnimationSpeed(float speed) throws IllegalArgumentException {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
-            nmsMob.animationSpeed = speed;
+            nmsMob.aS = speed;
         }
     }
 
     private static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {
-        return Registry.ACTIVITY.get(new ResourceLocation(a.getKey().getKey()));
+        return IRegistry.au.get(new MinecraftKey(a.getKey().getKey()));
     }
 
     private static Activity fromNMS(net.minecraft.world.entity.schedule.Activity a) {
-        ResourceLocation key = Registry.ACTIVITY.getKey(a);
-        return Activity.getByKey(NamespacedKey.minecraft(key.getPath()));
+        MinecraftKey key = IRegistry.au.getKey(a);
+        return Activity.getByKey(NamespacedKey.minecraft(key.getKey()));
     }
 
     private static Schedule fromNMS(net.minecraft.world.entity.schedule.Schedule s) {
         Schedule.Builder b = Schedule.builder();
         for (int i = 0; i < 24000; i++) {
-            if (s.getActivityAt(i) == null) continue;
-            Activity a = fromNMS(s.getActivityAt(i));
+            if (s.a(i) == null) continue;
+            Activity a = fromNMS(s.a(i));
             b.addActivity(i, a);
         }
 
@@ -1126,31 +1129,31 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         for (int i = 0; i < 24000; i++) {
             if (!s.contains(i)) continue;
             net.minecraft.world.entity.schedule.Activity a = toNMS(s.get(i));
-            b.changeActivityAt(i, a);
+            b.a(i, a);
         }
 
-        return b.build();
+        return b.a();
     }
 
-    private static <T extends net.minecraft.world.entity.LivingEntity> Behavior<T> toNMS(Consumer<Mob> en) {
+    private static <T extends EntityLiving> Behavior<T> toNMS(Consumer<Mob> en) {
         return new Behavior<>(Collections.emptyMap()) {
             @Override
-            protected void tick(ServerLevel var0, T m, long var2) {
-                if (!(m instanceof net.minecraft.world.entity.Mob)) return;
-                en.accept(fromNMS((net.minecraft.world.entity.Mob) m));
+            protected void d(WorldServer var0, T m, long var2) {
+                if (!(m instanceof EntityInsentient)) return;
+                en.accept(fromNMS((EntityInsentient) m));
             }
         };
     }
 
     @Override
     public Schedule getDefaultSchedule(String key) {
-        return fromNMS(Registry.SCHEDULE.get(new ResourceLocation(key)));
+        return fromNMS(IRegistry.at.get(new MinecraftKey(key)));
     }
 
     @SuppressWarnings("deprecation")
     private static final class EntityScheduleManager1_17_R1 implements EntityScheduleManager {
 
-        private final net.minecraft.world.entity.Mob nmsMob;
+        private final EntityInsentient nmsMob;
         private final Mob m;
 
         EntityScheduleManager1_17_R1(Mob m) {
@@ -1161,64 +1164,64 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public @Nullable Schedule getCurrentSchedule() {
-            return fromNMS(nmsMob.getBrain().getSchedule());
+            return fromNMS(nmsMob.getBehaviorController().getSchedule());
         }
 
         @Override
         public void setSchedule(@NotNull Schedule s) {
-            nmsMob.getBrain().setSchedule(toNMS(s));
+            nmsMob.getBehaviorController().setSchedule(toNMS(s));
         }
 
         @Override
         public @NotNull Set<Activity> getActiveActivities() {
-            return nmsMob.getBrain().getActiveActivities().stream().map(ChipUtil1_17_R1::fromNMS).collect(Collectors.toSet());
+            return nmsMob.getBehaviorController().c().stream().map(ChipUtil1_17_R1::fromNMS).collect(Collectors.toSet());
         }
 
         @Override
         public void setDefaultActivity(@NotNull Activity a) {
-            nmsMob.getBrain().setDefaultActivity(toNMS(a));
+            nmsMob.getBehaviorController().b(toNMS(a));
         }
 
         @Override
         public void useDefaultActivity() {
-            nmsMob.getBrain().useDefaultActivity();
+            nmsMob.getBehaviorController().e();
         }
 
         @Override
         public void setRunningActivity(@NotNull Activity a) {
-            nmsMob.getBrain().setActiveActivityIfPossible(toNMS(a));
+            nmsMob.getBehaviorController().a(toNMS(a));
         }
 
         @Override
         public @Nullable Activity getRunningActivity() {
-            return nmsMob.getBrain().getActiveNonCoreActivity().isPresent() ? fromNMS(nmsMob.getBrain().getActiveNonCoreActivity().get()) : null;
+            return nmsMob.getBehaviorController().f().isPresent() ? fromNMS(nmsMob.getBehaviorController().f().get()) : null;
         }
 
         @Override
         public boolean isRunning(@NotNull Activity a) {
-            return nmsMob.getBrain().isActive(toNMS(a));
+            return nmsMob.getBehaviorController().c(toNMS(a));
         }
 
         @Override
         public int size() {
-            return nmsMob.getBrain().getRunningBehaviors().size();
+            return nmsMob.getBehaviorController().d().size();
         }
 
         @Override
         public boolean isEmpty() {
-            return nmsMob.getBrain().getRunningBehaviors().isEmpty();
+            return nmsMob.getBehaviorController().d().isEmpty();
         }
 
         @Nullable
         @Override
         public Consumer<Mob> put(@NotNull Activity key, Consumer<Mob> value) {
-            nmsMob.getBrain().addActivity(toNMS(key), 0, ImmutableList.of(toNMS(value)));
+            nmsMob.getBehaviorController().a(toNMS(key), 0, ImmutableList.of(toNMS(value)));
             return value;
         }
 
         @Override
         public void clear() {
-            nmsMob.getBrain().removeAllBehaviors();
+            nmsMob.getBehaviorController().g();
         }
 
     }
@@ -1243,73 +1246,73 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static DamageSource toNMS(EntityDamageEvent.DamageCause c) {
         return switch (c) {
-            case FIRE -> DamageSource.IN_FIRE;
-            case LIGHTNING -> DamageSource.LIGHTNING_BOLT;
-            case FIRE_TICK -> DamageSource.ON_FIRE;
-            case SUFFOCATION -> DamageSource.IN_WALL;
-            case LAVA -> DamageSource.LAVA;
-            case HOT_FLOOR -> DamageSource.HOT_FLOOR;
-            case CRAMMING -> DamageSource.CRAMMING;
-            case DROWNING -> DamageSource.DROWN;
-            case STARVATION -> DamageSource.STARVE;
-            case CONTACT -> DamageSource.CACTUS;
-            case MAGIC -> DamageSource.MAGIC;
-            case FALL -> DamageSource.FALL;
-            case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
-            case VOID -> DamageSource.OUT_OF_WORLD;
-            case WITHER -> DamageSource.WITHER;
-            case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
-            case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
-            case FREEZE -> DamageSource.FREEZE;
-            case DRYOUT -> DamageSource.DRY_OUT;
-            default -> DamageSource.GENERIC;
+            case FIRE -> DamageSource.a;
+            case LIGHTNING -> DamageSource.b;
+            case FIRE_TICK -> DamageSource.c;
+            case SUFFOCATION -> DamageSource.f;
+            case LAVA -> DamageSource.d;
+            case HOT_FLOOR -> DamageSource.e;
+            case CRAMMING -> DamageSource.g;
+            case DROWNING -> DamageSource.h;
+            case STARVATION -> DamageSource.i;
+            case CONTACT -> DamageSource.j;
+            case MAGIC -> DamageSource.o;
+            case FALL -> DamageSource.k;
+            case FLY_INTO_WALL -> DamageSource.l;
+            case VOID -> DamageSource.m;
+            case WITHER -> DamageSource.p;
+            case FALLING_BLOCK -> DamageSource.r;
+            case DRAGON_BREATH -> DamageSource.s;
+            case FREEZE -> DamageSource.v;
+            case DRYOUT -> DamageSource.t;
+            default -> DamageSource.n;
         };
     }
 
-    private static AbstractDragonPhaseInstance toNMS(CustomPhase c) {
-        return new AbstractDragonPhaseInstance(((CraftEnderDragon) c.getDragon()).getHandle()) {
+    private static AbstractDragonController toNMS(CustomPhase c) {
+        return new AbstractDragonController(((CraftEnderDragon) c.getDragon()).getHandle()) {
             @Override
-            public EnderDragonPhase<? extends DragonPhaseInstance> getPhase() {
+            public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
                 try {
-                    Method create = EnderDragonPhase.class.getDeclaredMethod("a");
+                    Method create = DragonControllerPhase.class.getDeclaredMethod("a");
                     create.setAccessible(true);
-                    return (EnderDragonPhase<? extends DragonPhaseInstance>) create.invoke(null, this.getClass(), c.getKey().getKey());
+                    return (DragonControllerPhase<? extends IDragonController>) create.invoke(null, this.getClass(), c.getKey().getKey());
                 } catch (Exception ignored) {}
-                return EnderDragonPhase.HOVERING;
+                return DragonControllerPhase.k;
             }
 
-            public void begin() { c.start(); }
-            public void end() { c.stop(); }
-            public boolean isSitting() { return c.isSitting(); }
-            public void doClientTick() { c.clientTick(); }
-            public void doServerTick() { c.serverTick(); }
-            public void onCrystalDestroyed(EndCrystal crystal, BlockPos pos, DamageSource s, net.minecraft.world.entity.player.Player p) {
+            public void d() { c.start(); }
+            public void e() { c.stop(); }
+            public boolean a() { return c.isSitting(); }
+            public void b() { c.clientTick(); }
+            public void c() { c.serverTick(); }
+            public void a(EntityEnderCrystal crystal, BlockPosition pos, DamageSource s, EntityHuman p) {
                 EnderCrystal bCrystal = (EnderCrystal) crystal.getBukkitEntity();
-                c.onCrystalDestroyed(bCrystal, fromNMS(s), p == null ? null : Bukkit.getPlayer(p.getUUID()));
+                c.onCrystalDestroyed(bCrystal, fromNMS(s), p == null ? null : Bukkit.getPlayer(p.getUniqueID()));
             }
-            public Vec3 getFlyTargetLocation() {
+            public Vec3D g() {
                 Location l = c.getTargetLocation();
-                return new Vec3(l.getX(), l.getY(), l.getZ());
+                return new Vec3D(l.getX(), l.getY(), l.getZ());
             }
-            public float getFlySpeed() { return c.getFlyingSpeed(); }
+            public float f() { return c.getFlyingSpeed(); }
             public float onHurt(DamageSource s, float damage) { return c.onDamage(fromNMS(s), damage); }
         };
     }
 
     @Override
     public void setCustomPhase(EnderDragon a, CustomPhase c) {
-        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
-        AbstractDragonPhaseInstance nmsPhase = toNMS(c);
+        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        AbstractDragonController nmsPhase = toNMS(c);
         try {
-            new EnderDragonPhaseManager(nmsMob).setPhase(nmsPhase.getPhase());
+            new DragonControllerManager(nmsMob).setControllerPhase(nmsPhase.getControllerPhase());
         } catch (IndexOutOfBoundsException ignored) {}
     }
 
-    private static ItemEntity toNMS(org.bukkit.entity.Item i) {
-        return (ItemEntity) ((CraftItem) i).getHandle();
+    private static EntityItem toNMS(org.bukkit.entity.Item i) {
+        return (EntityItem) ((CraftItem) i).getHandle();
     }
 
-    private static net.minecraft.world.entity.LivingEntity toNMS(LivingEntity en) {
+    private static EntityLiving toNMS(LivingEntity en) {
         return ((CraftLivingEntity) en).getHandle();
     }
 
@@ -1317,14 +1320,14 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         final Object nmsValue;
 
         if (value instanceof Location l) {
-            if (key.equals("nearest_bed") || key.equals("celebrate_location") || key.equals("nearest_repellent")) nmsValue = new BlockPos(l.getX(), l.getY(), l.getZ());
-            else nmsValue = GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ()));
+            if (key.equals("nearest_bed") || key.equals("celebrate_location") || key.equals("nearest_repellent")) nmsValue = new BlockPosition(l.getX(), l.getY(), l.getZ());
+            else nmsValue = GlobalPos.create(toNMS(l.getWorld()).getDimensionKey(), new BlockPosition(l.getX(), l.getY(), l.getZ()));
         }
         else if (value instanceof Location[] ls) {
             List<GlobalPos> p = new ArrayList<>();
 
             for (Location l : ls) {
-                p.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ())));
+                p.add(GlobalPos.create(toNMS(l.getWorld()).getDimensionKey(), new BlockPosition(l.getX(), l.getY(), l.getZ())));
             }
 
             nmsValue = p;
@@ -1333,7 +1336,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             if (key.equals("liked_player")) nmsValue = p.getUniqueId();
             else nmsValue = toNMS(p);
         }
-        else if (value instanceof Memory.WalkingTarget t) nmsValue = new WalkTarget(toNMS(t.getLocation()), (float) t.getSpeedModifier(), t.getDistance());
+        else if (value instanceof Memory.WalkingTarget t) nmsValue = new MemoryTarget(toNMS(t.getLocation()), (float) t.getSpeedModifier(), t.getDistance());
         else if (value instanceof LivingEntity l) nmsValue = toNMS(l);
         else if (value instanceof Entity e) {
             if (key.equals("angry_at")) nmsValue = e.getUniqueId();
@@ -1346,22 +1349,22 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
             for (org.bukkit.block.Block bl : b) {
                 Location l = bl.getLocation();
-                s.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ())));
+                s.add(GlobalPos.create(toNMS(l.getWorld()).getDimensionKey(), new BlockPosition(l.getX(), l.getY(), l.getZ())));
             }
             nmsValue = s;
         }
         else if (value instanceof Villager[] vs) {
-            List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
+            List<EntityLiving> s = new ArrayList<>();
             for (Villager v : vs) s.add(toNMS(v));
             nmsValue = s;
         }
         else if (value instanceof Player[] ps) {
-            List<net.minecraft.world.entity.player.Player> s = new ArrayList<>();
+            List<EntityHuman> s = new ArrayList<>();
             for (Player p : ps) s.add(toNMS(p));
             nmsValue = s;
         }
         else if (value instanceof LivingEntity[] ls) {
-            List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
+            List<EntityLiving> s = new ArrayList<>();
             for (LivingEntity l : ls) s.add(toNMS(l));
             nmsValue = s;
         }
@@ -1375,8 +1378,8 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         Object value = nmsValue;
 
         if (nmsValue instanceof GlobalPos l) {
-            BlockPos pos = l.pos();
-            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registryHolder.registryOrThrow(Registry.DIMENSION_REGISTRY).get(l.dimension()).getWorld();
+            BlockPosition pos = l.getBlockPosition();
+            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().l.d(IRegistry.Q).a(l.getDimensionManager()).getWorld();
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
         else if (nmsValue instanceof List<?> li) {
@@ -1388,27 +1391,27 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 }
                 case "nearest_players" -> {
                     List<Player> l = new ArrayList<>();
-                    li.forEach(o -> l.add(Bukkit.getPlayer(((net.minecraft.world.entity.player.Player) o).getUUID())));
+                    li.forEach(o -> l.add(Bukkit.getPlayer(((EntityHuman) o).getUniqueID())));
                     value = l.toArray(new Player[0]);
                 }
                 case "visible_villager_babies" -> {
                     List<Villager> l = new ArrayList<>();
-                    li.forEach(o -> l.add((Villager) fromNMS((net.minecraft.world.entity.LivingEntity) o)));
+                    li.forEach(o -> l.add((Villager) fromNMS((EntityLiving) o)));
                     value = l.toArray(new Villager[0]);
                 }
                 case "mobs" -> {
                     List<LivingEntity> vl = new ArrayList<>();
-                    li.forEach(o -> vl.add(fromNMS((net.minecraft.world.entity.LivingEntity) o)));
+                    li.forEach(o -> vl.add(fromNMS((EntityLiving) o)));
                     value = vl.toArray(new LivingEntity[0]);
                 }
             }
         }
-        else if (nmsValue instanceof net.minecraft.world.entity.player.Player p) value = Bukkit.getPlayer(p.getUUID());
-        else if (nmsValue instanceof WalkTarget t) {
-            BlockPos p = t.getTarget().currentBlockPosition();
-            value = new Memory.WalkingTarget(new Location(m.getWorld(), p.getX(), p.getY(), p.getZ()), t.getSpeedModifier(), t.getCloseEnoughDist());
+        else if (nmsValue instanceof EntityHuman p) value = Bukkit.getPlayer(p.getUniqueID());
+        else if (nmsValue instanceof MemoryTarget t) {
+            BlockPosition p = t.a().b();
+            value = new Memory.WalkingTarget(new Location(m.getWorld(), p.getX(), p.getY(), p.getZ()), t.b(), t.c());
         }
-        else if (nmsValue instanceof net.minecraft.world.entity.LivingEntity l) value = Bukkit.getEntity(l.getUUID());
+        else if (nmsValue instanceof EntityLiving l) value = Bukkit.getEntity(l.getUniqueID());
         else if (nmsValue instanceof Set<?> s) {
             if (key.equals("doors_to_close")) {
                 List<org.bukkit.block.Block> l = new ArrayList<>();
@@ -1423,7 +1426,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     private static EntityDamageEvent.DamageCause fromNMS(DamageSource c) {
-        return switch (c.msgId) {
+        return switch (c.y) {
             case "inFire" -> FIRE;
             case "lightningBolt" -> LIGHTNING;
             case "onFire" -> FIRE_TICK;
@@ -1455,12 +1458,12 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             return;
         }
 
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = IRegistry.ar.getKey(type).getKey();
         Object nmsValue = toNMS(key, value);
 
-        nms.getBrain().setMemory(type, nmsValue);
+        nms.getBehaviorController().setMemory(type, nmsValue);
     }
 
     @Override
@@ -1470,87 +1473,87 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             return;
         }
 
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = IRegistry.ar.getKey(type).getKey();
         Object nmsValue = toNMS(key, value);
 
-        nms.getBrain().setMemoryWithExpiry(type, nmsValue, durationTicks);
+        nms.getBehaviorController().a(type, nmsValue, durationTicks);
     }
 
     @Override
     public <T> T getMemory(Mob mob, Memory<T> m) {
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = IRegistry.ar.getKey(type).getKey();
 
-        return m.getBukkitClass().cast(fromNMS(mob, key, nms.getBrain().getMemory(type)));
+        return m.getBukkitClass().cast(fromNMS(mob, key, nms.getBehaviorController().getMemory(type)));
     }
 
     @Override
     public long getExpiry(Mob mob, Memory<?> m) {
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
 
-        return nms.getBrain().getTimeUntilExpiry(type);
+        return nms.getBehaviorController().d(type);
     }
 
     @Override
     public boolean contains(Mob mob, Memory<?> m) {
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
 
-        return nms.getBrain().hasMemoryValue(type);
+        return nms.getBehaviorController().hasMemory(type);
     }
 
     @Override
     public void removeMemory(Mob mob, Memory<?> m) {
-        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        EntityInsentient nms = toNMS(mob);
         MemoryModuleType<?> type = toNMS(m);
-        nms.getBrain().eraseMemory(type);
+        nms.getBehaviorController().removeMemory(type);
     }
 
     @Override
     public boolean isRestricted(Mob m) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        return nms.isWithinRestriction();
+        EntityInsentient nms = toNMS(m);
+        return nms.fg();
     }
 
     @Override
     public void clearRestriction(Mob m) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        nms.clearRestriction();
+        EntityInsentient nms = toNMS(m);
+        nms.fj();
     }
 
     @Override
     public void restrictTo(Mob m, double x, double y, double z, int radius) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        nms.restrictTo(new BlockPos(x, y, z), radius);
+        EntityInsentient nms = toNMS(m);
+        nms.a(new BlockPosition(x, y, z), radius);
     }
 
     @Override
     public Location getRestriction(Mob m) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        BlockPos c = nms.getRestrictCenter();
+        EntityInsentient nms = toNMS(m);
+        BlockPosition c = nms.fh();
         return new Location(m.getWorld(), c.getX(), c.getY(), c.getZ());
     }
 
     @Override
     public int getRestrictionRadius(Mob m) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        return ((int) nms.getRestrictRadius()) < 0 ? Integer.MAX_VALUE : (int) nms.getRestrictRadius();
+        EntityInsentient nms = toNMS(m);
+        return ((int) nms.fi()) < 0 ? Integer.MAX_VALUE : (int) nms.fi();
     }
 
     @Override
     public boolean hasRestriction(Mob m) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        return nms.hasRestriction();
+        EntityInsentient nms = toNMS(m);
+        return nms.fk();
     }
 
     @Override
     public boolean canSee(Mob m, Entity en) {
-        net.minecraft.world.entity.Mob nms = toNMS(m);
-        return nms.getSensing().hasLineOfSight(toNMS(en));
+        EntityInsentient nms = toNMS(m);
+        return nms.getEntitySenses().a(toNMS(en));
     }
 
     private static net.minecraft.world.entity.Entity toNMS(Entity en) {
@@ -1559,21 +1562,21 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static VillagerProfession toNMS(Villager.Profession p) {
         return switch (p) {
-            case FARMER -> VillagerProfession.FARMER;
-            case FISHERMAN -> VillagerProfession.FISHERMAN;
-            case LIBRARIAN -> VillagerProfession.LIBRARIAN;
-            case WEAPONSMITH -> VillagerProfession.WEAPONSMITH;
-            case TOOLSMITH -> VillagerProfession.TOOLSMITH;
-            case BUTCHER -> VillagerProfession.BUTCHER;
-            case FLETCHER -> VillagerProfession.FLETCHER;
-            case MASON -> VillagerProfession.MASON;
-            case CLERIC -> VillagerProfession.CLERIC;
-            case ARMORER -> VillagerProfession.ARMORER;
-            case NITWIT -> VillagerProfession.NITWIT;
-            case SHEPHERD -> VillagerProfession.SHEPHERD;
-            case CARTOGRAPHER -> VillagerProfession.CARTOGRAPHER;
-            case LEATHERWORKER -> VillagerProfession.LEATHERWORKER;
-            default -> VillagerProfession.NONE;
+            case FARMER -> VillagerProfession.f;
+            case FISHERMAN -> VillagerProfession.g;
+            case LIBRARIAN -> VillagerProfession.j;
+            case WEAPONSMITH -> VillagerProfession.o;
+            case TOOLSMITH -> VillagerProfession.n;
+            case BUTCHER -> VillagerProfession.c;
+            case FLETCHER -> VillagerProfession.h;
+            case MASON -> VillagerProfession.k;
+            case CLERIC -> VillagerProfession.e;
+            case ARMORER -> VillagerProfession.b;
+            case NITWIT -> VillagerProfession.l;
+            case SHEPHERD -> VillagerProfession.m;
+            case CARTOGRAPHER -> VillagerProfession.d;
+            case LEATHERWORKER -> VillagerProfession.i;
+            default -> VillagerProfession.a;
         };
     }
 
@@ -1638,7 +1641,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         }
     }
 
-    private static net.minecraft.world.entity.Mob toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    private static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -1650,61 +1653,61 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         return types.toArray(new EntityType[0]);
     }
 
-    private static Difficulty toNMS(org.bukkit.Difficulty d) {
+    private static EnumDifficulty toNMS(org.bukkit.Difficulty d) {
         return switch (d) {
-            case PEACEFUL -> Difficulty.PEACEFUL;
-            case EASY -> Difficulty.EASY;
-            case NORMAL -> Difficulty.NORMAL;
-            case HARD -> Difficulty.HARD;
+            case PEACEFUL -> EnumDifficulty.a;
+            case EASY -> EnumDifficulty.b;
+            case NORMAL -> EnumDifficulty.c;
+            case HARD -> EnumDifficulty.d;
         };
     }
 
-    private static org.bukkit.Difficulty fromNMS(Difficulty d) {
+    private static org.bukkit.Difficulty fromNMS(EnumDifficulty d) {
         return switch (d) {
-            case PEACEFUL -> org.bukkit.Difficulty.PEACEFUL;
-            case EASY -> org.bukkit.Difficulty.EASY;
-            case NORMAL -> org.bukkit.Difficulty.NORMAL;
-            case HARD -> org.bukkit.Difficulty.HARD;
+            case a -> org.bukkit.Difficulty.PEACEFUL;
+            case b -> org.bukkit.Difficulty.EASY;
+            case c -> org.bukkit.Difficulty.NORMAL;
+            case d -> org.bukkit.Difficulty.HARD;
         };
     }
 
-    private static PathfinderMob toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
+    private static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
 
-    private Goal.Flag toNMS(Pathfinder.PathfinderFlag f) {
+    private PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
         return switch (f) {
-            case MOVEMENT -> Goal.Flag.MOVE;
-            case JUMPING -> Goal.Flag.JUMP;
-            case TARGETING -> Goal.Flag.TARGET;
-            case LOOKING -> Goal.Flag.LOOK;
+            case MOVEMENT -> PathfinderGoal.Type.a;
+            case JUMPING -> PathfinderGoal.Type.c;
+            case TARGETING -> PathfinderGoal.Type.d;
+            case LOOKING -> PathfinderGoal.Type.b;
         };
     }
 
-    private static Pathfinder.PathfinderFlag fromNMS(Goal.Flag f) {
+    private static Pathfinder.PathfinderFlag fromNMS(PathfinderGoal.Type f) {
         return switch (f) {
-            case MOVE -> Pathfinder.PathfinderFlag.MOVEMENT;
-            case JUMP -> Pathfinder.PathfinderFlag.JUMPING;
-            case TARGET -> Pathfinder.PathfinderFlag.TARGETING;
-            case LOOK -> Pathfinder.PathfinderFlag.LOOKING;
+            case a -> Pathfinder.PathfinderFlag.MOVEMENT;
+            case c -> Pathfinder.PathfinderFlag.JUMPING;
+            case d -> Pathfinder.PathfinderFlag.TARGETING;
+            case b -> Pathfinder.PathfinderFlag.LOOKING;
         };
     }
 
-    private static float getFloat(Goal o, String name) { return getObject(o, name, Float.class); }
+    private static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
 
-    private static double getDouble(Goal o, String name) {
+    private static double getDouble(PathfinderGoal o, String name) {
         return getObject(o, name, Double.class);
     }
 
-    private static boolean getBoolean(Goal o, String name) {
+    private static boolean getBoolean(PathfinderGoal o, String name) {
         return getObject(o, name, Boolean.class);
     }
 
-    private static int getInt(Goal o, String name) {
+    private static int getInt(PathfinderGoal o, String name) {
         return getObject(o, name, Integer.class);
     }
 
-    private static <T> T getObject(Goal o, String name, Class<T> cast) {
+    private static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
         try {
-            Class<? extends Goal> clazz = o.getClass();
+            Class<? extends PathfinderGoal> clazz = o.getClass();
 
             while (clazz.getSuperclass() != null) {
                 try {
@@ -1712,7 +1715,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                     f.setAccessible(true);
                     return cast.cast(f.get(o));
                 } catch (NoSuchFieldException e) {
-                    if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
+                    if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                     else break;
                 }
             }
@@ -1724,31 +1727,31 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         return null;
     }
 
-    private static Mob fromNMS(net.minecraft.world.entity.Mob m) { return (Mob) m.getBukkitEntity(); }
+    private static Mob fromNMS(EntityInsentient m) { return (Mob) m.getBukkitEntity(); }
 
-    private static World fromNMS(Level l) { return l.getWorld(); }
+    private static World fromNMS(net.minecraft.world.level.World l) { return l.getWorld(); }
 
-    private static ServerLevel toNMS(World w) { return ((CraftWorld) w).getHandle(); }
+    private static WorldServer toNMS(World w) { return ((CraftWorld) w).getHandle(); }
 
-    private static BlockPos toNMS(Location l) { return new BlockPos(l.getX(), l.getY(), l.getZ()); }
+    private static BlockPosition toNMS(Location l) { return new BlockPosition(l.getX(), l.getY(), l.getZ()); }
 
-    private static List<ItemStack> fromNMS(Ingredient in) { return Arrays.stream(in.itemStacks).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
+    private static List<ItemStack> fromNMS(RecipeItemStack in) { return Arrays.stream(in.c).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
 
-    private static Sound fromNMS(SoundEvent s) { return CraftSound.getBukkit(s); }
+    private static Sound fromNMS(SoundEffect s) { return CraftSound.getBukkit(s); }
 
-    private static Mob getEntity(Goal g) {
+    private static Mob getEntity(PathfinderGoal g) {
         try {
-            Class<? extends Goal> clazz = g.getClass();
+            Class<? extends PathfinderGoal> clazz = g.getClass();
 
             while (clazz.getSuperclass() != null) {
                 for (Field f : clazz.getDeclaredFields()) {
                     f.setAccessible(true);
-                    if (net.minecraft.world.entity.Mob.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
-                        return fromNMS((net.minecraft.world.entity.Mob) f.get(g));
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                        return fromNMS((EntityInsentient) f.get(g));
                     }
                 }
 
-                if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
+                if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                 else break;
             }
 
@@ -1760,7 +1763,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         }
     }
 
-    private static Object invoke(Goal g, String method, Object... args) {
+    private static Object invoke(PathfinderGoal g, String method, Object... args) {
         try {
             Method m = g.getClass().getDeclaredMethod(method);
             m.setAccessible(true);
@@ -1773,13 +1776,13 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         }
     }
 
-    private static CustomPathfinder custom(Goal g) {
+    private static CustomPathfinder custom(PathfinderGoal g) {
         return new CustomPathfinder(getEntity(g)) {
             @Override
             public @NotNull PathfinderFlag[] getFlags() {
-                PathfinderFlag[] flags = new PathfinderFlag[g.getFlags().size()];
+                PathfinderFlag[] flags = new PathfinderFlag[g.i().size()];
                 int i = 0;
-                for (Goal.Flag f : g.getFlags()) {
+                for (PathfinderGoal.Type f : g.i()) {
                     flags[i] = fromNMS(f);
                     i++;
                 }
@@ -1788,17 +1791,17 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
             @Override
             public boolean canStart() {
-                return g.canUse();
+                return g.a();
             }
 
             @Override
             public void start() {
-                g.start();
+                g.c();
             }
 
             @Override
             public void tick() {
-                g.tick();
+                g.d();
             }
 
             @Override
@@ -1808,18 +1811,18 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         };
     }
 
-    private static BlockPos getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPos bp, BlockGetter g) {
-        if (g.getBlockState(bp).is(block)) return bp;
+    private static BlockPosition getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPosition bp, IBlockAccess g) {
+        if (g.getType(bp).a(block)) return bp;
         else {
-            BlockPos[] bp1 = new BlockPos[]{new BlockPos(bp.below()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPos(bp.above())};
-            for (BlockPos bps : bp1) if (g.getBlockState(bps).is(block)) return bps;
+            BlockPosition[] bp1 = new BlockPosition[]{new BlockPosition(bp.down()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPosition(bp.up())};
+            for (BlockPosition bps : bp1) if (g.getType(bps).a(block)) return bps;
             return null;
         }
     }
 
-    private static Location fromNMS(BlockPos p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
+    private static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
-    private Pathfinder fromNMS(Goal g) {
+    private Pathfinder fromNMS(PathfinderGoal g) {
         Mob m = getEntity(g);
         String name = g.getClass().getSimpleName();
 
@@ -1875,16 +1878,16 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 case "StrollVillageGolem" -> new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
                 case "Swell" -> new PathfinderSwellCreeper((Creeper) m);
                 case "Tame" -> new PathfinderTameHorse((AbstractHorse) m);
-                case "Tempt" -> new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "m", Ingredient.class)));
+                case "Tempt" -> new PathfinderTempt((Creature) m, getDouble(g, "e"), fromNMS(getObject(g, "m", RecipeItemStack.class)));
                 case "TradeWithPlayer" -> new PathfinderTradePlayer((AbstractVillager) m);
                 case "UniversalAngerReset" -> new PathfinderResetAnger(m, getBoolean(g, "c"));
-                case "UseItem" -> new PathfinderUseItem(m, fromNMS(getObject(g, "b", net.minecraft.world.item.ItemStack.class)), en -> getObject(g, "c", Predicate.class).test(toNMS(en)), fromNMS(getObject(g, "d", SoundEvent.class)));
+                case "UseItem" -> new PathfinderUseItem(m, fromNMS(getObject(g, "b", net.minecraft.world.item.ItemStack.class)), en -> getObject(g, "c", Predicate.class).test(toNMS(en)), fromNMS(getObject(g, "d", SoundEffect.class)));
                 case "ZombieAttack" -> new PathfinderZombieAttack((Zombie) m, getDouble(g, "b"), getBoolean(g, "c"));
 
                 // Target
                 case "NearestAttackableTarget" -> new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "d"));
-                case "NearestAttackableTargetWitch" -> new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true, l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
-                case "NearestHealableRaider" -> new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), true,  l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
+                case "NearestAttackableTargetWitch" -> new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true, l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+                case "NearestHealableRaider" -> new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), true,  l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
                 case "DefendVillage" -> new PathfinderDefendVillage((IronGolem) m);
                 case "HurtByTarget" -> new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
@@ -1895,19 +1898,19 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         } else return custom(g);
     }
 
-    private static class Attribute1_17_R1 extends RangedAttribute implements Attribute {
+    private static class Attribute1_17_R1 extends AttributeRanged implements Attribute {
 
         private final NamespacedKey key;
         private final double defaultV;
         private final double min;
         private final double max;
 
-        public Attribute1_17_R1(RangedAttribute a) {
-            super(a.getDescriptionId(), a.getDefaultValue(), a.getMinValue(), a.getMaxValue());
-            this.key = Registry.ATTRIBUTE.getKey(a) == null ? NamespacedKey.minecraft(a.getDescriptionId()) : CraftNamespacedKey.fromMinecraft(Registry.ATTRIBUTE.getKey(a));
-            this.defaultV = a.getDefaultValue();
-            this.min = a.getMinValue();
-            this.max = a.getMaxValue();
+        public Attribute1_17_R1(AttributeRanged a) {
+            super(a.getName(), a.getDefault(), a.d(), a.e());
+            this.key = IRegistry.al.getKey(a) == null ? NamespacedKey.minecraft(a.getName()) : CraftNamespacedKey.fromMinecraft(IRegistry.al.getKey(a));
+            this.defaultV = a.getDefault();
+            this.min = a.d();
+            this.max = a.e();
         }
 
         public Attribute1_17_R1(NamespacedKey key, double defaultV, double min, double max, boolean clientSide) {
@@ -1916,7 +1919,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             this.min = min;
             this.defaultV = defaultV;
             this.max = max;
-            this.setSyncable(clientSide);
+            this.a(clientSide);
         }
 
         public double getMinValue() {
@@ -1933,7 +1936,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public boolean isClientSide() {
-            return isClientSyncable();
+            return b();
         }
 
         @NotNull
@@ -1945,10 +1948,10 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static class AttributeInstance1_17_R1 implements AttributeInstance {
 
-        private final net.minecraft.world.entity.ai.attributes.AttributeInstance handle;
+        private final AttributeModifiable handle;
         private final Attribute a;
 
-        AttributeInstance1_17_R1(Attribute a, net.minecraft.world.entity.ai.attributes.AttributeInstance handle) {
+        AttributeInstance1_17_R1(Attribute a, AttributeModifiable handle) {
             this.a = a;
             this.handle = handle;
         }
@@ -1965,7 +1968,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public void setBaseValue(double v) {
-            handle.setBaseValue(v);
+            handle.setValue(v);
         }
 
         @NotNull
@@ -1977,7 +1980,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         @Override
         public void addModifier(@NotNull AttributeModifier mod) {
             Preconditions.checkArgument(mod != null, "modifier");
-            handle.addPermanentModifier(CraftAttributeInstance.convert(mod));
+            handle.addModifier(CraftAttributeInstance.convert(mod));
         }
 
         @Override
@@ -1993,7 +1996,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public double getDefaultValue() {
-            return handle.getAttribute().getDefaultValue();
+            return handle.getAttribute().getDefault();
         }
     }
 
@@ -2002,73 +2005,73 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         if (existsAttribute(key)) return null;
 
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> writable = server.registryAccess().ownedRegistryOrThrow(Registry.ATTRIBUTE_REGISTRY);
-        ResourceKey<net.minecraft.world.entity.ai.attributes.Attribute> nmsKey = ResourceKey.create(Registry.ATTRIBUTE_REGISTRY, toNMS(key));
+        IRegistryWritable<AttributeBase> writable = server.getCustomRegistry().b(IRegistry.y);
+        ResourceKey<AttributeBase> nmsKey = ResourceKey.a(IRegistry.y, toNMS(key));
         Attribute1_17_R1 att = new Attribute1_17_R1(key, defaultV, min, max, client);
-        writable.register(nmsKey, att, Lifecycle.stable());
+        writable.a(nmsKey, att, Lifecycle.stable());
         return att;
     }
 
     @Override
     public boolean existsAttribute(NamespacedKey key) {
-        return Registry.ATTRIBUTE.containsKey(toNMS(key));
+        return IRegistry.al.c(toNMS(key));
     }
 
-    private static ResourceLocation toNMS(NamespacedKey key) {
+    private static MinecraftKey toNMS(NamespacedKey key) {
         return CraftNamespacedKey.toMinecraft(key);
     }
 
     @Override
     public Attribute getAttribute(NamespacedKey key) {
-        net.minecraft.world.entity.ai.attributes.Attribute a = Registry.ATTRIBUTE.get(toNMS(key));
-        if (!(a instanceof RangedAttribute)) return null;
-        return new Attribute1_17_R1((RangedAttribute) a);
+        AttributeBase a = IRegistry.al.get(toNMS(key));
+        if (!(a instanceof AttributeRanged)) return null;
+        return new Attribute1_17_R1((AttributeRanged) a);
     }
 
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
-        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = Registry.ATTRIBUTE.get(toNMS(a.getKey()));
-        return new AttributeInstance1_17_R1(a, toNMS(m).getAttribute(nmsAttribute));
+        AttributeBase nmsAttribute = IRegistry.al.get(toNMS(a.getKey()));
+        return new AttributeInstance1_17_R1(a, toNMS(m).getAttributeInstance(nmsAttribute));
     }
 
-    private static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
-        return net.minecraft.world.entity.ai.gossip.GossipType.byId(t.getKey().getKey());
+    private static ReputationType toNMS(GossipType t) {
+        return ReputationType.a(t.getKey().getKey());
     }
 
-    private static GossipType fromNMS(net.minecraft.world.entity.ai.gossip.GossipType t) {
-        return GossipType.getByKey(NamespacedKey.minecraft(t.id));
+    private static GossipType fromNMS(ReputationType t) {
+        return GossipType.getByKey(NamespacedKey.minecraft(t.i));
     }
 
     private static class EntityGossipContainer1_17_R1 implements EntityGossipContainer {
-        private final GossipContainer handle;
+        private final Reputation handle;
 
         EntityGossipContainer1_17_R1(Villager v) {
-            this.handle = ((CraftVillager) v).getHandle().getGossips();
+            this.handle = ((CraftVillager) v).getHandle().fS();
         }
 
         @Override
         public void decay() {
-            handle.decay();
+            handle.b();
         }
 
         @Override
         public int getReputation(@NotNull Entity en, @Nullable GossipType... types) throws IllegalArgumentException {
-            return handle.getReputation(en.getUniqueId(), g -> Arrays.asList(types).contains(fromNMS(g)));
+            return handle.a(en.getUniqueId(), g -> Arrays.asList(types).contains(fromNMS(g)));
         }
 
         @Override
         public void put(@NotNull Entity en, @NotNull GossipType type, int maxCap) throws IllegalArgumentException {
-            handle.add(en.getUniqueId(), toNMS(type), maxCap);
+            handle.a(en.getUniqueId(), toNMS(type), maxCap);
         }
 
         @Override
         public void remove(@NotNull Entity en, @NotNull GossipType type) throws IllegalArgumentException {
-            handle.remove(en.getUniqueId(), toNMS(type));
+            handle.a(en.getUniqueId(), toNMS(type));
         }
 
         @Override
         public void removeAll(@NotNull GossipType type) throws IllegalArgumentException {
-            handle.remove(toNMS(type));
+            handle.a(toNMS(type));
         }
     }
 
