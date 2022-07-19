@@ -447,7 +447,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
                 g = new PathfinderGoalNearestAttackableTarget<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
                 break;
             }
-            case "NearestAttackableTargetRaider": {
+            case "NearestAttackableTargetWitch": {
                 PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
                 g = new PathfinderGoalNearestAttackableTargetWitch<>((EntityRaider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
                 break;

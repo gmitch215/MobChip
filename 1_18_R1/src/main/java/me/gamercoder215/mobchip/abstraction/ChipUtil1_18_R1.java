@@ -424,7 +424,7 @@ public class ChipUtil1_18_R1 implements ChipUtil {
                 PathfinderNearestAttackableTarget p = (PathfinderNearestAttackableTarget) b;
                 yield new NearestAttackableTargetGoal<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
             }
-            case "NearestAttackableTargetRaider" -> {
+            case "NearestAttackableTargetWitch" -> {
                 PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
                 yield new NearestAttackableWitchTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
             }
