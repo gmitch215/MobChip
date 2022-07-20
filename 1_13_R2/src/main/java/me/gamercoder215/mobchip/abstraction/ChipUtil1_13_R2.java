@@ -1021,6 +1021,70 @@ public class ChipUtil1_13_R2 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.aG = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.C;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.C = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.positionChanged;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.positionChanged = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.J;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.K;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return 0F; // doesn't exist
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.bL();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            return false; // doesn't exist
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        final AttributeRanged a;
+
+        switch (s) {
+            case "generic.follow_range": a = (AttributeRanged) GenericAttributes.FOLLOW_RANGE; break;
+            case "generic.knockback_resistance": a = (AttributeRanged) GenericAttributes.c; break;
+            case "generic.movement_speed": a = (AttributeRanged) GenericAttributes.MOVEMENT_SPEED; break;
+            case "generic.attack_damage": a = (AttributeRanged) GenericAttributes.ATTACK_DAMAGE; break;
+            case "generic.attack_speed": a = (AttributeRanged) GenericAttributes.g; break;
+            case "generic.armor": a = (AttributeRanged) GenericAttributes.h; break;
+            case "generic.armor_toughness": a = (AttributeRanged) GenericAttributes.i; break;
+            case "generic.luck": a = (AttributeRanged) GenericAttributes.j; break;
+            default: a = (AttributeRanged) GenericAttributes.maxHealth; break;
+        }
+
+        return new Attribute1_13_R2(NamespacedKey.minecraft(s), a.getDefault(), Attribute1_13_R2.getDouble(a, "a"), a.maximum, a.c());
     }
 
     @Override

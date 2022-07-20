@@ -1101,6 +1101,62 @@ public class ChipUtil1_18_R2 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.animationSpeed = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.verticalCollision;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.verticalCollision = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.horizontalCollision;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.horizontalCollision = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.walkDist;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.moveDist;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return nmsMob.flyDist;
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.ignoreExplosion();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            try {
+                Method m = net.minecraft.world.entity.Mob.class.getDeclaredMethod("P");
+                m.setAccessible(true);
+                return (boolean) m.invoke(nmsMob);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        return new Attribute1_18_R2((RangedAttribute) Registry.ATTRIBUTE.get(new ResourceLocation(s)));
     }
 
     private static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {

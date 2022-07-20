@@ -22,7 +22,6 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.*;
-import net.minecraft.core.IRegistry;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.MinecraftKey;
@@ -1102,6 +1101,62 @@ public class ChipUtil1_17_R1 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.aS = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.B;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.B = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.A;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.A = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.H;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.I;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return nmsMob.J;
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.cx();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            try {
+                Method m = EntityInsentient.class.getDeclaredMethod("Q");
+                m.setAccessible(true);
+                return (boolean) m.invoke(nmsMob);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        return new Attribute1_17_R1((AttributeRanged) IRegistry.al.get(new MinecraftKey(s)));
     }
 
     private static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {

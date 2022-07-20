@@ -99,6 +99,8 @@ public interface ChipUtil {
 
     Attribute getAttribute(NamespacedKey key);
 
+    Attribute getDefaultAttribute(String s);
+
     AttributeInstance getAttributeInstance(Mob m, Attribute a);
 
     default void updateGoals(Map<Integer, Pathfinder> goals, Map<Integer, Boolean> target) {

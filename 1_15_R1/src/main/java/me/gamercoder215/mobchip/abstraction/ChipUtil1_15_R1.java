@@ -1133,6 +1133,76 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.aD = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.v;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.v = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.positionChanged;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.positionChanged = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.A;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.B;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return 0F; // doesn't exist
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.ca();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            try {
+                Method m = EntityInsentient.class.getDeclaredMethod("J");
+                m.setAccessible(true);
+                return (boolean) m.invoke(nmsMob);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        final AttributeRanged a;
+
+        switch (s) {
+            case "generic.follow_range": a = (AttributeRanged) GenericAttributes.FOLLOW_RANGE; break;
+            case "generic.knockback_resistance": a = (AttributeRanged) GenericAttributes.KNOCKBACK_RESISTANCE; break;
+            case "generic.movement_speed": a = (AttributeRanged) GenericAttributes.MOVEMENT_SPEED; break;
+            case "generic.attack_damage": a = (AttributeRanged) GenericAttributes.ATTACK_DAMAGE; break;
+            case "generic.attack_speed": a = (AttributeRanged) GenericAttributes.ATTACK_SPEED; break;
+            case "generic.armor": a = (AttributeRanged) GenericAttributes.ARMOR; break;
+            case "generic.armor_toughness": a = (AttributeRanged) GenericAttributes.ARMOR_TOUGHNESS; break;
+            case "generic.luck": a = (AttributeRanged) GenericAttributes.LUCK; break;
+            default: a = (AttributeRanged) GenericAttributes.MAX_HEALTH; break;
+        }
+
+        return new Attribute1_15_R1(NamespacedKey.minecraft(s), a.getDefault(), Attribute1_15_R1.getDouble(a, "a"), a.maximum, a.c());
     }
 
     private static Activity toNMS(me.gamercoder215.mobchip.ai.schedule.Activity a) {

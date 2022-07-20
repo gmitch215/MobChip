@@ -21,8 +21,8 @@ import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.util.Position;
-import net.minecraft.core.*;
 import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -1101,6 +1101,62 @@ public class ChipUtil1_19_R1 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.animationSpeed = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.verticalCollision;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.verticalCollision = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.horizontalCollision;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.horizontalCollision = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.walkDist;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.moveDist;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return nmsMob.flyDist;
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.ignoreExplosion();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            try {
+                Method m = net.minecraft.world.entity.Mob.class.getDeclaredMethod("Q");
+                m.setAccessible(true);
+                return (boolean) m.invoke(nmsMob);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        return new Attribute1_19_R1((RangedAttribute) Registry.ATTRIBUTE.get(new ResourceLocation(s)));
     }
 
     private static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {

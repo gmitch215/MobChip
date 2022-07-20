@@ -1189,6 +1189,62 @@ public class ChipUtil1_16_R1 implements ChipUtil {
             if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
             nmsMob.aC = speed;
         }
+
+        @Override
+        public boolean hasVerticalCollision() {
+            return nmsMob.v;
+        }
+
+        @Override
+        public void setVerticalCollision(boolean collision) {
+            nmsMob.v = collision;
+        }
+
+        @Override
+        public boolean hasHorizontalCollision() {
+            return nmsMob.positionChanged;
+        }
+
+        @Override
+        public void setHorizontalCollision(boolean collision) {
+            nmsMob.positionChanged = collision;
+        }
+
+        @Override
+        public float getWalkDistance() {
+            return nmsMob.A;
+        }
+
+        @Override
+        public float getMoveDistance() {
+            return nmsMob.B;
+        }
+
+        @Override
+        public float getFlyDistance() {
+            return 0F; // doesn't exist
+        }
+
+        @Override
+        public boolean isImmuneToExplosions() {
+            return nmsMob.ci();
+        }
+
+        @Override
+        public boolean isPeacefulCompatible() {
+            try {
+                Method m = EntityInsentient.class.getDeclaredMethod("L");
+                m.setAccessible(true);
+                return (boolean) m.invoke(nmsMob);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public Attribute getDefaultAttribute(String s) {
+        return new Attribute1_16_R1((AttributeRanged) IRegistry.ATTRIBUTE.get(new MinecraftKey(s)));
     }
 
     private static Activity toNMS(me.gamercoder215.mobchip.ai.schedule.Activity a) {
