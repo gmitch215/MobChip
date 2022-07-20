@@ -66,25 +66,26 @@ public abstract class CustomPhase implements Keyed {
     /**
      * Called when the Phase ends on the last tick.
      */
-    public void stop() {};
+    public void stop() {}
 
     /**
      * Called when the Phase starts on the first tick.
      */
-    public void start() {};
+    public void start() {}
 
     /**
      * Called every tick during the phase between the first and last.
      * <br><br>
      * Use this method to handle server logic (e.g. movements).
      */
-    public void serverTick() {};
+    public void serverTick() {}
+
     /**
      * Called every tick during the phase between the first and last.
      * <br><br>
      * Use this method to handle client logic (e.g. packets, particles).
      */
-    public void clientTick() {};
+    public void clientTick() {}
 
     /**
      * Called when an End Crystal is destroyed during this phase.
