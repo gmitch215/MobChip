@@ -5,17 +5,101 @@ import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 /**
  * Represents an Entity's Attribute
  */
 public final class EntityAttribute implements Attribute {
 
-    private Attribute handle;
-
     private static final ChipUtil wrapper = ChipUtil.getWrapper();
+
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_MAX_HEALTH}
+     */
+    public static final Attribute GENERIC_MAX_HEALTH = wrapper.getDefaultAttribute("generic.max_health");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_FOLLOW_RANGE}
+     */
+    public static final Attribute GENERIC_FOLLOW_RANGE = wrapper.getDefaultAttribute("generic.follow_range");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_KNOCKBACK_RESISTANCE}
+     */
+    public static final Attribute GENERIC_KNOCKBACK_RESISTANCE = wrapper.getDefaultAttribute("generic.knockback_resistance");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_MOVEMENT_SPEED}
+     */
+    public static final Attribute GENERIC_MOVEMENT_SPEED = wrapper.getDefaultAttribute("generic.movement_speed");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_FLYING_SPEED}
+     */
+    public static final Attribute GENERIC_FLYING_SPEED = wrapper.getDefaultAttribute("generic.flying_speed");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ATTACK_DAMAGE}
+     */
+    public static final Attribute GENERIC_ATTACK_DAMAGE = wrapper.getDefaultAttribute("generic.attack_damage");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ATTACK_SPEED}
+     */
+    public static final Attribute GENERIC_ATTACK_SPEED = wrapper.getDefaultAttribute("generic.attack_speed");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ARMOR}
+     */
+    public static final Attribute GENERIC_ARMOR = wrapper.getDefaultAttribute("generic.armor");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ARMOR_TOUGHNESS}
+     */
+    public static final Attribute GENERIC_ARMOR_TOUGHNESS = wrapper.getDefaultAttribute("generic.armor_toughness");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ATTACK_KNOCKBACK}
+     */
+    public static final Attribute GENERIC_ATTACK_KNOCKBACK = wrapper.getDefaultAttribute("generic.attack_knockback");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_LUCK}
+     */
+    public static final Attribute GENERIC_LUCK = wrapper.getDefaultAttribute("generic.luck");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#ZOMBIE_SPAWN_REINFORCEMENTS}
+     */
+    public static final Attribute ZOMBIE_SPAWN_REINFORCEMENTS = wrapper.getDefaultAttribute("zombie.spawn_reinforcements");
+    /**
+     * Represents {@link org.bukkit.attribute.Attribute#HORSE_JUMP_STRENGTH}
+     */
+    public static final Attribute HORSE_JUMP_STRENGTH = wrapper.getDefaultAttribute("horse.jump_strength");
+
+    /**
+     * Converts a Bukkit Attribute to a MobChip Attribute.
+     * @param attribute Bukkit Attribute
+     * @return MobChip Attribute, or null if Attribute is null
+     */
+    @Nullable
+    public static Attribute fromBukkit(@Nullable org.bukkit.attribute.Attribute attribute) {
+        if (attribute == null) return null;
+        return new EntityAttribute(attribute);
+    }
+
+    private Attribute handle;
 
     private EntityAttribute(Attribute handle) {
         this.handle = handle;
+    }
+
+    private EntityAttribute(org.bukkit.attribute.Attribute bukkit) {
+        try {
+            for (Field f : EntityAttribute.class.getDeclaredFields()) {
+                if (!Modifier.isStatic(f.getModifiers())) continue;
+                if (!Modifier.isFinal(f.getModifiers())) continue;
+
+                if (f.getName().equals(bukkit.name())) {
+                    f.setAccessible(true);
+                    this.handle = (Attribute) f.get(null);
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
