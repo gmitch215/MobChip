@@ -594,12 +594,15 @@ public class ChipUtil1_18_R1 implements ChipUtil {
 
         private final Mob m;
 
+        private final net.minecraft.world.entity.Mob nms;
+
         public EntityController1_18_R1(Mob m) {
             net.minecraft.world.entity.Mob nms = toNMS(m);
             this.lookC = nms.getLookControl();
             this.moveC = nms.getMoveControl();
             this.jumpC = nms.getJumpControl();
             this.m = m;
+            this.nms = nms;
         }
 
         @Override
@@ -622,6 +625,8 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         public EntityController moveTo(double x, double y, double z, double speedMod) {
             moveC.setWantedPosition(x, y, z, speedMod);
             moveC.tick();
+            nms.getNavigation().moveTo(moveC.getWantedX(), moveC.getWantedY(), moveC.getWantedZ(), moveC.getSpeedModifier());
+            nms.getNavigation().tick();
             return this;
         }
 
@@ -629,8 +634,11 @@ public class ChipUtil1_18_R1 implements ChipUtil {
         public EntityController strafe(float fwd, float right) {
             moveC.strafe(fwd, right);
             moveC.tick();
+            nms.getNavigation().moveTo(moveC.getWantedX(), moveC.getWantedY(), moveC.getWantedZ(), moveC.getSpeedModifier());
+            nms.getNavigation().tick();
             return this;
         }
+
 
         @Override
         public double getCurrentSpeedModifier() {

@@ -610,6 +610,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         private final ControllerLook lookC;
 
         private final Mob m;
+        private final EntityInsentient nms;
 
         public EntityController1_15_R1(Mob m) {
             EntityInsentient nms = toNMS(m);
@@ -617,6 +618,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             this.moveC = nms.getControllerMove();
             this.jumpC = nms.getControllerJump();
             this.m = m;
+            this.nms = nms;
         }
 
         @Override
@@ -639,6 +641,8 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         public EntityController moveTo(double x, double y, double z, double speedMod) {
             moveC.a(x, y, z, speedMod);
             moveC.a();
+            nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
+            nms.getNavigation().c();
             return this;
         }
 
@@ -646,6 +650,8 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         public EntityController strafe(float fwd, float right) {
             moveC.a(fwd, right);
             moveC.a();
+            nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
+            nms.getNavigation().c();
             return this;
         }
 
