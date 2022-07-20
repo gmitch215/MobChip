@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents an Entity's Body and Attributes
+ * Represents an Entity's Body and Server Attributes
  */
 public interface EntityBody {
 
@@ -322,5 +322,59 @@ public interface EntityBody {
      * @throws IllegalArgumentException if speed is less than 0.0F
      */
     void setAnimationSpeed(float speed) throws IllegalArgumentException;
+
+    /**
+     * Whether this Mob has vertical collision enabled.
+     * @return true if mob has vertical collision, else false
+     */
+    boolean hasVerticalCollision();
+
+    /**
+     * Sets if this Mob has vertical collision enabled.
+     * @param collision true if mob has vertical collision, else false
+     */
+    void setVerticalCollision(boolean collision);
+
+    /**
+     * Whether this Mob has horizontal collision enabled.
+     * @return true if mob has horizontal collision, else false
+     */
+    boolean hasHorizontalCollision();
+
+    /**
+     * Sets if this Mob has horizontal collision enabled.
+     * @param collision true if mob has horizontal collision, else false
+     */
+    void setHorizontalCollision(boolean collision);
+
+    /**
+     * Fetches how far this Mob has automatically walked.
+     * @return Walking Distance
+     */
+    float getWalkDistance();
+
+    /**
+     * Fetches how far this Mob has moved.
+     * @return Movement Distance
+     */
+    float getMoveDistance();
+
+    /**
+     * Fetches how far this Mob has flown.
+     * @return Flying Distance
+     */
+    float getFlyDistance();
+
+    /**
+     * Whether this Entity is immune to explosions.
+     * @return true if immune, else false
+     */
+    boolean isImmuneToExplosions();
+
+    /**
+     * Whether this Mob can be spawned in Peaceful Mode,
+     * @return true if peaceful, else false
+     */
+    boolean isPeacefulCompatible();
 
 }
