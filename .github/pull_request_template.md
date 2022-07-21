@@ -1,13 +1,13 @@
 ## Info
-This PR closes #xxxx.
+_This PR closes #xxxx._
 
 ## Details
-I want x to be added because y doesn't work.
+_I want x to be added because y doesn't work._
 
 ## Tested Environments
 
 ### OS
-OS:
+OS: 
 
 ### Java / Minecraft
 
@@ -17,7 +17,8 @@ OS:
 
 #### JDK Builds
 Tested on:
+- [ ] JDK Versuib 8/11
 - [ ] JDK Version 17/18
 
 ## Demonstration
-Screenshots or any other info, if you please.
+_Screenshots or any other info, if you please._
