@@ -16,7 +16,7 @@
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.2.1</version>
 				<configuration>
-					<attach>false</attach>
+					<attach>true</attach>
 				</configuration>
 				<executions>
 					<execution>
