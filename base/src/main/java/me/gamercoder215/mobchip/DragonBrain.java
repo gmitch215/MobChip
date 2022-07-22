@@ -1,6 +1,7 @@
-package me.gamercoder215.mobchip.ai.enderdragon;
+package me.gamercoder215.mobchip;
 
 import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import org.jetbrains.annotations.NotNull;
 
 /**
