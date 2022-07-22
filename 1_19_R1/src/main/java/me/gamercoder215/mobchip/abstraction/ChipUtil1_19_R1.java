@@ -217,10 +217,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderBreakDoor p = (PathfinderBreakDoor) b;
                 yield new BreakDoorGoal(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
             }
-            case "Breath" -> {
-                PathfinderBreathAir p = (PathfinderBreathAir) b;
-                yield new BreathAirGoal((PathfinderMob) m);
-            }
+            case "Breath" -> new BreathAirGoal((PathfinderMob) m);
             case "Breed" -> {
                 PathfinderBreed p = (PathfinderBreed) b;
                 yield new BreedGoal((net.minecraft.world.entity.animal.Animal) m, p.getSpeedModifier());
@@ -241,10 +238,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderOpenDoor p = (PathfinderOpenDoor) b;
                 yield new OpenDoorGoal(m, p.mustClose());
             }
-            case "EatTile" -> {
-                PathfinderEatTile p = (PathfinderEatTile) b;
-                yield new EatBlockGoal(m);
-            }
+            case "EatTile" -> new EatBlockGoal(m);
             case "FishSchool" -> {
                 PathfinderFollowFishLeader p = (PathfinderFollowFishLeader) b;
                 yield new FollowFlockLeaderGoal((AbstractSchoolingFish) m);
@@ -253,14 +247,8 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
                 yield new FleeSunGoal((PathfinderMob) m, p.getSpeedModifier());
             }
-            case "Float" -> {
-                PathfinderFloat p = (PathfinderFloat) b;
-                yield new FloatGoal(m);
-            }
-            case "FollowBoat" -> {
-                PathfinderFollowBoat p = (PathfinderFollowBoat) b;
-                yield new FollowBoatGoal((PathfinderMob) m);
-            }
+            case "Float" -> new FloatGoal(m);
+            case "FollowBoat" -> new FollowBoatGoal((PathfinderMob) m);
             case "FollowEntity" -> {
                 PathfinderFollowMob p = (PathfinderFollowMob) b;
                 yield new FollowMobGoal(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
@@ -313,34 +301,19 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderRandomStrollThroughVillage p = (PathfinderRandomStrollThroughVillage) b;
                 yield new StrollThroughVillageGoal((PathfinderMob) m, p.getInterval());
             }
-            case "OcelotAttack" -> {
-                PathfinderOcelotAttack p = (PathfinderOcelotAttack) b;
-                yield new OcelotAttackGoal(m);
-            }
-            case "OfferFlower" -> {
-                PathfinderOfferFlower p = (PathfinderOfferFlower) b;
-                yield new OfferFlowerGoal((net.minecraft.world.entity.animal.IronGolem) m);
-            }
+            case "OcelotAttack" -> new OcelotAttackGoal(m);
+            case "OfferFlower" -> new OfferFlowerGoal((net.minecraft.world.entity.animal.IronGolem) m);
             case "Panic" -> {
                 PathfinderPanic p = (PathfinderPanic) b;
                 yield new PanicGoal((PathfinderMob) m, p.getSpeedModifier());
             }
-            case "Perch" -> {
-                PathfinderRideShoulder p = (PathfinderRideShoulder) b;
-                yield new LandOnOwnersShoulderGoal((ShoulderRidingEntity) m);
-            }
-            case "Raid" -> {
-                PathfinderMoveToRaid p = (PathfinderMoveToRaid) b;
-                yield new PathfindToRaidGoal<>((net.minecraft.world.entity.raid.Raider) m);
-            }
+            case "Perch" -> new LandOnOwnersShoulderGoal((ShoulderRidingEntity) m);
+            case "Raid" -> new PathfindToRaidGoal<>((net.minecraft.world.entity.raid.Raider) m);
             case "RandomFly" -> {
                 PathfinderRandomStrollFlying p = (PathfinderRandomStrollFlying) b;
                 yield new WaterAvoidingRandomFlyingGoal((PathfinderMob) m, p.getSpeedModifier());
             }
-            case "RandomLookaround" -> {
-                PathfinderRandomLook p = (PathfinderRandomLook) b;
-                yield new RandomLookAroundGoal(m);
-            }
+            case "RandomLookaround" -> new RandomLookAroundGoal(m);
             case "RandomStroll" -> {
                 PathfinderRandomStroll p = (PathfinderRandomStroll) b;
                 yield new RandomStrollGoal((PathfinderMob) m, p.getSpeedModifier(), p.getInterval());
@@ -357,14 +330,8 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
                 yield new RemoveBlockGoal(((CraftBlock) p.getBlock()).getNMS().getBlock(), (PathfinderMob) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
             }
-            case "RestrictSun" -> {
-                PathfinderRestrictSun p = (PathfinderRestrictSun) b;
-                yield new RestrictSunGoal((PathfinderMob) m);
-            }
-            case "Sit" -> {
-                PathfinderSit p = (PathfinderSit) b;
-                yield new SitWhenOrderedToGoal((TamableAnimal) m);
-            }
+            case "RestrictSun" -> new RestrictSunGoal((PathfinderMob) m);
+            case "Sit" -> new SitWhenOrderedToGoal((TamableAnimal) m);
             case "StrollVillage" -> {
                 PathfinderRandomStrollToVillage p = (PathfinderRandomStrollToVillage) b;
                 yield new MoveBackToVillageGoal((PathfinderMob) m, p.getSpeedModifier(), true);
@@ -373,10 +340,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderRandomStrollInVillage p = (PathfinderRandomStrollInVillage) b;
                 yield new GolemRandomStrollInVillageGoal((PathfinderMob) m, p.getSpeedModifier());
             }
-            case "Swell" -> {
-                PathfinderSwellCreeper p = (PathfinderSwellCreeper) b;
-                yield new SwellGoal((net.minecraft.world.entity.monster.Creeper) m);
-            }
+            case "Swell" -> new SwellGoal((net.minecraft.world.entity.monster.Creeper) m);
             case "Tame" -> {
                 PathfinderTameHorse p = (PathfinderTameHorse) b;
                 yield new RunAroundLikeCrazyGoal((net.minecraft.world.entity.animal.horse.AbstractHorse) m, p.getSpeedModifier());
@@ -385,18 +349,12 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderTempt p = (PathfinderTempt) b;
                 yield new TemptGoal((PathfinderMob) m, p.getSpeedModifier(), Ingredient.of(p.getItems().stream().map(CraftItemStack::asNMSCopy)), true);
             }
-            case "TradeWithPlayer" -> {
-                PathfinderTradePlayer p = (PathfinderTradePlayer) b;
-                yield new TradeWithPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
-            }
+            case "TradeWithPlayer" -> new TradeWithPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
             case "UseItem" -> {
                 PathfinderUseItem p = (PathfinderUseItem) b;
                 yield new UseItemGoal<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
             }
-            case "Water" -> {
-                PathfinderFindWater p = (PathfinderFindWater) b;
-                yield new TryFindWaterGoal((PathfinderMob) m);
-            }
+            case "Water" -> new TryFindWaterGoal((PathfinderMob) m);
             case "WaterJump" -> {
                 PathfinderDolphinJump p = (PathfinderDolphinJump) b;
                 yield new DolphinJumpGoal((net.minecraft.world.entity.animal.Dolphin) m, p.getInterval());
@@ -412,10 +370,7 @@ public class ChipUtil1_19_R1 implements ChipUtil {
 
             // Target
 
-            case "DefendVillage" -> {
-                PathfinderDefendVillage p = (PathfinderDefendVillage) b;
-                yield new DefendVillageTargetGoal((net.minecraft.world.entity.animal.IronGolem) m);
-            }
+            case "DefendVillage" -> new DefendVillageTargetGoal((net.minecraft.world.entity.animal.IronGolem) m);
             case "HurtByTarget" -> {
                 PathfinderHurtByTarget p = (PathfinderHurtByTarget) b;
                 List<Class<? extends net.minecraft.world.entity.LivingEntity>> classes = new ArrayList<>();
@@ -435,14 +390,8 @@ public class ChipUtil1_19_R1 implements ChipUtil {
                 PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
                 yield new NearestHealableRaiderTargetGoal<>((net.minecraft.world.entity.raid.Raider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
-            case "OwnerHurtByTarget" -> {
-                PathfinderOwnerHurtByTarget p = (PathfinderOwnerHurtByTarget) b;
-                yield new OwnerHurtByTargetGoal((TamableAnimal) m);
-            }
-            case "OwnerHurtTarget" -> {
-                PathfinderOwnerHurtTarget p = (PathfinderOwnerHurtTarget) b;
-                yield new OwnerHurtTargetGoal((TamableAnimal) m);
-            }
+            case "OwnerHurtByTarget" -> new OwnerHurtByTargetGoal((TamableAnimal) m);
+            case "OwnerHurtTarget" -> new OwnerHurtTargetGoal((TamableAnimal) m);
 
             default -> {
                 if (b instanceof CustomPathfinder p) {

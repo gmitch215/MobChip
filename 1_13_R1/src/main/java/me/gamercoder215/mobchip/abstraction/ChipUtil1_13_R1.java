@@ -207,46 +207,22 @@ public class ChipUtil1_13_R1 implements ChipUtil {
                 g = new PathfinderGoalBeg((EntityWolf) m, p.getRange());
                 break;
             }
-            case "BreakDoor": {
-                PathfinderBreakDoor p = (PathfinderBreakDoor) b;
-                g = new PathfinderGoalBreakDoor(m);
-                break;
-            }
-            case "Breath": {
-                PathfinderBreathAir p = (PathfinderBreathAir) b;
-                g = new PathfinderGoalBreath((EntityCreature) m);
-                break;
-            }
+            case "BreakDoor": g = new PathfinderGoalBreakDoor(m); break;
+            case "Breath": g = new PathfinderGoalBreath((EntityCreature) m); break;
             case "Breed": {
                 PathfinderBreed p = (PathfinderBreed) b;
                 g = new PathfinderGoalBreed((EntityAnimal) m, p.getSpeedModifier());
                 break;
             }
-            case "EatTile": {
-                PathfinderEatTile p = (PathfinderEatTile) b;
-                g = new PathfinderGoalEatTile(m);
-                break;
-            }
-            case "FishSchool": {
-                PathfinderFollowFishLeader p = (PathfinderFollowFishLeader) b;
-                g = new PathfinderGoalFishSchool((EntityFish) m);
-                break;
-            }
+            case "EatTile": g = new PathfinderGoalEatTile(m); break;
+            case "FishSchool": g = new PathfinderGoalFishSchool((EntityFish) m);break;
             case "FleeSun": {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
                 g = new PathfinderGoalFleeSun((EntityCreature) m, p.getSpeedModifier());
                 break;
             }
-            case "Float": {
-                PathfinderFloat p = (PathfinderFloat) b;
-                g = new PathfinderGoalFloat(m);
-                break;
-            }
-            case "FollowBoat": {
-                PathfinderFollowBoat p = (PathfinderFollowBoat) b;
-                g = new PathfinderGoalFollowBoat((EntityCreature) m);
-                break;
-            }
+            case "Float": g = new PathfinderGoalFloat(m); break;
+            case "FollowBoat": g = new PathfinderGoalFollowBoat((EntityCreature) m); break;
             case "FollowEntity": {
                 PathfinderFollowMob p = (PathfinderFollowMob) b;
                 g = new PathfinderGoalFollowEntity(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
@@ -297,36 +273,20 @@ public class ChipUtil1_13_R1 implements ChipUtil {
                 g = new PathfinderGoalMoveTowardsTarget((EntityCreature) m, p.getSpeedModifier(), p.getRange());
                 break;
             }
-            case "OcelotAttack": {
-                PathfinderOcelotAttack p = (PathfinderOcelotAttack) b;
-                g = new PathfinderGoalOcelotAttack(m);
-                break;
-            }
-            case "OfferFlower": {
-                PathfinderOfferFlower p = (PathfinderOfferFlower) b;
-                g = new PathfinderGoalOfferFlower((EntityIronGolem) m);
-                break;
-            }
+            case "OcelotAttack": g = new PathfinderGoalOcelotAttack(m); break;
+            case "OfferFlower": g = new PathfinderGoalOfferFlower((EntityIronGolem) m); break;
             case "Panic": {
                 PathfinderPanic p = (PathfinderPanic) b;
                 g = new PathfinderGoalPanic((EntityCreature) m, p.getSpeedModifier());
                 break;
             }
-            case "Perch": {
-                PathfinderRideShoulder p = (PathfinderRideShoulder) b;
-                g = new PathfinderGoalPerch((EntityPerchable) m);
-                break;
-            }
+            case "Perch": g = new PathfinderGoalPerch((EntityPerchable) m); break;
             case "RandomFly": {
                 PathfinderRandomStrollFlying p = (PathfinderRandomStrollFlying) b;
                 g = new PathfinderGoalRandomFly((EntityCreature) m, p.getSpeedModifier());
                 break;
             }
-            case "RandomLookaround": {
-                PathfinderRandomLook p = (PathfinderRandomLook) b;
-                g = new PathfinderGoalRandomLookaround(m);
-                break;
-            }
+            case "RandomLookaround": g = new PathfinderGoalRandomLookaround(m); break;
             case "RandomStroll": {
                 PathfinderRandomStroll p = (PathfinderRandomStroll) b;
                 g = new PathfinderGoalRandomStroll((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
@@ -347,21 +307,9 @@ public class ChipUtil1_13_R1 implements ChipUtil {
                 g = new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
                 break;
             }
-            case "RestrictSun": {
-                PathfinderRestrictSun p = (PathfinderRestrictSun) b;
-                g = new PathfinderGoalRestrictSun((EntityCreature) m);
-                break;
-            }
-            case "Sit": {
-                PathfinderSit p = (PathfinderSit) b;
-                g = new PathfinderGoalSit((EntityTameableAnimal) m);
-                break;
-            }
-            case "Swell": {
-                PathfinderSwellCreeper p = (PathfinderSwellCreeper) b;
-                g = new PathfinderGoalSwell((EntityCreeper) m);
-                break;
-            }
+            case "RestrictSun": g = new PathfinderGoalRestrictSun((EntityCreature) m); break;
+            case "Sit": g = new PathfinderGoalSit((EntityTameableAnimal) m); break;
+            case "Swell": g = new PathfinderGoalSwell((EntityCreeper) m);break;
             case "Tame": {
                 PathfinderTameHorse p = (PathfinderTameHorse) b;
                 g = new PathfinderGoalTame((EntityHorseAbstract) m, p.getSpeedModifier());
@@ -372,11 +320,7 @@ public class ChipUtil1_13_R1 implements ChipUtil {
                 g = new PathfinderGoalTempt((EntityCreature) m, p.getSpeedModifier(), new RecipeItemStack(p.getItems().stream().map(CraftItemStack::asNMSCopy).filter(i -> !i.isEmpty()).map(RecipeItemStack.StackProvider::new)), true);
                 break;
             }
-            case "Water": {
-                PathfinderFindWater p = (PathfinderFindWater) b;
-                g = new PathfinderGoalWater((EntityCreature) m);
-                break;
-            }
+            case "Water": g = new PathfinderGoalWater((EntityCreature) m); break;
             case "WaterJump": {
                 PathfinderDolphinJump p = (PathfinderDolphinJump) b;
                 g = new PathfinderGoalWaterJump((EntityDolphin) m, p.getInterval());
@@ -390,11 +334,7 @@ public class ChipUtil1_13_R1 implements ChipUtil {
 
             // Target
 
-            case "DefendVillage": {
-                PathfinderDefendVillage p = (PathfinderDefendVillage) b;
-                g = new PathfinderGoalDefendVillage((EntityIronGolem) m);
-                break;
-            }
+            case "DefendVillage": g = new PathfinderGoalDefendVillage((EntityIronGolem) m); break;
             case "HurtByTarget": {
                 PathfinderHurtByTarget p = (PathfinderHurtByTarget) b;
                 List<Class<? extends EntityLiving>> classes = new ArrayList<>();
@@ -408,17 +348,8 @@ public class ChipUtil1_13_R1 implements ChipUtil {
                 g = new PathfinderGoalNearestAttackableTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
                 break;
             }
-            case "OwnerHurtByTarget": {
-                PathfinderOwnerHurtByTarget p = (PathfinderOwnerHurtByTarget) b;
-                g = new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
-                break;
-            }
-            case "OwnerHurtTarget": {
-                PathfinderOwnerHurtTarget p = (PathfinderOwnerHurtTarget) b;
-                g = new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m);
-                break;
-            }
-
+            case "OwnerHurtByTarget": g = new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m); break;
+            case "OwnerHurtTarget": g = new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m); break;
             default: {
                 if (b instanceof CustomPathfinder) {
                     CustomPathfinder p = (CustomPathfinder) b;
