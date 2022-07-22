@@ -48,6 +48,19 @@ public final class CombatEntry {
     }
 
     /**
+     * Fetches the cause of the damage in this CombatEntry.
+     * @return DamageCause of this CombatEntry
+     */
+    @NotNull
+    public EntityDamageEvent.DamageCause getCause() { return this.cause; }
+
+    /**
+     * Fetches how long {@link #getOwner()} was in combat, in ticks.
+     * @return Duration of Combat, in ticks
+     */
+    public int getCombatTime() { return this.ticks; }
+
+    /**
      * Fetches the owner of this CombatEntry.
      * @return CombatEntry Owner
      */
@@ -120,6 +133,8 @@ public final class CombatEntry {
 
     /**
      * Fetches the last amount of distance the Entity fell in this CombatEntry.
+     * <br><br>
+     * This may return {@link Float#MAX_VALUE} if the Damage Cause is {@link EntityDamageEvent.DamageCause#VOID}
      * @return Fall Distance
      */
     public float getFallDistance() {
