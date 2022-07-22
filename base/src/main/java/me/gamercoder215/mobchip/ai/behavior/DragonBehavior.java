@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * Represents Entity Behaviors for an Ender Dragon
- */
-public interface DragonBehavior extends CreatureBehavior {
+*/
+public interface DragonBehavior extends EntityBehavior {
 
     /**
      * Makes this Ender Dragon perform a natural knockback with its wings when Entities get too close.
