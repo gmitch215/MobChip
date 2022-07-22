@@ -1,7 +1,7 @@
 package me.gamercoder215.mobchip.bukkit;
 
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
-import me.gamercoder215.mobchip.ai.enderdragon.DragonBrain;
+import me.gamercoder215.mobchip.DragonBrain;
 import org.bukkit.entity.EnderDragon;
 import org.jetbrains.annotations.NotNull;
 
