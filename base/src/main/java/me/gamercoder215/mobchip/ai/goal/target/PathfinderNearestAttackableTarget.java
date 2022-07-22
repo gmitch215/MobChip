@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal.target;
 
 import me.gamercoder215.mobchip.ai.goal.Conditional;
+import me.gamercoder215.mobchip.ai.goal.Repeated;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import java.util.function.Predicate;
  * Represents a Pathfinder to target a specific type of Entity
  * @param <T> Type of Target to look for
  */
-public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends TargetPathfinder implements Filtering<T>, Conditional<LivingEntity> {
+public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends TargetPathfinder implements Filtering<T>, Conditional<LivingEntity>, Repeated {
 
     private Class<T> filter;
     private Predicate<? super LivingEntity> conditions;

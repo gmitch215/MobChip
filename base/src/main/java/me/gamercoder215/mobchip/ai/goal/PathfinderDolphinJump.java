@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a Pathfinder that makes Dolphins Jump
  */
-public final class PathfinderDolphinJump extends Pathfinder {
+public final class PathfinderDolphinJump extends Pathfinder implements Repeated {
 
     private int interval;
 
@@ -32,11 +32,7 @@ public final class PathfinderDolphinJump extends Pathfinder {
     }
 
     
-    /**
-     * Sets the Interval of how often Dolphins will jump.
-     * @param interval Interval to set
-     * @throws IllegalArgumentException if interval is less than 0
-     */
+    @Override
     public void setInterval(int interval) throws IllegalArgumentException {
         if (interval < 0) throw new IllegalArgumentException("Must be greater than 0");
         this.interval = interval;

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a Pathfinder for Creatures to randomly stroll
  */
-public class PathfinderRandomStroll extends Pathfinder implements SpeedModifier {
+public class PathfinderRandomStroll extends Pathfinder implements SpeedModifier, Repeated {
     
     private double speedMod;
 
@@ -35,25 +35,24 @@ public class PathfinderRandomStroll extends Pathfinder implements SpeedModifier 
      * @param c Creature to use
      * @param speedMod Speed Modifier while strolling
      * @param interval Strolling Speed Interval, in ticks
+     * @throws IllegalArgumentException if interval is less than 0
      */
-    public PathfinderRandomStroll(@NotNull Creature c, double speedMod, int interval) {
+    public PathfinderRandomStroll(@NotNull Creature c, double speedMod, int interval) throws IllegalArgumentException {
         super(c);
+        if (interval < 0) throw new IllegalArgumentException("Interval must be greater than 0");
 
         this.speedMod = speedMod;
         this.interval = interval;
     }
 
-    /**
-     * Gets the strolling speed interval of this Pathfinder, in ticks.
-     * @return Stroll Speed Interval in ticks
-     */
+    @Override
     public int getInterval() { return this.interval; }
 
-    /**
-     * Sets the interval strolling speed of this Pathfinder, in ticks.
-     * @param interval Stroll Speed Interval in ticks
-     */
-    public void setInterval(int interval) { this.interval = interval;}
+    @Override
+    public void setInterval(int interval) {
+        if (interval < 0) throw new IllegalArgumentException("Interval must be greater than 0");
+        this.interval = interval;
+    }
 
     @Override
     public double getSpeedModifier() {
