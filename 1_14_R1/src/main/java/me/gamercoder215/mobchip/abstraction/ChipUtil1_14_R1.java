@@ -19,6 +19,9 @@ import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.combat.CombatEntry;
+import me.gamercoder215.mobchip.combat.CombatLocation;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.World;
@@ -63,31 +66,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         EntityInsentient mob = toNMS(m);
         PathfinderGoalSelector s = target ? mob.targetSelector : mob.goalSelector;
 
-        PathfinderGoal g = new PathfinderGoal() {
-            @Override
-            public boolean a() {
-                return p.canStart();
-            }
-            @Override
-            public boolean b() {
-                return p.canContinueToUse();
-            }
-            @Override
-            public boolean C_() {
-                return p.canInterrupt();
-            }
-
-            @Override
-            public void c() {
-                p.start();
-            }
-
-            @Override
-            public void e() {
-                p.tick();
-            }
-
-        };
+        PathfinderGoal g = custom(p);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
@@ -182,263 +161,197 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
 
-        final PathfinderGoal g;
         switch (b.getInternalName()) {
             case "AvoidTarget": {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
-                g = new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
-                break;
+                return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
             }
             case "ArrowAttack": {
                 PathfinderRangedAttack p = (PathfinderRangedAttack) b;
-                g = new PathfinderGoalArrowAttack((IRangedEntity) m, p.getSpeedModifier(), p.getMinAttackInterval(), p.getMaxAttackInterval(), p.getRange());
-                break;
+                return new PathfinderGoalArrowAttack((IRangedEntity) m, p.getSpeedModifier(), p.getMinAttackInterval(), p.getMaxAttackInterval(), p.getRange());
             }
             case "Beg": {
                 PathfinderBeg p = (PathfinderBeg) b;
-                g = new PathfinderGoalBeg((EntityWolf) m, p.getRange());
-                break;
+                return new PathfinderGoalBeg((EntityWolf) m, p.getRange());
             }
             case "BowShoot": {
                 PathfinderRangedBowAttack p = (PathfinderRangedBowAttack) b;
-                g = new PathfinderGoalBowShoot((EntityMonster) m, p.getSpeedModifier(), p.getInterval(), p.getRange());
-                break;
+                return new PathfinderGoalBowShoot((EntityMonster) m, p.getSpeedModifier(), p.getInterval(), p.getRange());
             }
             case "BreakDoor": {
                 PathfinderBreakDoor p = (PathfinderBreakDoor) b;
-                g = new PathfinderGoalBreakDoor(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
-                break;
+                return new PathfinderGoalBreakDoor(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
             }
-            case "Breath": g = new PathfinderGoalBreath((EntityCreature) m); break;
-
+            case "Breath": return new PathfinderGoalBreath((EntityCreature) m);
             case "Breed": {
                 PathfinderBreed p = (PathfinderBreed) b;
-                g = new PathfinderGoalBreed((EntityAnimal) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalBreed((EntityAnimal) m, p.getSpeedModifier());
             }
             case "CatSitOnBed": {
                 PathfinderCatOnBed p = (PathfinderCatOnBed) b;
-                g = new PathfinderGoalCatSitOnBed((EntityCat) m, p.getSpeedModifier(), Math.min((int) p.getRange(), 1));
-                break;
+                return new PathfinderGoalCatSitOnBed((EntityCat) m, p.getSpeedModifier(), Math.min((int) p.getRange(), 1));
             }
             case "CrossbowAttack": {
                 PathfinderRangedCrossbowAttack p = (PathfinderRangedCrossbowAttack) b;
-                g = new PathfinderGoalCrossbowAttack((EntityMonster) m, p.getSpeedModifier(), p.getRange());
-                break;
+                return new PathfinderGoalCrossbowAttack((EntityMonster) m, p.getSpeedModifier(), p.getRange());
             }
             case "DoorOpen": {
                 PathfinderOpenDoor p = (PathfinderOpenDoor) b;
-                g = new PathfinderGoalDoorOpen(m, p.mustClose());
-                break;
+                return new PathfinderGoalDoorOpen(m, p.mustClose());
             }
-            case "EatTile": g = new PathfinderGoalEatTile(m); break;
-
-            case "FishSchool": g = new PathfinderGoalFishSchool((EntityFishSchool) m); break;
-
+            case "EatTile": return new PathfinderGoalEatTile(m);
+            case "FishSchool": return new PathfinderGoalFishSchool((EntityFishSchool) m);
             case "FleeSun": {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
-                g = new PathfinderGoalFleeSun((EntityCreature) m, p.getSpeedModifier());
-                break;
-            }
-            case "Float": g = new PathfinderGoalFloat(m); break;
-            case "FollowBoat": g = new PathfinderGoalFollowBoat((EntityCreature) m); break;
+                return new PathfinderGoalFleeSun((EntityCreature) m, p.getSpeedModifier());
 
+            }
+            case "Float": return new PathfinderGoalFloat(m);
+            case "FollowBoat": return new PathfinderGoalFollowBoat((EntityCreature) m);
             case "FollowEntity": {
                 PathfinderFollowMob p = (PathfinderFollowMob) b;
-                g = new PathfinderGoalFollowEntity(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
-                break;
+                return new PathfinderGoalFollowEntity(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
             }
             case "FollowOwner": {
                 PathfinderFollowOwner p = (PathfinderFollowOwner) b;
-                g = new PathfinderGoalFollowOwner((EntityTameableAnimal) m, p.getSpeedModifier(), p.getStartDistance(), p.getStopDistance());
-                break;
+                return new PathfinderGoalFollowOwner((EntityTameableAnimal) m, p.getSpeedModifier(), p.getStartDistance(), p.getStopDistance());
             }
             case "FollowParent": {
                 PathfinderFollowParent p = (PathfinderFollowParent) b;
-                g = new PathfinderGoalFollowParent((EntityTameableAnimal) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalFollowParent((EntityTameableAnimal) m, p.getSpeedModifier());
             }
             case "JumpOnBlock": {
                 PathfinderCatOnBlock p = (PathfinderCatOnBlock) b;
-                g = new PathfinderGoalJumpOnBlock((EntityCat) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalJumpOnBlock((EntityCat) m, p.getSpeedModifier());
             }
             case "LeapAtTarget": {
                 PathfinderLeapAtTarget p = (PathfinderLeapAtTarget) b;
-                g = new PathfinderGoalLeapAtTarget(m, p.getHeight());
-                break;
+                return new PathfinderGoalLeapAtTarget(m, p.getHeight());
             }
             case "LlamaFollow": {
                 PathfinderLlamaFollowCaravan p = (PathfinderLlamaFollowCaravan) b;
-                g = new PathfinderGoalLlamaFollow((EntityLlama) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalLlamaFollow((EntityLlama) m, p.getSpeedModifier());
             }
             case "LookAtPlayer": {
                 PathfinderLookAtEntity<?> p = (PathfinderLookAtEntity) b;
-                g = new PathfinderGoalLookAtPlayer(m, toNMS(p.getFilter()), p.getRange(), p.getProbability());
-                break;
+                return new PathfinderGoalLookAtPlayer(m, toNMS(p.getFilter()), p.getRange(), p.getProbability());
             }
-            case "LookAtTradingPlayer": g = new PathfinderGoalLookAtTradingPlayer((EntityVillagerAbstract) m); break;
+            case "LookAtTradingPlayer": return new PathfinderGoalLookAtTradingPlayer((EntityVillagerAbstract) m);
             case "MeleeAttack": {
                 PathfinderMeleeAttack p = (PathfinderMeleeAttack) b;
-                g = new PathfinderGoalMeleeAttack((EntityCreature) m, p.getSpeedModifier(), p.mustSee());
-                break;
+                return new PathfinderGoalMeleeAttack((EntityCreature) m, p.getSpeedModifier(), p.mustSee());
             }
             case "MoveThroughVillage": {
                 PathfinderMoveThroughVillage p = (PathfinderMoveThroughVillage) b;
-                g = new PathfinderGoalMoveThroughVillage((EntityVillager) m, p.getSpeedModifier(), p.mustBeNight(), p.getMinDistance(), p.canUseDoors());
-                break;
+                return new PathfinderGoalMoveThroughVillage((EntityVillager) m, p.getSpeedModifier(), p.mustBeNight(), p.getMinDistance(), p.canUseDoors());
             }
             case "MoveTowardsRestriction": {
                 PathfinderMoveTowardsRestriction p = (PathfinderMoveTowardsRestriction) b;
-                g = new PathfinderGoalMoveTowardsRestriction((EntityCreature) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalMoveTowardsRestriction((EntityCreature) m, p.getSpeedModifier());
             }
             case "MoveTowardsTarget": {
                 PathfinderMoveTowardsTarget p = (PathfinderMoveTowardsTarget) b;
-                g = new PathfinderGoalMoveTowardsTarget((EntityCreature) m, p.getSpeedModifier(), p.getRange());
-                break;
+                return new PathfinderGoalMoveTowardsTarget((EntityCreature) m, p.getSpeedModifier(), p.getRange());
             }
             case "NearestVillage": {
                 PathfinderRandomStrollThroughVillage p = (PathfinderRandomStrollThroughVillage) b;
-                g = new PathfinderGoalNearestVillage((EntityCreature) m, p.getInterval());
-                break;
+                return new PathfinderGoalNearestVillage((EntityCreature) m, p.getInterval());
             }
-            case "OcelotAttack": g = new PathfinderGoalOcelotAttack(m); break;
-            case "OfferFlower": g = new PathfinderGoalOfferFlower((EntityIronGolem) m); break;
+            case "OcelotAttack": return new PathfinderGoalOcelotAttack(m);
+            case "OfferFlower": return new PathfinderGoalOfferFlower((EntityIronGolem) m);
             case "Panic": {
                 PathfinderPanic p = (PathfinderPanic) b;
-                g = new PathfinderGoalPanic((EntityCreature) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalPanic((EntityCreature) m, p.getSpeedModifier());
             }
-            case "Perch": g = new PathfinderGoalPerch((EntityPerchable) m); break;
-            case "Raid": g = new PathfinderGoalRaid<>((EntityRaider) m); break;
+            case "Perch": return new PathfinderGoalPerch((EntityPerchable) m);
+            case "Raid": return new PathfinderGoalRaid<>((EntityRaider) m);
             case "RandomFly": {
                 PathfinderRandomStrollFlying p = (PathfinderRandomStrollFlying) b;
-                g = new PathfinderGoalRandomFly((EntityCreature) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalRandomFly((EntityCreature) m, p.getSpeedModifier());
             }
-            case "RandomLookaround": g = new PathfinderGoalRandomLookaround(m); break;
+            case "RandomLookaround": return new PathfinderGoalRandomLookaround(m);
             case "RandomStroll": {
                 PathfinderRandomStroll p = (PathfinderRandomStroll) b;
-                g = new PathfinderGoalRandomStroll((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
-                break;
+                return new PathfinderGoalRandomStroll((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
             }
             case "RandomStrollLand": {
                 PathfinderRandomStrollLand p = (PathfinderRandomStrollLand) b;
-                g = new PathfinderGoalRandomStrollLand((EntityCreature) m, p.getSpeedModifier(), p.getProbability());
-                break;
+                return new PathfinderGoalRandomStrollLand((EntityCreature) m, p.getSpeedModifier(), p.getProbability());
             }
             case "RandomSwim": {
                 PathfinderRandomSwim p = (PathfinderRandomSwim) b;
-                g = new PathfinderGoalRandomSwim((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
-                break;
+                return new PathfinderGoalRandomSwim((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
             }
             case "RemoveBlock": {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                g = new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
-                break;
+                return new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
             }
-            case "RestrictSun": g = new PathfinderGoalRestrictSun((EntityCreature) m); break;
-            case "Sit": g = new PathfinderGoalSit((EntityTameableAnimal) m); break;
+            case "RestrictSun": return new PathfinderGoalRestrictSun((EntityCreature) m);
+            case "Sit": return new PathfinderGoalSit((EntityTameableAnimal) m);
             case "StrollVillage": {
                 PathfinderRandomStrollToVillage p = (PathfinderRandomStrollToVillage) b;
-                g = new PathfinderGoalStrollVillage((EntityCreature) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalStrollVillage((EntityCreature) m, p.getSpeedModifier());
             }
-            case "Swell": g = new PathfinderGoalSwell((EntityCreeper) m); break;
+            case "Swell": return new PathfinderGoalSwell((EntityCreeper) m);
             case "Tame": {
                 PathfinderTameHorse p = (PathfinderTameHorse) b;
-                g = new PathfinderGoalTame((EntityHorseAbstract) m, p.getSpeedModifier());
-                break;
+                return new PathfinderGoalTame((EntityHorseAbstract) m, p.getSpeedModifier());
             }
             case "Tempt": {
                 PathfinderTempt p = (PathfinderTempt) b;
-                g = new PathfinderGoalTempt((EntityCreature) m, p.getSpeedModifier(), new RecipeItemStack(p.getItems().stream().map(CraftItemStack::asNMSCopy).filter(i -> !i.isEmpty()).map(RecipeItemStack.StackProvider::new)), true);
-                break;
+                return new PathfinderGoalTempt((EntityCreature) m, p.getSpeedModifier(), new RecipeItemStack(p.getItems().stream().map(CraftItemStack::asNMSCopy).filter(i -> !i.isEmpty()).map(RecipeItemStack.StackProvider::new)), true);
             }
-            case "TradeWithPlayer": g = new PathfinderGoalTradeWithPlayer((EntityVillagerAbstract) m); break;
+            case "TradeWithPlayer": return new PathfinderGoalTradeWithPlayer((EntityVillagerAbstract) m);
             case "UseItem": {
                 PathfinderUseItem p = (PathfinderUseItem) b;
-                g = new PathfinderGoalUseItem<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
-                break;
+                return new PathfinderGoalUseItem<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
             }
-            case "Water": g = new PathfinderGoalWater((EntityCreature) m); break;
-
+            case "Water": return new PathfinderGoalWater((EntityCreature) m);
             case "WaterJump": {
                 PathfinderDolphinJump p = (PathfinderDolphinJump) b;
-                g = new PathfinderGoalWaterJump((EntityDolphin) m, p.getInterval());
-                break;
+                return new PathfinderGoalWaterJump((EntityDolphin) m, p.getInterval());
             }
             case "ZombieAttack": {
                 PathfinderZombieAttack p = (PathfinderZombieAttack) b;
-                g = new PathfinderGoalZombieAttack((EntityZombie) m, p.getSpeedModifier(), p.mustSee());
-                break;
+                return new PathfinderGoalZombieAttack((EntityZombie) m, p.getSpeedModifier(), p.mustSee());
             }
 
             // Target
 
-            case "DefendVillage": g = new PathfinderGoalDefendVillage((EntityIronGolem) m); break;
+            case "DefendVillage": return new PathfinderGoalDefendVillage((EntityIronGolem) m);
             case "HurtByTarget": {
                 PathfinderHurtByTarget p = (PathfinderHurtByTarget) b;
                 List<Class<? extends EntityLiving>> classes = new ArrayList<>();
                 p.getIgnoring().stream().map(EntityType::getEntityClass).forEach(c -> classes.add(toNMS(c.asSubclass(LivingEntity.class))));
 
-                g = new PathfinderGoalHurtByTarget((EntityCreature) m, classes.toArray(new Class[0]));
-                break;
+                return new PathfinderGoalHurtByTarget((EntityCreature) m, classes.toArray(new Class[0]));
             }
             case "NearestAttackableTarget": {
                 PathfinderNearestAttackableTarget p = (PathfinderNearestAttackableTarget) b;
-                g = new PathfinderGoalNearestAttackableTarget<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
-                break;
+                return new PathfinderGoalNearestAttackableTarget<>(m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), t -> p.getCondition().test(fromNMS(t)));
             }
             case "NearestAttackableTargetWitch": {
                 PathfinderNearestAttackableTargetRaider p = (PathfinderNearestAttackableTargetRaider) b;
-                g = new PathfinderGoalNearestAttackableTargetWitch<>((EntityRaider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
-                break;
+                return new PathfinderGoalNearestAttackableTargetWitch<>((EntityRaider) m, toNMS(p.getFilter()), p.getInterval(), p.mustSee(), p.mustReach(), l -> p.getCondition().test(fromNMS(l)));
             }
             case "NearestHealableRaider": {
                 PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
-                g = new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
-                break;
+                return new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
-            case "OwnerHurtByTarget": g = new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m); break;
-            case "OwnerHurtTarget": g = new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m); break;
+            case "OwnerHurtByTarget": return new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
+            case "OwnerHurtTarget": return new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m);
+            case "RandomTargetNonTamed": {
+                PathfinderWildTarget p = (PathfinderWildTarget) b;
+                return new PathfinderGoalRandomTargetNonTamed<>((EntityTameableAnimal) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
+            }
 
             default: {
                 if (b instanceof CustomPathfinder) {
                     CustomPathfinder p = (CustomPathfinder) b;
-                    g = new PathfinderGoal() {
-                        @Override
-                        public boolean a() {
-                            return p.canStart();
-                        }
-
-                        @Override
-                        public boolean b() {
-                            return p.canContinueToUse();
-                        }
-
-                        @Override
-                        public boolean C_() {
-                            return p.canInterrupt();
-                        }
-
-                        @Override
-                        public void c() {
-                            p.start();
-                        }
-
-                        @Override
-                        public void e() {
-                            p.tick();
-                        }
-                    };
-                } else g = null;
+                    return custom(p);
+                } else return null;
             }
         }
-
-        return g;
     }
 
     @Override
@@ -1731,7 +1644,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
     private static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
 
-    private PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
+    private static PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
         switch (f) {
             default: return PathfinderGoal.Type.MOVE;
             case JUMPING: return PathfinderGoal.Type.JUMP;
@@ -1847,6 +1760,41 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         }
     }
 
+    private static PathfinderGoal custom(CustomPathfinder p) {
+        PathfinderGoal g = new PathfinderGoal() {
+            @Override
+            public boolean a() {
+                return p.canStart();
+            }
+            @Override
+            public boolean b() {
+                return p.canContinueToUse();
+            }
+            @Override
+            public boolean C_() {
+                return p.canInterrupt();
+            }
+
+            @Override
+            public void c() {
+                p.start();
+            }
+
+            @Override
+            public void e() {
+                p.tick();
+            }
+
+            @Override
+            public void d() { p.stop(); }
+
+        };
+        EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
+        Arrays.stream(p.getFlags()).map(ChipUtil1_14_R1::toNMS).forEach(flags::add);
+        g.a(flags);
+        return g;
+    }
+
     private static CustomPathfinder custom(PathfinderGoal g) {
         return new CustomPathfinder(getEntity(g)) {
             @Override
@@ -1866,14 +1814,17 @@ public class ChipUtil1_14_R1 implements ChipUtil {
             }
 
             @Override
+            public boolean canInterrupt() { return g.C_(); }
+            @Override
             public void start() {
                 g.c();
             }
 
             @Override
-            public void tick() {
-                g.e();
-            }
+            public void tick() { g.e(); }
+
+            @Override
+            public void stop() { g.d(); }
 
             @Override
             public String getInternalName() {
@@ -1954,14 +1905,14 @@ public class ChipUtil1_14_R1 implements ChipUtil {
                 case "ZombieAttack": return new PathfinderZombieAttack((Zombie) m, getDouble(g, "d"), getBoolean(g, "e"));
 
                 // Target
-                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true);
-                case "NearestAttackableTargetWitch": return new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), true, true, l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
-                case "NearestHealableRaider": return new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), true,  l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+                case "NearestAttackableTarget": return new PathfinderNearestAttackableTarget<>(m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "a"));
+                case "NearestAttackableTargetWitch": return new PathfinderNearestAttackableTargetRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getInt(g, "b"), getBoolean(g, "f"), getBoolean(g, "a"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+                case "NearestHealableRaider": return new PathfinderNearestHealableRaider<>((Raider) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"),  l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
                 case "DefendVillage": return new PathfinderDefendVillage((IronGolem) m);
                 case "HurtByTarget": return new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "d", Class[].class)));
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget": return new PathfinderOwnerHurtTarget((Tameable) m);
-
+                case "RandomTargetNonTamed": return new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
                 default: return custom(g);
             }
         } else return custom(g);
@@ -2203,5 +2154,141 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     @Override
     public EntityGossipContainer getGossipContainer(Villager v) {
         return new EntityGossipContainer1_14_R1(v);
+    }
+
+    private static Entity fromNMS(net.minecraft.server.v1_14_R1.Entity en) {
+        return en.getBukkitEntity();
+    }
+
+    private static me.gamercoder215.mobchip.combat.CombatEntry fromNMS(Mob m, net.minecraft.server.v1_14_R1.CombatEntry en) {
+        int time = 0;
+        float health = 0;
+
+        try {
+            Field timeF = net.minecraft.server.v1_14_R1.CombatEntry.class.getDeclaredField("b");
+            timeF.setAccessible(true);
+            time = timeF.getInt(en);
+
+            Field healthF = net.minecraft.server.v1_14_R1.CombatEntry.class.getDeclaredField("d");
+            healthF.setAccessible(true);
+            health = healthF.getFloat(en);
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
+
+        return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
+    }
+
+    private static net.minecraft.server.v1_14_R1.CombatEntry toNMS(me.gamercoder215.mobchip.combat.CombatEntry en) {
+        return new net.minecraft.server.v1_14_R1.CombatEntry(toNMS(en.getCause()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
+    }
+
+    private static class EntityCombatTracker1_14_R1 implements EntityCombatTracker {
+
+        private final CombatTracker handle;
+        private final Mob m;
+
+        EntityCombatTracker1_14_R1(Mob m) {
+            this.m = m;
+            this.handle = toNMS(m).getCombatTracker();
+        }
+
+        @Override
+        public @NotNull String getCurrentDeathMessage() {
+            return handle.getDeathMessage().getString();
+        }
+
+        @Override
+        public @Nullable me.gamercoder215.mobchip.combat.CombatEntry getLatestEntry() {
+            List<me.gamercoder215.mobchip.combat.CombatEntry> l = getCombatEntries();
+            return l.isEmpty() ? null : l.get(l.size() - 1);
+        }
+
+        @Override
+        public @NotNull List<me.gamercoder215.mobchip.combat.CombatEntry> getCombatEntries() {
+            List<me.gamercoder215.mobchip.combat.CombatEntry> entries = new ArrayList<>();
+            try {
+                Field f = CombatTracker.class.getDeclaredField("a");
+                f.setAccessible(true);
+                ((List<net.minecraft.server.v1_14_R1.CombatEntry>) f.get(handle)).stream().map(en -> fromNMS(m, en)).forEach(entries::add);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+            return entries;
+        }
+
+        @Override
+        public void recordEntry(@NotNull CombatEntry entry) {
+            if (entry == null) return;
+            try {
+                Field f = CombatTracker.class.getDeclaredField("c");
+                f.setAccessible(true);
+                Object entries = f.get(handle);
+
+                Method m = List.class.getMethod("add", Object.class);
+                m.invoke(entries, toNMS(entry));
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+        }
+
+        @Override
+        public int getCombatDuration() {
+            return handle.f();
+        }
+
+        @Override
+        public boolean isTakingDamage() {
+            handle.g();
+            try {
+                Field damage = CombatTracker.class.getDeclaredField("g");
+                damage.setAccessible(true);
+                return damage.getBoolean(handle);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isInCombat() {
+            handle.g();
+            try {
+                Field combat = CombatTracker.class.getDeclaredField("f");
+                combat.setAccessible(true);
+                return combat.getBoolean(handle);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+            return false;
+        }
+    }
+
+    @Override
+    public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_14_R1(m); }
+
+    @Override
+    public void knockback(EnderDragon a, List<Entity> list) {
+        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+
+        try {
+            Method m = EntityEnderDragon.class.getDeclaredMethod("a", List.class);
+            m.setAccessible(true);
+            m.invoke(nmsMob, list.stream().map(ChipUtil1_14_R1::toNMS).collect(Collectors.toList()));
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
     }
 }

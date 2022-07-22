@@ -20,6 +20,9 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
+import me.gamercoder215.mobchip.combat.CombatEntry;
+import me.gamercoder215.mobchip.combat.CombatLocation;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.*;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
@@ -31,6 +34,7 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
@@ -106,7 +110,7 @@ import java.util.stream.Collectors;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ChipUtil1_17_R1 implements ChipUtil {
+public final class ChipUtil1_17_R1 implements ChipUtil {
 
     private static ItemStack fromNMS(net.minecraft.world.item.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
@@ -116,31 +120,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         EntityInsentient mob = toNMS(m);
         PathfinderGoalSelector s = target ? mob.bP : mob.bO;
 
-        PathfinderGoal g = new PathfinderGoal() {
-            @Override
-            public boolean a() {
-                return p.canStart();
-            }
-            @Override
-            public boolean b() {
-                return p.canContinueToUse();
-            }
-            @Override
-            public boolean C_() {
-                return p.canInterrupt();
-            }
-
-            @Override
-            public void c() {
-                p.start();
-            }
-
-            @Override
-            public void e() {
-                p.tick();
-            }
-
-        };
+        PathfinderGoal g = custom(p);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
@@ -393,38 +373,15 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 yield new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
             case "OwnerHurtByTarget" -> new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
-            case "OwnerHurtTarget" -> new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
-
-
+            case "OwnerHurtTarget" -> new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m);
+            case "RandomTargetNonTamed" -> {
+                PathfinderWildTarget p = (PathfinderWildTarget) b;
+                yield new PathfinderGoalRandomTargetNonTamed<>((EntityTameableAnimal) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
+            }
+            
             default -> {
-                if (b instanceof CustomPathfinder p) {
-                    yield new PathfinderGoal() {
-                        @Override
-                        public boolean a() {
-                            return p.canStart();
-                        }
-
-                        @Override
-                        public boolean b() {
-                            return p.canContinueToUse();
-                        }
-
-                        @Override
-                        public boolean C_() {
-                            return p.canInterrupt();
-                        }
-
-                        @Override
-                        public void c() {
-                            p.start();
-                        }
-
-                        @Override
-                        public void e() {
-                            p.tick();
-                        }
-                    };
-                } else yield null;
+                if (b instanceof CustomPathfinder p) yield custom(p);
+                else yield null;
             }
         };
     }
@@ -1682,7 +1639,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
 
-    private PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
+    private static PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
         return switch (f) {
             case MOVEMENT -> PathfinderGoal.Type.a;
             case JUMPING -> PathfinderGoal.Type.c;
@@ -1810,14 +1767,55 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
             @Override
             public void tick() {
-                g.d();
+                g.e();
             }
+
+            @Override
+            public boolean canInterrupt() { return g.C_(); }
+
+            @Override
+            public void stop() { g.d(); }
 
             @Override
             public String getInternalName() {
                 return g.getClass().getSimpleName();
             }
         };
+    }
+
+    private static PathfinderGoal custom(CustomPathfinder p) {
+        PathfinderGoal g = new PathfinderGoal() {
+            @Override
+            public boolean a() {
+                return p.canStart();
+            }
+            @Override
+            public boolean b() {
+                return p.canContinueToUse();
+            }
+            @Override
+            public boolean C_() {
+                return p.canInterrupt();
+            }
+
+            @Override
+            public void c() {
+                p.start();
+            }
+
+            @Override
+            public void e() {
+                p.tick();
+            }
+
+            @Override
+            public void d() { p.stop(); }
+
+        };
+        EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
+        Arrays.stream(p.getFlags()).map(ChipUtil1_17_R1::toNMS).forEach(flags::add);
+        g.a(flags);
+        return g;
     }
 
     private static BlockPosition getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPosition bp, IBlockAccess g) {
@@ -1901,6 +1899,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 case "HurtByTarget" -> new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
+                case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
 
                 default -> custom(g);
             };
@@ -2087,6 +2086,104 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public EntityGossipContainer getGossipContainer(Villager v) {
         return new EntityGossipContainer1_17_R1(v);
+    }
+
+    private static Entity fromNMS(net.minecraft.world.entity.Entity en) {
+        return en.getBukkitEntity();
+    }
+
+    private static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
+        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.i() == null ? null : fromNMS(en.i()));
+    }
+
+    private static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
+        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
+    }
+
+    private static class EntityCombatTracker1_17_R1 implements EntityCombatTracker {
+
+        private final CombatTracker handle;
+        private final Mob m;
+
+        EntityCombatTracker1_17_R1(Mob m) {
+            this.m = m;
+            this.handle = toNMS(m).getCombatTracker();
+        }
+
+        @Override
+        public @NotNull String getCurrentDeathMessage() {
+            return handle.getDeathMessage().getString();
+        }
+
+        @Override
+        public @Nullable CombatEntry getLatestEntry() {
+            return handle.i() == null ? null : fromNMS(m, handle.i());
+        }
+
+        @Override
+        public @NotNull List<CombatEntry> getCombatEntries() {
+            List<CombatEntry> entries = new ArrayList<>();
+            try {
+                Field f = CombatTracker.class.getDeclaredField("c");
+                f.setAccessible(true);
+                ((List<net.minecraft.world.damagesource.CombatEntry>) f.get(handle)).stream().map(en -> fromNMS(m, en)).forEach(entries::add);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+            return entries;
+        }
+
+        @Override
+        public void recordEntry(@NotNull CombatEntry entry) {
+            if (entry == null) return;
+            try {
+                Field f = CombatTracker.class.getDeclaredField("c");
+                f.setAccessible(true);
+                Object entries = f.get(handle);
+
+                Method m = List.class.getMethod("add", Object.class);
+                m.invoke(entries, toNMS(entry));
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+        }
+
+        @Override
+        public int getCombatDuration() {
+            return handle.f();
+        }
+
+        @Override
+        public boolean isTakingDamage() {
+            return handle.d();
+        }
+
+        @Override
+        public boolean isInCombat() {
+            return handle.e();
+        }
+    }
+
+    @Override
+    public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_17_R1(m); }
+
+    @Override
+    public void knockback(EnderDragon a, List<Entity> list) {
+        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+
+        try {
+            Method m = EntityEnderDragon.class.getDeclaredMethod("a", List.class);
+            m.setAccessible(true);
+            m.invoke(nmsMob, list.stream().map(ChipUtil1_17_R1::toNMS).collect(Collectors.toList()));
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
     }
 
 }

@@ -14,6 +14,7 @@ import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Villager;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,9 +65,13 @@ public interface ChipUtil {
 
     EntityGossipContainer getGossipContainer(Villager v);
 
+    EntityCombatTracker getCombatTracker(Mob m);
+
     void setCustomPhase(EnderDragon a, CustomPhase c);
 
-     <T>  void setMemory(Mob mob, Memory<T> m, T value);
+    void knockback(EnderDragon a, List<Entity> list);
+
+    <T> void setMemory(Mob mob, Memory<T> m, T value);
 
     <T> void setMemory(Mob mob, Memory<T> m, T value, long durationTicks);
 
