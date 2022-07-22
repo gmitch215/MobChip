@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip;
 
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -209,7 +210,9 @@ public interface EntityBody {
     /**
      * Whether this Mob is currently in combat.
      * @return true if mob is in combat, else false
+     * @deprecated Use {@link EntityCombatTracker#isInCombat()} instead.
      */
+    @Deprecated
     boolean isInCombat();
 
     /**
