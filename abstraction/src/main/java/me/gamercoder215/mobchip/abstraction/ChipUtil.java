@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
+import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
@@ -106,6 +107,10 @@ public interface ChipUtil {
     Attribute getDefaultAttribute(String s);
 
     AttributeInstance getAttributeInstance(Mob m, Attribute a);
+
+    DragonPhase fromBukkit(EnderDragon dragon, EnderDragon.Phase phase);
+
+    DragonPhase getCurrentPhase(EnderDragon dragon);
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {
         return new BehaviorResult() {

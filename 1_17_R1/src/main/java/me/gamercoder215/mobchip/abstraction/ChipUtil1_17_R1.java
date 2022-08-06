@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
+import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
@@ -57,10 +58,7 @@ import net.minecraft.world.entity.animal.horse.EntityHorseAbstract;
 import net.minecraft.world.entity.animal.horse.EntityLlama;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
-import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonController;
-import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
+import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.entity.monster.EntityCreeper;
 import net.minecraft.world.entity.monster.EntityMonster;
@@ -1236,7 +1234,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     private static AbstractDragonController toNMS(CustomPhase c) {
-        return new AbstractDragonController(((CraftEnderDragon) c.getDragon()).getHandle()) {
+        return new AbstractDragonController(toNMS(c.getDragon())) {
             @Override
             public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
                 try {
@@ -1267,7 +1265,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
     @Override
     public void setCustomPhase(EnderDragon a, CustomPhase c) {
-        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        EntityEnderDragon nmsMob = toNMS(a);
         AbstractDragonController nmsPhase = toNMS(c);
         try {
             new DragonControllerManager(nmsMob).setControllerPhase(nmsPhase.getControllerPhase());
@@ -2173,7 +2171,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
     @Override
     public void knockback(EnderDragon a, List<Entity> list) {
-        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        EntityEnderDragon nmsMob = toNMS(a);
 
         try {
             Method m = EntityEnderDragon.class.getDeclaredMethod("a", List.class);
@@ -2184,6 +2182,94 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
         }
+    }
+
+    private static final class DragonPhase1_17_R1 implements DragonPhase {
+
+        private final EnderDragon dragon;
+        private final IDragonController handle;
+
+        DragonPhase1_17_R1(EnderDragon dragon, IDragonController handle) {
+            this.dragon = dragon;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull EnderDragon getDragon() {
+            return this.dragon;
+        }
+
+        @Override
+        public @NotNull Location getTargetLocation() {
+            return fromNMS(handle.g(), dragon.getWorld());
+        }
+
+        @Override
+        public void start() {
+            handle.d();
+        }
+
+        @Override
+        public void stop() {
+            handle.e();
+        }
+
+        @Override
+        public void clientTick() {
+            handle.b();
+        }
+
+        @Override
+        public void serverTick() {
+            handle.c();
+        }
+
+        @Override
+        public boolean isSitting() {
+            return handle.a();
+        }
+
+        @Override
+        public float getFlyingSpeed() {
+            return handle.f();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
+        }
+    }
+
+    private static EntityEnderDragon toNMS(EnderDragon dragon) {
+        return ((CraftEnderDragon) dragon).getHandle();
+    }
+
+    private static Location fromNMS(IPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
+
+    @Override
+    public DragonPhase fromBukkit(EnderDragon d, EnderDragon.Phase phase) {
+        EntityEnderDragon nms = toNMS(d);
+        IDragonController i = switch (phase) {
+            case CIRCLING -> new DragonControllerHold(nms);
+            case STRAFING -> new DragonControllerStrafe(nms);
+            case FLY_TO_PORTAL -> new DragonControllerLandingFly(nms);
+            case LAND_ON_PORTAL -> new DragonControllerLanding(nms);
+            case LEAVE_PORTAL -> new DragonControllerFly(nms);
+            case BREATH_ATTACK -> new DragonControllerLandedFlame(nms);
+            case SEARCH_FOR_BREATH_ATTACK_TARGET -> new DragonControllerLandedSearch(nms);
+            case ROAR_BEFORE_ATTACK -> new DragonControllerLandedAttack(nms);
+            case CHARGE_PLAYER -> new DragonControllerCharge(nms);
+            case DYING -> new DragonControllerDying(nms);
+            default -> new DragonControllerHover(nms);
+        };
+
+        return new DragonPhase1_17_R1(d, i);
+    }
+
+    @Override
+    public DragonPhase getCurrentPhase(EnderDragon dragon) {
+        return new DragonPhase1_17_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
 
 }

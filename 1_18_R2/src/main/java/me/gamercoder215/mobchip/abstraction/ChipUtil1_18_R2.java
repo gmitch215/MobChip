@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
+import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
@@ -55,10 +56,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
-import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonPhaseInstance;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
-import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
-import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhaseManager;
+import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -1110,7 +1108,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
     }
 
     private static AbstractDragonPhaseInstance toNMS(CustomPhase c) {
-        return new AbstractDragonPhaseInstance(((CraftEnderDragon) c.getDragon()).getHandle()) {
+        return new AbstractDragonPhaseInstance(toNMS(c.getDragon())) {
             @Override
             public EnderDragonPhase<? extends DragonPhaseInstance> getPhase() {
                 try {
@@ -1141,7 +1139,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
 
     @Override
     public void setCustomPhase(EnderDragon a, CustomPhase c) {
-        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = toNMS(a);
         AbstractDragonPhaseInstance nmsPhase = toNMS(c);
         try {
             new EnderDragonPhaseManager(nmsMob).setPhase(nmsPhase.getPhase());
@@ -2179,7 +2177,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
 
     @Override
     public void knockback(EnderDragon a, List<Entity> list) {
-        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsMob = toNMS(a);
 
         try {
             Method m = net.minecraft.world.entity.boss.enderdragon.EnderDragon.class.getDeclaredMethod("a", List.class);
@@ -2190,5 +2188,93 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
         }
+    }
+
+    private static final class DragonPhase1_18_R2 implements DragonPhase {
+
+        private final EnderDragon dragon;
+        private final DragonPhaseInstance handle;
+
+        DragonPhase1_18_R2(EnderDragon dragon, DragonPhaseInstance handle) {
+            this.dragon = dragon;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull EnderDragon getDragon() {
+            return this.dragon;
+        }
+
+        @Override
+        public @NotNull Location getTargetLocation() {
+            return fromNMS(handle.getFlyTargetLocation(), dragon.getWorld());
+        }
+
+        @Override
+        public void start() {
+            handle.begin();
+        }
+
+        @Override
+        public void stop() {
+            handle.end();
+        }
+
+        @Override
+        public void clientTick() {
+            handle.doClientTick();
+        }
+
+        @Override
+        public void serverTick() {
+            handle.doServerTick();
+        }
+
+        @Override
+        public boolean isSitting() {
+            return handle.isSitting();
+        }
+
+        @Override
+        public float getFlyingSpeed() {
+            return handle.getFlySpeed();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
+        }
+    }
+
+    private static net.minecraft.world.entity.boss.enderdragon.EnderDragon toNMS(EnderDragon dragon) {
+        return ((CraftEnderDragon) dragon).getHandle();
+    }
+
+    private static Location fromNMS(net.minecraft.core.Position p, World w) { return new Location(w, p.x(), p.y(), p.z()); }
+
+    @Override
+    public DragonPhase fromBukkit(EnderDragon d, EnderDragon.Phase phase) {
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
+        DragonPhaseInstance i = switch (phase) {
+            case CIRCLING -> new DragonHoldingPatternPhase(nms);
+            case STRAFING -> new DragonStrafePlayerPhase(nms);
+            case FLY_TO_PORTAL -> new DragonLandingApproachPhase(nms);
+            case LAND_ON_PORTAL -> new DragonLandingPhase(nms);
+            case LEAVE_PORTAL -> new DragonTakeoffPhase(nms);
+            case BREATH_ATTACK -> new DragonSittingFlamingPhase(nms);
+            case SEARCH_FOR_BREATH_ATTACK_TARGET -> new DragonSittingScanningPhase(nms);
+            case ROAR_BEFORE_ATTACK -> new DragonSittingAttackingPhase(nms);
+            case CHARGE_PLAYER -> new DragonChargePlayerPhase(nms);
+            case DYING -> new DragonDeathPhase(nms);
+            default -> new DragonHoverPhase(nms);
+        };
+
+        return new DragonPhase1_18_R2(d, i);
+    }
+
+    @Override
+    public DragonPhase getCurrentPhase(EnderDragon dragon) {
+        return new DragonPhase1_18_R2(dragon, toNMS(dragon).getPhaseManager().getCurrentPhase());
     }
 }

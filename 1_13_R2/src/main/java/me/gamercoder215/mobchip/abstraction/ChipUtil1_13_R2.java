@@ -8,6 +8,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
+import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
@@ -1228,7 +1229,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     }
 
     private static AbstractDragonController toNMS(CustomPhase c) {
-        return new AbstractDragonController(((CraftEnderDragon) c.getDragon()).getHandle()) {
+        return new AbstractDragonController(toNMS(c.getDragon())) {
             @Override
             public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
                 try {
@@ -1259,7 +1260,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
 
     @Override
     public void setCustomPhase(EnderDragon a, CustomPhase c) {
-        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        EntityEnderDragon nmsMob = toNMS(a);
         AbstractDragonController nmsPhase = toNMS(c);
         try {
             new DragonControllerManager(nmsMob).setControllerPhase(nmsPhase.getControllerPhase());
@@ -1882,7 +1883,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
 
     @Override
     public void knockback(EnderDragon a, List<Entity> list) {
-        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        EntityEnderDragon nmsMob = toNMS(a);
 
         try {
             Method m = EntityEnderDragon.class.getDeclaredMethod("a", List.class);
@@ -1893,6 +1894,95 @@ public class ChipUtil1_13_R2 implements ChipUtil {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
         }
+    }
+
+    private static final class DragonPhase1_13_R2 implements DragonPhase {
+
+        private final EnderDragon dragon;
+        private final IDragonController handle;
+
+        DragonPhase1_13_R2(EnderDragon dragon, IDragonController handle) {
+            this.dragon = dragon;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull EnderDragon getDragon() {
+            return this.dragon;
+        }
+
+        @Override
+        public @NotNull Location getTargetLocation() {
+            return fromNMS(handle.g(), dragon.getWorld());
+        }
+
+        @Override
+        public void start() {
+            handle.d();
+        }
+
+        @Override
+        public void stop() {
+            handle.e();
+        }
+
+        @Override
+        public void clientTick() {
+            handle.b();
+        }
+
+        @Override
+        public void serverTick() {
+            handle.c();
+        }
+
+        @Override
+        public boolean isSitting() {
+            return handle.a();
+        }
+
+        @Override
+        public float getFlyingSpeed() {
+            return handle.f();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
+        }
+    }
+
+    private static EntityEnderDragon toNMS(EnderDragon dragon) {
+        return ((CraftEnderDragon) dragon).getHandle();
+    }
+
+    private static Location fromNMS(Vec3D p, World w) { return new Location(w, p.x, p.y, p.z); }
+
+    @Override
+    public DragonPhase fromBukkit(EnderDragon d, EnderDragon.Phase phase) {
+        EntityEnderDragon nms = toNMS(d);
+        final IDragonController i;
+        switch (phase) {
+            case CIRCLING: i = new DragonControllerHold(nms); break;
+            case STRAFING: i = new DragonControllerStrafe(nms); break;
+            case FLY_TO_PORTAL: i = new DragonControllerLandingFly(nms); break;
+            case LAND_ON_PORTAL: i = new DragonControllerLanding(nms); break;
+            case LEAVE_PORTAL: i = new DragonControllerFly(nms); break;
+            case BREATH_ATTACK: i = new DragonControllerLandedFlame(nms); break;
+            case SEARCH_FOR_BREATH_ATTACK_TARGET: i = new DragonControllerLandedSearch(nms); break;
+            case ROAR_BEFORE_ATTACK: i = new DragonControllerLandedAttack(nms); break;
+            case CHARGE_PLAYER: i = new DragonControllerCharge(nms); break;
+            case DYING: i = new DragonControllerDying(nms); break;
+            default: i = new DragonControllerHover(nms); break;
+        }
+
+        return new DragonPhase1_13_R2(d, i);
+    }
+
+    @Override
+    public DragonPhase getCurrentPhase(EnderDragon dragon) {
+        return new DragonPhase1_13_R2(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
 
 }
