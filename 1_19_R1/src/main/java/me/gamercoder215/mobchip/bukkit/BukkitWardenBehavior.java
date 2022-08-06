@@ -2,16 +2,22 @@ package me.gamercoder215.mobchip.bukkit;
 
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.behavior.WardenBehavior;
+import org.bukkit.Location;
 import org.bukkit.entity.Warden;
 import org.jetbrains.annotations.NotNull;
 
-class BukkitWardenBehavior extends BukkitCreatureBehavior implements WardenBehavior {
+class BukkitWardenBehavior extends BukkitUpdatableCreatureBehavior implements WardenBehavior {
 
     final Warden m;
 
     public BukkitWardenBehavior(Warden m) {
         super(m);
         this.m = m;
+    }
+
+    @Override
+    public @NotNull BehaviorResult setDisturbanceLocation(@NotNull Location loc) {
+        return wrapper.setDisturbanceLocation(m, loc);
     }
 
     @Override

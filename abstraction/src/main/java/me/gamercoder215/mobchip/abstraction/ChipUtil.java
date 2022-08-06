@@ -18,10 +18,8 @@ import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -108,6 +106,29 @@ public interface ChipUtil {
     Attribute getDefaultAttribute(String s);
 
     AttributeInstance getAttributeInstance(Mob m, Attribute a);
+
+    default BehaviorResult hearNoteblock(Creature c, Location loc) {
+        return new BehaviorResult() {
+            @Override
+            public @NotNull Status getStatus() {
+                return Status.STOPPED;
+            }
+
+            @Override
+            public void stop() {}
+        };
+    }
+
+    default BehaviorResult setDisturbanceLocation(Creature c, Location loc) {
+        return new BehaviorResult() {
+            @Override
+            public @NotNull Status getStatus() {
+                return Status.STOPPED;
+            }
+            @Override
+            public void stop() {}
+        };
+    }
 
     default void updateGoals(Map<Integer, Pathfinder> goals, Map<Integer, Boolean> target) {
         try {

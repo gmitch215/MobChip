@@ -54,6 +54,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
+import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
@@ -61,6 +62,8 @@ import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhaseManager;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.entity.monster.warden.WardenAi;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -2200,5 +2203,18 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
 
     @Override
     public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_19_R1(m); }
+
+    @Override
+    public BehaviorResult hearNoteblock(Creature c, Location loc) {
+        AllayAi.hearNoteblock(toNMS(c), toNMS(loc));
+        return ChipUtil.super.hearNoteblock(c, loc);
+    }
+
+    @Override
+    public BehaviorResult setDisturbanceLocation(Creature c, Location loc) {
+        Warden w = ((CraftWarden) c).getHandle();
+        WardenAi.setDisturbanceLocation(w, toNMS(loc));
+        return ChipUtil.super.setDisturbanceLocation(c, loc);
+    }
 }
 

@@ -118,6 +118,10 @@ public class BukkitBrain implements EntityBrain {
 					Class<?> piglin = Class.forName(BUKKIT_PACKAGE + "BukkitPiglinBehavior");
 					return (EntityBehavior) piglin.getConstructor(m.getClass()).newInstance(m);
 				}
+				case "allay": {
+					Class<?> allay = Class.forName(BUKKIT_PACKAGE + "BukkitAllayBehavior");
+					return (EntityBehavior) allay.getConstructor(m.getClass()).newInstance(m);
+				}
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException ignored) {}
 		catch (Exception e) {

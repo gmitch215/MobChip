@@ -5,7 +5,7 @@ import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import org.bukkit.entity.Axolotl;
 import org.jetbrains.annotations.NotNull;
 
-class BukkitAxolotlBehavior extends BukkitCreatureBehavior implements AxolotlBehavior {
+class BukkitAxolotlBehavior extends BukkitUpdatableCreatureBehavior implements AxolotlBehavior {
 
     final Axolotl m;
 
