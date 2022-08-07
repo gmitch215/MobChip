@@ -3,7 +3,7 @@ package me.gamercoder215.mobchip.ai;
 /**
  * Represents a Pathfinder that has a chance of succeeding
  * <p>
- * The range must be between 1F and 100F.
+ * The range must be between 0F and 1F.
  */
 public interface Probable {
 	

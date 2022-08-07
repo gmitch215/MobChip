@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a Pathfinder for Any Ranged Monster to shoot arrows from a bow
  */
-public final class PathfinderRangedBowAttack extends Pathfinder implements SpeedModifier, Ranged {
+public final class PathfinderRangedBowAttack extends Pathfinder implements SpeedModifier, Ranged, Repeated {
     
     private double speedMod;
     private float range;
@@ -37,10 +37,12 @@ public final class PathfinderRangedBowAttack extends Pathfinder implements Speed
      * @param speedMod Speed Modifier while attacking
      * @param range Range of attack
      * @param interval Interval of attack, in ticks
+     * @throws IllegalArgumentException if interval is less than 0
      */
-    public PathfinderRangedBowAttack(@NotNull ProjectileSource m, double speedMod, float range, int interval) {
+    public PathfinderRangedBowAttack(@NotNull ProjectileSource m, double speedMod, float range, int interval) throws IllegalArgumentException {
         super((Mob) m);
 
+        if (interval < 0) throw new IllegalArgumentException("Interval must be greater than 0");
         this.speedMod = speedMod;
         this.range = range;
         this.aInv = interval;
@@ -65,22 +67,16 @@ public final class PathfinderRangedBowAttack extends Pathfinder implements Speed
         this.speedMod = mod;
     }
 
-    /**
-     * Gets the current interval of attack, in ticks.
-     * @return Interval of attack, in ticks
-     */
+    @Override
     public int getInterval() {
         return this.aInv;
     }
 
-    /**
-     * Sets the current interval of attack, in ticks
-     * @param interval Interval of attack
-     */
+    @Override
     public void setInterval(int interval) {
+        if (interval < 0) throw new IllegalArgumentException("Interval must be greater than 0");
         this.aInv = interval;
     }
-
 
     @Override
     public @NotNull PathfinderFlag[] getFlags() {

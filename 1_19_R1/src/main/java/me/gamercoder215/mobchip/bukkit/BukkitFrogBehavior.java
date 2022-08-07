@@ -6,7 +6,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Frog;
 import org.jetbrains.annotations.NotNull;
 
-class BukkitFrogBehavior extends BukkitCreatureBehavior implements FrogBehavior {
+class BukkitFrogBehavior extends BukkitUpdatableCreatureBehavior implements FrogBehavior {
 
     final Frog m;
 

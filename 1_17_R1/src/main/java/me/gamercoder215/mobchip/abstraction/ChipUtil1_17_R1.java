@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
+import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
@@ -20,6 +21,9 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
+import me.gamercoder215.mobchip.combat.CombatEntry;
+import me.gamercoder215.mobchip.combat.CombatLocation;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.*;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
@@ -31,6 +35,7 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
@@ -53,10 +58,7 @@ import net.minecraft.world.entity.animal.horse.EntityHorseAbstract;
 import net.minecraft.world.entity.animal.horse.EntityLlama;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
-import net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonController;
-import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
+import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.entity.monster.EntityCreeper;
 import net.minecraft.world.entity.monster.EntityMonster;
@@ -106,7 +108,7 @@ import java.util.stream.Collectors;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ChipUtil1_17_R1 implements ChipUtil {
+public final class ChipUtil1_17_R1 implements ChipUtil {
 
     private static ItemStack fromNMS(net.minecraft.world.item.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
@@ -116,31 +118,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
         EntityInsentient mob = toNMS(m);
         PathfinderGoalSelector s = target ? mob.bP : mob.bO;
 
-        PathfinderGoal g = new PathfinderGoal() {
-            @Override
-            public boolean a() {
-                return p.canStart();
-            }
-            @Override
-            public boolean b() {
-                return p.canContinueToUse();
-            }
-            @Override
-            public boolean C_() {
-                return p.canInterrupt();
-            }
-
-            @Override
-            public void c() {
-                p.start();
-            }
-
-            @Override
-            public void e() {
-                p.tick();
-            }
-
-        };
+        PathfinderGoal g = custom(p);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
@@ -226,10 +204,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderBreakDoor p = (PathfinderBreakDoor) b;
                 yield new PathfinderGoalBreakDoor(m, p.getBreakTime(), d -> p.getCondition().test(fromNMS(d)));
             }
-            case "Breath" -> {
-                PathfinderBreathAir p = (PathfinderBreathAir) b;
-                yield new PathfinderGoalBreath((EntityCreature) m);
-            }
+            case "Breath" -> new PathfinderGoalBreath((EntityCreature) m);
             case "Breed" -> {
                 PathfinderBreed p = (PathfinderBreed) b;
                 yield new PathfinderGoalBreed((EntityAnimal) m, p.getSpeedModifier());
@@ -246,26 +221,14 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderOpenDoor p = (PathfinderOpenDoor) b;
                 yield new PathfinderGoalDoorOpen(m, p.mustClose());
             }
-            case "EatTile" -> {
-                PathfinderEatTile p = (PathfinderEatTile) b;
-                yield new PathfinderGoalEatTile(m);
-            }
-            case "FishSchool" -> {
-                PathfinderFollowFishLeader p = (PathfinderFollowFishLeader) b;
-                yield new PathfinderGoalFishSchool((EntityFishSchool) m);
-            }
+            case "EatTile" -> new PathfinderGoalEatTile(m);
+            case "FishSchool" -> new PathfinderGoalFishSchool((EntityFishSchool) m);
             case "FleeSun" -> {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
                 yield new PathfinderGoalFleeSun((EntityCreature) m, p.getSpeedModifier());
             }
-            case "Float" -> {
-                PathfinderFloat p = (PathfinderFloat) b;
-                yield new PathfinderGoalFloat(m);
-            }
-            case "FollowBoat" -> {
-                PathfinderFollowBoat p = (PathfinderFollowBoat) b;
-                yield new PathfinderGoalFollowBoat((EntityCreature) m);
-            }
+            case "Float" -> new PathfinderGoalFloat(m);
+            case "FollowBoat" -> new PathfinderGoalFollowBoat((EntityCreature) m);
             case "FollowEntity" -> {
                 PathfinderFollowMob p = (PathfinderFollowMob) b;
                 yield new PathfinderGoalFollowEntity(m, p.getSpeedModifier(), p.getStopDistance(), p.getRange());
@@ -294,10 +257,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderLookAtEntity<?> p = (PathfinderLookAtEntity) b;
                 yield new PathfinderGoalLookAtPlayer(m, toNMS(p.getFilter()), p.getRange(), p.getProbability(), p.isHorizontal());
             }
-            case "LookAtTradingPlayer" -> {
-                PathfinderLookAtTradingPlayer p = (PathfinderLookAtTradingPlayer) b;
-                yield new PathfinderGoalLookAtTradingPlayer((EntityVillagerAbstract) m);
-            }
+            case "LookAtTradingPlayer" -> new PathfinderGoalLookAtTradingPlayer((EntityVillagerAbstract) m);
             case "MeleeAttack" -> {
                 PathfinderMeleeAttack p = (PathfinderMeleeAttack) b;
                 yield new PathfinderGoalMeleeAttack((EntityCreature) m, p.getSpeedModifier(), p.mustSee());
@@ -318,34 +278,19 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderRandomStrollThroughVillage p = (PathfinderRandomStrollThroughVillage) b;
                 yield new PathfinderGoalNearestVillage((EntityCreature) m, p.getInterval());
             }
-            case "OcelotAttack" -> {
-                PathfinderOcelotAttack p = (PathfinderOcelotAttack) b;
-                yield new PathfinderGoalOcelotAttack(m);
-            }
-            case "OfferFlower" -> {
-                PathfinderOfferFlower p = (PathfinderOfferFlower) b;
-                yield new PathfinderGoalOfferFlower((EntityIronGolem) m);
-            }
+            case "OcelotAttack" -> new PathfinderGoalOcelotAttack(m);
+            case "OfferFlower" -> new PathfinderGoalOfferFlower((EntityIronGolem) m);
             case "Panic" -> {
                 PathfinderPanic p = (PathfinderPanic) b;
                 yield new PathfinderGoalPanic((EntityCreature) m, p.getSpeedModifier());
             }
-            case "Perch" -> {
-                PathfinderRideShoulder p = (PathfinderRideShoulder) b;
-                yield new PathfinderGoalPerch((EntityPerchable) m);
-            }
-            case "Raid" -> {
-                PathfinderMoveToRaid p = (PathfinderMoveToRaid) b;
-                yield new PathfinderGoalRaid<>((EntityRaider) m);
-            }
+            case "Perch" -> new PathfinderGoalPerch((EntityPerchable) m);
+            case "Raid" -> new PathfinderGoalRaid<>((EntityRaider) m);
             case "RandomFly" -> {
                 PathfinderRandomStrollFlying p = (PathfinderRandomStrollFlying) b;
                 yield new PathfinderGoalRandomFly((EntityCreature) m, p.getSpeedModifier());
             }
-            case "RandomLookaround" -> {
-                PathfinderRandomLook p = (PathfinderRandomLook) b;
-                yield new PathfinderGoalRandomLookaround(m);
-            }
+            case "RandomLookaround" -> new PathfinderGoalRandomLookaround(m);
             case "RandomStroll" -> {
                 PathfinderRandomStroll p = (PathfinderRandomStroll) b;
                 yield new PathfinderGoalRandomStroll((EntityCreature) m, p.getSpeedModifier(), p.getInterval());
@@ -362,14 +307,8 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
                 yield new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
             }
-            case "RestrictSun" -> {
-                PathfinderRestrictSun p = (PathfinderRestrictSun) b;
-                yield new PathfinderGoalRestrictSun((EntityCreature) m);
-            }
-            case "Sit" -> {
-                PathfinderSit p = (PathfinderSit) b;
-                yield new PathfinderGoalSit((EntityTameableAnimal) m);
-            }
+            case "RestrictSun" -> new PathfinderGoalRestrictSun((EntityCreature) m);
+            case "Sit" -> new PathfinderGoalSit((EntityTameableAnimal) m);
             case "StrollVillage" -> {
                 PathfinderRandomStrollToVillage p = (PathfinderRandomStrollToVillage) b;
                 yield new PathfinderGoalStrollVillage((EntityCreature) m, p.getSpeedModifier(), true);
@@ -378,10 +317,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderRandomStrollInVillage p = (PathfinderRandomStrollInVillage) b;
                 yield new PathfinderGoalStrollVillageGolem((EntityCreature) m, p.getSpeedModifier());
             }
-            case "Swell" -> {
-                PathfinderSwellCreeper p = (PathfinderSwellCreeper) b;
-                yield new PathfinderGoalSwell((EntityCreeper) m);
-            }
+            case "Swell" -> new PathfinderGoalSwell((EntityCreeper) m);
             case "Tame" -> {
                 PathfinderTameHorse p = (PathfinderTameHorse) b;
                 yield new PathfinderGoalTame((EntityHorseAbstract) m, p.getSpeedModifier());
@@ -398,10 +334,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderUseItem p = (PathfinderUseItem) b;
                 yield new PathfinderGoalUseItem<>(m, toNMS(p.getItem()), toNMS(p.getFinishSound()), e -> p.getCondition().test(fromNMS(e)));
             }
-            case "Water" -> {
-                PathfinderFindWater p = (PathfinderFindWater) b;
-                yield new PathfinderGoalWater((EntityCreature) m);
-            }
+            case "Water" -> new PathfinderGoalWater((EntityCreature) m);
             case "WaterJump" -> {
                 PathfinderDolphinJump p = (PathfinderDolphinJump) b;
                 yield new PathfinderGoalWaterJump((EntityDolphin) m, p.getInterval());
@@ -417,10 +350,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
             // Target
 
-            case "DefendVillage" -> {
-                PathfinderDefendVillage p = (PathfinderDefendVillage) b;
-                yield new PathfinderGoalDefendVillage((EntityIronGolem) m);
-            }
+            case "DefendVillage" -> new PathfinderGoalDefendVillage((EntityIronGolem) m);
             case "HurtByTarget" -> {
                 PathfinderHurtByTarget p = (PathfinderHurtByTarget) b;
                 List<Class<? extends EntityLiving>> classes = new ArrayList<>();
@@ -440,44 +370,16 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderNearestHealableRaider p = (PathfinderNearestHealableRaider) b;
                 yield new PathfinderGoalNearestHealableRaider<>((EntityRaider) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
-            case "OwnerHurtByTarget" -> {
-                PathfinderOwnerHurtByTarget p = (PathfinderOwnerHurtByTarget) b;
-                yield new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
+            case "OwnerHurtByTarget" -> new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
+            case "OwnerHurtTarget" -> new PathfinderGoalOwnerHurtTarget((EntityTameableAnimal) m);
+            case "RandomTargetNonTamed" -> {
+                PathfinderWildTarget p = (PathfinderWildTarget) b;
+                yield new PathfinderGoalRandomTargetNonTamed<>((EntityTameableAnimal) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
-            case "OwnerHurtTarget" -> {
-                PathfinderOwnerHurtTarget p = (PathfinderOwnerHurtTarget) b;
-                yield new PathfinderGoalOwnerHurtByTarget((EntityTameableAnimal) m);
-            }
-
+            
             default -> {
-                if (b instanceof CustomPathfinder p) {
-                    yield new PathfinderGoal() {
-                        @Override
-                        public boolean a() {
-                            return p.canStart();
-                        }
-
-                        @Override
-                        public boolean b() {
-                            return p.canContinueToUse();
-                        }
-
-                        @Override
-                        public boolean C_() {
-                            return p.canInterrupt();
-                        }
-
-                        @Override
-                        public void c() {
-                            p.start();
-                        }
-
-                        @Override
-                        public void e() {
-                            p.tick();
-                        }
-                    };
-                } else yield null;
+                if (b instanceof CustomPathfinder p) yield custom(p);
+                else yield null;
             }
         };
     }
@@ -1332,7 +1234,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     private static AbstractDragonController toNMS(CustomPhase c) {
-        return new AbstractDragonController(((CraftEnderDragon) c.getDragon()).getHandle()) {
+        return new AbstractDragonController(toNMS(c.getDragon())) {
             @Override
             public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
                 try {
@@ -1363,7 +1265,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     @Override
     public void setCustomPhase(EnderDragon a, CustomPhase c) {
-        EntityEnderDragon nmsMob = ((CraftEnderDragon) a).getHandle();
+        EntityEnderDragon nmsMob = toNMS(a);
         AbstractDragonController nmsPhase = toNMS(c);
         try {
             new DragonControllerManager(nmsMob).setControllerPhase(nmsPhase.getControllerPhase());
@@ -1735,7 +1637,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
     private static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
 
-    private PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
+    private static PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
         return switch (f) {
             case MOVEMENT -> PathfinderGoal.Type.a;
             case JUMPING -> PathfinderGoal.Type.c;
@@ -1863,14 +1765,55 @@ public class ChipUtil1_17_R1 implements ChipUtil {
 
             @Override
             public void tick() {
-                g.d();
+                g.e();
             }
+
+            @Override
+            public boolean canInterrupt() { return g.C_(); }
+
+            @Override
+            public void stop() { g.d(); }
 
             @Override
             public String getInternalName() {
                 return g.getClass().getSimpleName();
             }
         };
+    }
+
+    private static PathfinderGoal custom(CustomPathfinder p) {
+        PathfinderGoal g = new PathfinderGoal() {
+            @Override
+            public boolean a() {
+                return p.canStart();
+            }
+            @Override
+            public boolean b() {
+                return p.canContinueToUse();
+            }
+            @Override
+            public boolean C_() {
+                return p.canInterrupt();
+            }
+
+            @Override
+            public void c() {
+                p.start();
+            }
+
+            @Override
+            public void e() {
+                p.tick();
+            }
+
+            @Override
+            public void d() { p.stop(); }
+
+        };
+        EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
+        Arrays.stream(p.getFlags()).map(ChipUtil1_17_R1::toNMS).forEach(flags::add);
+        g.a(flags);
+        return g;
     }
 
     private static BlockPosition getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPosition bp, IBlockAccess g) {
@@ -1954,6 +1897,7 @@ public class ChipUtil1_17_R1 implements ChipUtil {
                 case "HurtByTarget" -> new PathfinderHurtByTarget((Creature) m, getEntityTypes(getObject(g, "i", Class[].class)));
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
+                case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
 
                 default -> custom(g);
             };
@@ -2140,6 +2084,192 @@ public class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public EntityGossipContainer getGossipContainer(Villager v) {
         return new EntityGossipContainer1_17_R1(v);
+    }
+
+    private static Entity fromNMS(net.minecraft.world.entity.Entity en) {
+        return en.getBukkitEntity();
+    }
+
+    private static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
+        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.i() == null ? null : fromNMS(en.i()));
+    }
+
+    private static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
+        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
+    }
+
+    private static class EntityCombatTracker1_17_R1 implements EntityCombatTracker {
+
+        private final CombatTracker handle;
+        private final Mob m;
+
+        EntityCombatTracker1_17_R1(Mob m) {
+            this.m = m;
+            this.handle = toNMS(m).getCombatTracker();
+        }
+
+        @Override
+        public @NotNull String getCurrentDeathMessage() {
+            return handle.getDeathMessage().getString();
+        }
+
+        @Override
+        public @Nullable CombatEntry getLatestEntry() {
+            return handle.i() == null ? null : fromNMS(m, handle.i());
+        }
+
+        @Override
+        public @NotNull List<CombatEntry> getCombatEntries() {
+            List<CombatEntry> entries = new ArrayList<>();
+            try {
+                Field f = CombatTracker.class.getDeclaredField("c");
+                f.setAccessible(true);
+                ((List<net.minecraft.world.damagesource.CombatEntry>) f.get(handle)).stream().map(en -> fromNMS(m, en)).forEach(entries::add);
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+            return entries;
+        }
+
+        @Override
+        public void recordEntry(@NotNull CombatEntry entry) {
+            if (entry == null) return;
+            try {
+                Field f = CombatTracker.class.getDeclaredField("c");
+                f.setAccessible(true);
+                Object entries = f.get(handle);
+
+                Method m = List.class.getMethod("add", Object.class);
+                m.invoke(entries, toNMS(entry));
+            } catch (Exception e) {
+                Bukkit.getLogger().severe(e.getClass().getSimpleName());
+                Bukkit.getLogger().severe(e.getMessage());
+                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            }
+        }
+
+        @Override
+        public int getCombatDuration() {
+            return handle.f();
+        }
+
+        @Override
+        public boolean isTakingDamage() {
+            return handle.d();
+        }
+
+        @Override
+        public boolean isInCombat() {
+            return handle.e();
+        }
+    }
+
+    @Override
+    public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_17_R1(m); }
+
+    @Override
+    public void knockback(EnderDragon a, List<Entity> list) {
+        EntityEnderDragon nmsMob = toNMS(a);
+
+        try {
+            Method m = EntityEnderDragon.class.getDeclaredMethod("a", List.class);
+            m.setAccessible(true);
+            m.invoke(nmsMob, list.stream().map(ChipUtil1_17_R1::toNMS).collect(Collectors.toList()));
+        } catch (Exception e) {
+            Bukkit.getLogger().severe(e.getClass().getSimpleName());
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+        }
+    }
+
+    private static final class DragonPhase1_17_R1 implements DragonPhase {
+
+        private final EnderDragon dragon;
+        private final IDragonController handle;
+
+        DragonPhase1_17_R1(EnderDragon dragon, IDragonController handle) {
+            this.dragon = dragon;
+            this.handle = handle;
+        }
+
+        @Override
+        public @NotNull EnderDragon getDragon() {
+            return this.dragon;
+        }
+
+        @Override
+        public @NotNull Location getTargetLocation() {
+            return fromNMS(handle.g(), dragon.getWorld());
+        }
+
+        @Override
+        public void start() {
+            handle.d();
+        }
+
+        @Override
+        public void stop() {
+            handle.e();
+        }
+
+        @Override
+        public void clientTick() {
+            handle.b();
+        }
+
+        @Override
+        public void serverTick() {
+            handle.c();
+        }
+
+        @Override
+        public boolean isSitting() {
+            return handle.a();
+        }
+
+        @Override
+        public float getFlyingSpeed() {
+            return handle.f();
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
+        }
+    }
+
+    private static EntityEnderDragon toNMS(EnderDragon dragon) {
+        return ((CraftEnderDragon) dragon).getHandle();
+    }
+
+    private static Location fromNMS(IPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
+
+    @Override
+    public DragonPhase fromBukkit(EnderDragon d, EnderDragon.Phase phase) {
+        EntityEnderDragon nms = toNMS(d);
+        IDragonController i = switch (phase) {
+            case CIRCLING -> new DragonControllerHold(nms);
+            case STRAFING -> new DragonControllerStrafe(nms);
+            case FLY_TO_PORTAL -> new DragonControllerLandingFly(nms);
+            case LAND_ON_PORTAL -> new DragonControllerLanding(nms);
+            case LEAVE_PORTAL -> new DragonControllerFly(nms);
+            case BREATH_ATTACK -> new DragonControllerLandedFlame(nms);
+            case SEARCH_FOR_BREATH_ATTACK_TARGET -> new DragonControllerLandedSearch(nms);
+            case ROAR_BEFORE_ATTACK -> new DragonControllerLandedAttack(nms);
+            case CHARGE_PLAYER -> new DragonControllerCharge(nms);
+            case DYING -> new DragonControllerDying(nms);
+            default -> new DragonControllerHover(nms);
+        };
+
+        return new DragonPhase1_17_R1(d, i);
+    }
+
+    @Override
+    public DragonPhase getCurrentPhase(EnderDragon dragon) {
+        return new DragonPhase1_17_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
 
 }

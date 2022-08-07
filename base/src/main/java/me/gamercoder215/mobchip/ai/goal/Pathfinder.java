@@ -10,10 +10,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class Pathfinder implements PathfinderInfo {
 
-	// Private Static Reflection Utils
-
-	// Other
-
 	/**
 	 * This Entity.
 	 */

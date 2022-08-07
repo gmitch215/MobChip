@@ -12,12 +12,10 @@ import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
  * @see EntityBrain
  */
 public class BukkitBrain implements EntityBrain {
-	
+
+	private static final String BUKKIT_PACKAGE = "me.gamercoder215.mobchip.bukkit.";
 	final Mob m;
 
 	BukkitBrain(@NotNull Mob m) {
@@ -43,8 +42,8 @@ public class BukkitBrain implements EntityBrain {
 	@Nullable
 	public static EntityBrain getBrain(@Nullable Mob m) {
 		if (m == null) return null;
-		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
 		if (m instanceof Villager) return new BukkitVillagerBrain((Villager) m);
+		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
 		return new BukkitBrain(m);
 	}
 
@@ -98,15 +97,43 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public EntityBehavior getBehaviors() {
 		try {
-			Class<?> b = Class.forName(BukkitBrain.class.getPackage().getName() + ".Bukkit" + Character.toUpperCase(m.getType().name().charAt(0)) + m.getType().name().substring(1).toLowerCase() + "Behavior");
-			return (EntityBehavior) b.getConstructor(m.getType().getEntityClass()).newInstance(m);
-		} catch (ClassNotFoundException | NoSuchMethodException e) {
-			return new BukkitEntityBehavior(m);
-		} catch (Exception e) {
+			switch (m.getType().name().toLowerCase()) {
+				case "frog": {
+					Class<?> frog = Class.forName(BUKKIT_PACKAGE + "BukkitFrogBehavior");
+					return (EntityBehavior) frog.getConstructor(m.getClass()).newInstance(m);
+				}
+				case "warden": {
+					Class<?> warden = Class.forName(BUKKIT_PACKAGE + "BukkitWardenBehavior");
+					return (EntityBehavior) warden.getConstructor(m.getClass()).newInstance(m);
+				}
+				case "ender_dragon": {
+					Class<?> dragon = Class.forName(BUKKIT_PACKAGE + "BukkitDragonBehavior");
+					return (EntityBehavior) dragon.getConstructor(m.getClass()).newInstance(m);
+				}
+				case "axolotl": {
+					Class<?> axolotl = Class.forName(BUKKIT_PACKAGE + "BukkitAxolotlBehavior");
+					return (EntityBehavior) axolotl.getConstructor(m.getClass()).newInstance(m);
+				}
+				case "piglin": {
+					Class<?> piglin = Class.forName(BUKKIT_PACKAGE + "BukkitPiglinBehavior");
+					return (EntityBehavior) piglin.getConstructor(m.getClass()).newInstance(m);
+				}
+				case "allay": {
+					Class<?> allay = Class.forName(BUKKIT_PACKAGE + "BukkitAllayBehavior");
+					return (EntityBehavior) allay.getConstructor(m.getClass()).newInstance(m);
+				}
+			}
+		} catch (ClassNotFoundException | NoSuchMethodException ignored) {}
+		catch (Exception e) {
+			Bukkit.getLogger().severe(e.getClass().getSimpleName());
 			Bukkit.getLogger().severe(e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-			return new BukkitEntityBehavior(m);
 		}
+
+		if (m instanceof Villager) return new BukkitVillagerBehavior((Villager) m);
+		if (m instanceof Creature) return new BukkitCreatureBehavior((Creature) m);
+
+		return new BukkitEntityBehavior(m);
 	}
 
 	/**
@@ -116,6 +143,11 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public @NotNull EntityBody getBody() {
 		return w.getBody(m);
+	}
+
+	@Override
+	public @NotNull EntityCombatTracker getCombatTracker() {
+		return w.getCombatTracker(m);
 	}
 
 	/**

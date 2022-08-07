@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
@@ -67,7 +68,6 @@ public interface EntityBrain {
      * @return Entity Behavior
      */
     EntityBehavior getBehaviors();
-
 
     /**
      * Sets a permanent memory into this entity's brain.
@@ -215,5 +215,12 @@ public interface EntityBrain {
      */
     @NotNull
     EntityBody getBody();
+
+    /**
+     * Fetches the Entity's Combat Tracker.
+     * @return Entity Combat Tracker
+     */
+    @NotNull
+    EntityCombatTracker getCombatTracker();
     
 }

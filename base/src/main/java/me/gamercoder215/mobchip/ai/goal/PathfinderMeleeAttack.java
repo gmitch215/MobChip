@@ -1,16 +1,17 @@
 package me.gamercoder215.mobchip.ai.goal;
 
 import me.gamercoder215.mobchip.ai.SpeedModifier;
+import me.gamercoder215.mobchip.ai.goal.target.PathfinderNearestAttackableTarget;
 import me.gamercoder215.mobchip.ai.goal.target.Targeting;
 import org.bukkit.entity.Creature;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a Pathfinder for a Creature to attack.
- * <p>
- * This Pathfinder does not look for entities to attack, but only attacks them.
- * <p>
- * Any entities that do not normally attack (i.e. animals) most commonly do not have attack attributes. <strong>An entity that attacks without an Attack Attribute will crash the server.</strong>
+ * <br><br>
+ * This Pathfinder does not look for entities to attack, but only attacks them. To look for entities, use {@link PathfinderNearestAttackableTarget} and its subclasses.
+ * <br><br>
+ * Any entities that do not normally attack (i.e. animals) most commonly do not have attack attributes. <br><br><strong>An entity that attacks without an Attack Attribute will crash the server.</strong>
  */
 public class PathfinderMeleeAttack extends Pathfinder implements SpeedModifier, Targeting {
 
@@ -39,8 +40,9 @@ public class PathfinderMeleeAttack extends Pathfinder implements SpeedModifier, 
      * @param c Creature to use
      * @param speedMod Speed Modifier while attacking
      * @param see Whether the Creature must see the target in order to attack
+     * @throws IllegalArgumentException if interval is less than 0
      */
-    public PathfinderMeleeAttack(@NotNull Creature c, double speedMod, boolean see) {
+    public PathfinderMeleeAttack(@NotNull Creature c, double speedMod, boolean see) throws IllegalArgumentException {
         super(c);
 
         this.speedMod = speedMod;

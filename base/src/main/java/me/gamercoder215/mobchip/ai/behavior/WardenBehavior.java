@@ -1,11 +1,21 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
+import me.gamercoder215.mobchip.ai.schedule.Updatable;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents Warden Behaviors
  */
-public interface WardenBehavior extends CreatureBehavior {
+public interface WardenBehavior extends CreatureBehavior, Updatable {
+
+    /**
+     * Sets the Warden's Disturbance Location.
+     * @param loc Location of Disturbance
+     * @return Result of Behavior
+     */
+    @NotNull
+    BehaviorResult setDisturbanceLocation(@NotNull Location loc);
 
     /**
      * Makes this Warden dig into the ground.

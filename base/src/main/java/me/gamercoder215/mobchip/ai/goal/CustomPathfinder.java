@@ -36,9 +36,9 @@ public abstract class CustomPathfinder extends Pathfinder {
 
     /**
      * Whether this Custom Pathfinder can start.
-     * <p>
+     * <br><br>
      * Any assignments to fields or checks should be in here. Return true for {@link #start()} to automatically run. 
-     * <p>
+     * <br><br>
      * Example:
      * <pre>
      * // public class LavaFloat extends CustomPathfinder {
@@ -55,9 +55,9 @@ public abstract class CustomPathfinder extends Pathfinder {
 
     /**
      * Called when {@link #canStart()} returns true.
-     * <p>
+     * <br><br>
      * Any actions that this Pathfinder will call should be in here. This method will run automatically.
-     * <p>
+     * <br><br>
      * Example:
      * <pre>
      * // public class LavaFloat extends CustomPathfinder {
@@ -73,9 +73,9 @@ public abstract class CustomPathfinder extends Pathfinder {
 
     /**
      * Called when {@link #canStart()} returns false.
-     * <p>
+     * <br><br>
      * Any actions that this Pathfinder will call <strong>when it can't run</strong> should be in here. This method will run automatically.
-     * <p>
+     * <br><br>
      * Example:
      * <pre>
      * // public class LavaFloat extends CustomPathfinder {
@@ -85,6 +85,13 @@ public abstract class CustomPathfinder extends Pathfinder {
      * </pre>
      */
     public abstract void tick();
+
+    /**
+     * Called when this Pathfinder stops being used.
+     * <br><br>
+     * Any actions that this Pathfinder will call <strong>when it stops</strong> should be in here. This method will run automatically.
+     */
+    public void stop() {};
 
     /**
      * Whether this Pathfinder Goal can be interrupted. Default: true
@@ -100,6 +107,10 @@ public abstract class CustomPathfinder extends Pathfinder {
      */
     public boolean canContinueToUse() { return canStart(); }
 
+    /**
+     * @deprecated Internal Use only
+     */
+    @Deprecated
     public String getInternalName() {
         return "CustomPathfinder";
     }
