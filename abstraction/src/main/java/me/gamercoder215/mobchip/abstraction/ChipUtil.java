@@ -112,6 +112,8 @@ public interface ChipUtil {
 
     DragonPhase getCurrentPhase(EnderDragon dragon);
 
+    default void updateActivities(Creature c) {};
+
     default BehaviorResult hearNoteblock(Creature c, Location loc) {
         return new BehaviorResult() {
             @Override

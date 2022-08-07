@@ -54,6 +54,7 @@ import net.minecraft.world.entity.ai.memory.MemoryTarget;
 import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
 import net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition;
 import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
 import net.minecraft.world.entity.animal.horse.EntityHorseAbstract;
 import net.minecraft.world.entity.animal.horse.EntityLlama;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
@@ -2270,6 +2271,12 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_17_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
+    }
+
+    @Override
+    public void updateActivities(Creature c) {
+        EntityCreature nms = toNMS(c);
+        if (c instanceof Axolotl) AxolotlAi.a((net.minecraft.world.entity.animal.axolotl.Axolotl) nms);
     }
 
 }

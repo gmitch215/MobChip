@@ -56,6 +56,8 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
 import net.minecraft.world.entity.animal.allay.AllayAi;
+import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
+import net.minecraft.world.entity.animal.frog.FrogAi;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -2301,6 +2303,15 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_19_R1(dragon, toNMS(dragon).getPhaseManager().getCurrentPhase());
+    }
+
+    @Override
+    public void updateActivities(Creature c) {
+        PathfinderMob nms = toNMS(c);
+        if (c instanceof Allay) AllayAi.updateActivity((net.minecraft.world.entity.animal.allay.Allay) nms);
+        else if (c instanceof Axolotl) AxolotlAi.updateActivity((net.minecraft.world.entity.animal.axolotl.Axolotl) nms);
+        else if (c instanceof Frog) FrogAi.updateActivity((net.minecraft.world.entity.animal.frog.Frog) nms);
+        else if (c instanceof org.bukkit.entity.Warden) WardenAi.updateActivity((Warden) nms);
     }
 }
 

@@ -11,6 +11,6 @@ class BukkitUpdatableCreatureBehavior extends BukkitCreatureBehavior implements 
 
     @Override
     public void updateActivities() {
-
+        wrapper.updateActivities(m);
     }
 }
