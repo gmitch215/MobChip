@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -449,10 +450,6 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
 
     private static LivingEntity fromNMS(net.minecraft.world.entity.LivingEntity l) {
         return (LivingEntity) l.getBukkitEntity();
-    }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(mem.getKey().getKey()));
     }
 
     @Override
@@ -2313,5 +2310,26 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         else if (c instanceof Frog) FrogAi.updateActivity((net.minecraft.world.entity.animal.frog.Frog) nms);
         else if (c instanceof org.bukkit.entity.Warden) WardenAi.updateActivity((Warden) nms);
     }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return Registry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new ResourceLocation(mem.getKey().getKey()) : new ResourceLocation(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, false);
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        WritableRegistry<MemoryModuleType<?>> writable = (WritableRegistry<MemoryModuleType<?>>) server.registryAccess().ownedRegistryOrThrow(Registry.MEMORY_MODULE_TYPE_REGISTRY);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.create(Registry.MEMORY_MODULE_TYPE_REGISTRY, toNMS(m.getKey()));
+        writable.register(nmsKey, toNMS(m), Lifecycle.stable());
+        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, true);
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return Registry.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
+    }
+
 }
 

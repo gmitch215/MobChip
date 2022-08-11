@@ -1980,4 +1980,15 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_13_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        // doesn't exist
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        // doesn't exist
+        return false;
+    }
 }

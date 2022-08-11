@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -399,10 +400,6 @@ public class ChipUtil1_16_R2 implements ChipUtil {
 
     private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
-    }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(mem.getKey().getKey()));
     }
 
     @Override
@@ -2070,17 +2067,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
 
     @Override
     public boolean existsAttribute(NamespacedKey key) {
-        try {
-            DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-            RegistryMaterials<AttributeBase> registry = (RegistryMaterials<AttributeBase>) server.aX().b(IRegistry.y);
-
-            Field res = RegistryMaterials.class.getDeclaredField("bh");
-            res.setAccessible(true);
-            Map<MinecraftKey, AttributeBase> map = (Map<MinecraftKey, AttributeBase>) res.get(registry);
-            return map.containsKey(toNMS(key));
-        } catch (Exception e) {
-            return false;
-        }
+        return IRegistry.ATTRIBUTE.getOptional(toNMS(key)).isPresent();
     }
 
     private static MinecraftKey toNMS(NamespacedKey key) {
@@ -2400,6 +2387,24 @@ public class ChipUtil1_16_R2 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_16_R2(dragon, toNMS(dragon).getDragonControllerManager().a());
+    }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return IRegistry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<MemoryModuleType<?>> writable = server.aX().b(IRegistry.D);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.a(IRegistry.D, toNMS(m.getKey()));
+        writable.a(nmsKey, toNMS(m), Lifecycle.stable());
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
     }
 
 }

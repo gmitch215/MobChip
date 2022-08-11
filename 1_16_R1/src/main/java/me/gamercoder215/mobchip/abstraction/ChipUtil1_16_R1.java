@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -438,11 +439,6 @@ public class ChipUtil1_16_R1 implements ChipUtil {
     private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
     }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(mem.getKey().getKey()));
-    }
-
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, Object... args) {
         return runBehavior(m, behaviorName, Behavior.class.getPackage().getName(), args);
@@ -2072,19 +2068,7 @@ public class ChipUtil1_16_R1 implements ChipUtil {
 
     @Override
     public boolean existsAttribute(NamespacedKey key) {
-        try {
-            DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-
-            if (!server.f.a(IRegistry.R).isPresent()) return false;
-            RegistryMaterials<AttributeBase> registry = (RegistryMaterials<AttributeBase>) server.f.a(IRegistry.R).get();
-
-            Field res = RegistryMaterials.class.getDeclaredField("c");
-            res.setAccessible(true);
-            Map<MinecraftKey, AttributeBase> map = (Map<MinecraftKey, AttributeBase>) res.get(registry);
-            return map.containsKey(toNMS(key));
-        } catch (Exception e) {
-            return false;
-        }
+        return IRegistry.ATTRIBUTE.getOptional(toNMS(key)).isPresent();
     }
 
     private static MinecraftKey toNMS(NamespacedKey key) {
@@ -2405,7 +2389,25 @@ public class ChipUtil1_16_R1 implements ChipUtil {
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_16_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
-    
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return IRegistry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        if (!server.f.a(IRegistry.W).isPresent()) return;
+        IRegistryWritable<MemoryModuleType<?>> writable = server.f.a(IRegistry.W).get();
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.a(IRegistry.W, toNMS(m.getKey()));
+        writable.a(nmsKey, toNMS(m));
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
+    }
     
     
 }

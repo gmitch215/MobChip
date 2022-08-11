@@ -1985,4 +1985,15 @@ public class ChipUtil1_13_R2 implements ChipUtil {
         return new DragonPhase1_13_R2(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
 
+    @Override
+    public void registerMemory(Memory<?> m) {
+        // doesn't exist
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        // doesn't exist
+        return false;
+    }
+
 }

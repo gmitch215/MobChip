@@ -112,6 +112,10 @@ public interface ChipUtil {
 
     DragonPhase getCurrentPhase(EnderDragon dragon);
 
+    void registerMemory(Memory<?> m);
+
+    boolean existsMemory(Memory<?> m);
+
     default void updateActivities(Creature c) {};
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {

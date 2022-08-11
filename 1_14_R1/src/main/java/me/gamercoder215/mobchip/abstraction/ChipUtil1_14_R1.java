@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -28,6 +29,7 @@ import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.World;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.attribute.CraftAttributeInstance;
@@ -401,11 +403,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
     }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(mem.getKey().getKey()));
-    }
-
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, Object... args) {
         return runBehavior(m, behaviorName, Behavior.class.getPackage().getName(), args);
@@ -2380,5 +2377,22 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_14_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
+    }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return IRegistry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<MemoryModuleType<?>> writable = IRegistry.MEMORY_MODULE_TYPE;
+        writable.a(toNMS(m.getKey()), toNMS(m));
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
     }
 }
