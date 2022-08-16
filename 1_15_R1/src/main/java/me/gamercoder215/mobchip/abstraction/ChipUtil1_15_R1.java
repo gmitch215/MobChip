@@ -2474,6 +2474,13 @@ public class ChipUtil1_15_R1 implements ChipUtil {
                 vector.setDouble("z", vec.getZ());
                 return vector;
             }
+            case "color": {
+                Color color = (Color) v;
+                NBTTagCompound clr = new NBTTagCompound();
+                clr.setString(CLASS_TAG, color.getClass().getName());
+                clr.setInt("rgb", color.asRGB());
+                return clr;
+            }
             default: return NBTTagString.a(v.toString());
         }
     }
@@ -2563,6 +2570,10 @@ public class ChipUtil1_15_R1 implements ChipUtil {
                             double z = cmp.getDouble("z");
                             return new Vector(x, y, z);
                         }
+                        case "color": {
+                            int rgb = cmp.getInt("rgb");
+                            return Color.fromRGB(rgb);
+                        }
                     }
                 } catch (ClassNotFoundException e) {
                     throw new AssertionError("Unknown Class: " + className);
@@ -2591,19 +2602,28 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         private final NBTTagCompound tag;
         private final Runnable saveFunc;
 
-        NBTSection1_15_R1(NBTTagCompound tag, Runnable saveFunc) {
+        private final String currentPath;
+
+        NBTSection1_15_R1(NBTTagCompound tag, Runnable saveFunc, String path) {
             this.tag = tag;
             this.saveFunc = saveFunc;
+            this.currentPath = path;
         }
 
         NBTSection1_15_R1(Mob m) {
             this.tag = new NBTTagCompound();
+            this.currentPath = "";
             toNMS(m).save(tag);
             this.saveFunc = () -> toNMS(m).f(tag);
         }
 
         private void save() {
             saveFunc.run();
+        }
+
+        @Override
+        public @NotNull String getCurrentPath() {
+            return currentPath;
         }
 
         @Override
@@ -2622,9 +2642,16 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public void set(@Nullable String key, @Nullable Object value) {
             if (key == null) return;
+            if (key.equals(CLASS_TAG)) return;
+
             if (value == null) tag.remove(key);
             else tag.set(key, serialize(value));
             save();
+        }
+
+        @Override
+        public boolean isSet(@Nullable String key) {
+            return false;
         }
 
         @Override
@@ -2654,6 +2681,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isDouble(@Nullable String key) {
+            return contains(key) && (get(key) instanceof Double || isInt(key));
+        }
+
+        @Override
         public int getInteger(@Nullable String key) {
             return get(key);
         }
@@ -2661,6 +2693,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public int getInteger(@Nullable String key, int def) {
             return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isInt(@Nullable String key) {
+            return contains(key) && get(key) instanceof Integer;
         }
 
         @Override
@@ -2674,6 +2711,56 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isBoolean(@Nullable String key) {
+            return contains(key) && get(key) instanceof Boolean;
+        }
+
+        @Override
+        public float getFloat(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public float getFloat(@Nullable String key, float def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isFloat(@Nullable String key) {
+            return contains(key) && (get(key) instanceof Float || isInt(key));
+        }
+
+        @Override
+        public long getLong(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public long getLong(@Nullable String key, long def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isLong(@Nullable String key) {
+            return contains(key) && get(key) instanceof Long;
+        }
+
+        @Override
+        public byte getByte(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public byte getByte(@Nullable String key, byte def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isByte(@Nullable String key) {
+            return contains(key) && get(key) instanceof Byte;
+        }
+
+        @Override
         public @Nullable String getString(@Nullable String key) {
             return contains(key) ? null : get(key);
         }
@@ -2681,6 +2768,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public @Nullable String getString(@Nullable String key, @Nullable String def) {
             return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isString(@Nullable String key) {
+            return contains(key) && get(key) instanceof String;
         }
 
         @Override
@@ -2694,6 +2786,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isNamespacedKey(@Nullable String key) {
+            return contains(key) && get(key) instanceof NamespacedKey;
+        }
+
+        @Override
         public @Nullable UUID getUUID(@Nullable String key) {
             return get(key);
         }
@@ -2701,6 +2798,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public @Nullable UUID getUUID(@Nullable String key, @Nullable UUID def) {
             return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isUUID(@Nullable String key) {
+            return contains(key) && get(key) instanceof UUID;
         }
 
         @Override
@@ -2714,6 +2816,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isOfflinePlayer(@Nullable String key) {
+            return contains(key) && get(key) instanceof OfflinePlayer;
+        }
+
+        @Override
         public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass) {
             return enumClass.cast(get(key));
         }
@@ -2721,6 +2828,16 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass, @Nullable T def) {
             return contains(key) ? def : enumClass.cast(get(key));
+        }
+
+        @Override
+        public boolean isEnum(@Nullable String key) {
+            return contains(key) && get(key) instanceof Enum;
+        }
+
+        @Override
+        public <T extends Enum<T>> boolean isEnum(@Nullable String key, Class<T> enumClass) throws IllegalArgumentException {
+            return contains(key) && get(key) instanceof Enum && enumClass.isAssignableFrom(get(key).getClass());
         }
 
         @Override
@@ -2734,6 +2851,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isLocation(@Nullable String key) {
+            return contains(key) && get(key) instanceof Location;
+        }
+
+        @Override
         public @Nullable Vector getVector(@Nullable String key) {
             return get(key);
         }
@@ -2741,6 +2863,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public @Nullable Vector getVector(@Nullable String key, @Nullable Vector def) {
             return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isVector(@Nullable String key) {
+            return contains(key) && get(key) instanceof Vector;
         }
 
         @Override
@@ -2754,6 +2881,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isItemStack(@Nullable String key) {
+            return contains(key) && get(key) instanceof ItemStack;
+        }
+
+        @Override
         public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz) {
             return clazz.cast(get(key));
         }
@@ -2764,13 +2896,45 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public @Nullable Color getColor(@Nullable String path) {
+            return get(path);
+        }
+
+        @Override
+        public @Nullable Color getColor(@Nullable String path, @Nullable Color def) {
+            return contains(path) ? def : get(path);
+        }
+
+        @Override
+        public boolean isColor(@Nullable String path) {
+            return contains(path) && get(path) instanceof Color;
+        }
+
+        @Override
         public @Nullable NBTSection getSection(@Nullable String key) {
-            return tag.get(key) == null ? null : new NBTSection1_15_R1(tag.getCompound(key), this::save);
+            return tag.get(key) == null ? null : new NBTSection1_15_R1(tag.getCompound(key), this::save, currentPath + "." + key);
         }
 
         @Override
         public @Nullable NBTSection getSection(@Nullable String key, @Nullable NBTSection def) {
-            return tag.get(key) == null ? def : new NBTSection1_15_R1(tag.getCompound(key), this::save);
+            return tag.get(key) == null ? def : new NBTSection1_15_R1(tag.getCompound(key), this::save, currentPath + "." + key);
+        }
+
+        @Override
+        public @NotNull NBTSection getOrCreateSection(@NotNull String key) throws IllegalArgumentException {
+            return getSection(key, new NBTSection1_15_R1(new NBTTagCompound(), this::save, currentPath + "." + key));
+        }
+
+        @Override
+        public @NotNull NBTSection getOrCreateSection(@NotNull String key, Map<String, Object> map) throws IllegalArgumentException {
+            NBTSection sec = getOrCreateSection(key);
+            map.forEach(sec::set);
+            return sec;
+        }
+
+        @Override
+        public boolean isSection(@Nullable String key) {
+            return isSet(key) && tag.get(key) instanceof NBTTagCompound && tag.getCompound(key).getString(CLASS_TAG).isEmpty();
         }
 
         @Override
@@ -2784,6 +2948,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         @Override
+        public boolean isList(@Nullable String key) {
+            return contains(key) && get(key) instanceof List;
+        }
+
+        @Override
         public @NotNull Map<String, Object> getMap(@Nullable String key) {
             return get(key);
         }
@@ -2791,6 +2960,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         @Override
         public @Nullable Map<String, Object> getMap(@Nullable String key, @Nullable Map<String, Object> def) {
             return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean isMap(@Nullable String key) {
+            return contains(key) && get(key) instanceof Map<?, ?>;
         }
 
     }
