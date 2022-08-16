@@ -13,6 +13,7 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -148,6 +149,11 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public @NotNull EntityCombatTracker getCombatTracker() {
 		return w.getCombatTracker(m);
+	}
+
+	@Override
+	public @NotNull EntityNBT getNBTEditor() {
+		return w.getNBTEditor(m);
 	}
 
 	/**

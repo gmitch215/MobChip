@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -31,6 +32,8 @@ import java.util.Set;
  * Represents an Abstract Wrapper
  */
 public interface ChipUtil {
+
+    String CLASS_TAG = "==";
 
     void addCustomPathfinder(CustomPathfinder p, int priority, boolean target);
 
@@ -115,6 +118,8 @@ public interface ChipUtil {
     void registerMemory(Memory<?> m);
 
     boolean existsMemory(Memory<?> m);
+
+    EntityNBT getNBTEditor(Mob m);
 
     default void updateActivities(Creature c) {};
 

@@ -24,10 +24,13 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
+import me.gamercoder215.mobchip.nbt.NBTSection;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.World;
 import org.bukkit.*;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_15_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -46,10 +49,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -2358,6 +2358,467 @@ public class ChipUtil1_15_R1 implements ChipUtil {
     public boolean existsMemory(Memory<?> m) {
         if (m instanceof EntityMemory<?>) return true;
         return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
+    }
+
+    private static NBTBase serialize(Object v) {
+        if (v.getClass().isArray()) {
+            NBTTagList tag = new NBTTagList();
+            for (int i = 0; i < Array.getLength(v); i++) tag.add(i, serialize(Array.get(v, i)));
+            return tag;
+        }
+
+        if (v instanceof Collection<?>) {
+            List<?> collection = new ArrayList<>((Collection<?>) v);
+            NBTTagCompound coll = new NBTTagCompound();
+
+            try {
+                coll.setString(CLASS_TAG, Collection.class.getName());
+                NBTTagList tag = new NBTTagList();
+                for (int i = 0; i < collection.size(); i++) tag.add(i, serialize(collection.get(i)));
+                coll.set("values", tag);
+
+                Field idF = NBTTagList.class.getDeclaredField("w");
+                idF.setAccessible(true);
+
+                coll.setByte("id", idF.getByte(tag));
+            } catch (ReflectiveOperationException e) {
+                Bukkit.getLogger().severe("Failed to serialize collection: " + e.getMessage());
+                for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+            }
+
+            return coll;
+        }
+
+        if (v instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) v;
+            NBTTagCompound tag = new NBTTagCompound();
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
+                tag.set(entry.getKey().toString(), serialize(entry.getValue()));
+            }
+            return tag;
+        }
+
+        if (v instanceof Enum<?>) {
+            Enum<?> enumeration = (Enum<?>) v;
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setString(CLASS_TAG, enumeration.getClass().getName());
+            tag.setString("value", ((Enum<?>) v).name());
+            return tag;
+        }
+
+        if (v instanceof ConfigurationSerializable) {
+            ConfigurationSerializable serializable = (ConfigurationSerializable) v;
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setString(CLASS_TAG, serializable.getClass().getName());
+            tag.set("value", serialize(serializable.serialize()));
+            return tag;
+        }
+
+        switch (v.getClass().getSimpleName().toLowerCase()) {
+            case "short": return NBTTagShort.a((short) v);
+            case "float": return NBTTagFloat.a((float) v);
+            case "long": return NBTTagLong.a((long) v);
+            case "byte": return NBTTagByte.a((byte) v);
+            case "integer": case "int": return NBTTagInt.a((int) v);
+            case "double": return NBTTagDouble.a((double) v);
+            case "uuid": {
+                UUID uid = (UUID) v;
+                NBTTagCompound uuid = new NBTTagCompound();
+                uuid.setString(CLASS_TAG, uid.getClass().getName());
+                uuid.setLong("least", uid.getLeastSignificantBits());
+                uuid.setLong("most", uid.getMostSignificantBits());
+                return uuid;
+            }
+            case "namespacedkey": {
+                NamespacedKey key = (NamespacedKey) v;
+                NBTTagCompound nmsKey = new NBTTagCompound();
+                nmsKey.setString(CLASS_TAG, key.getClass().getName());
+                nmsKey.setString("namespace", key.getNamespace());
+                nmsKey.setString("key", key.getKey());
+                return nmsKey;
+            }
+            case "itemstack": {
+                ItemStack item = (ItemStack) v;
+                NBTTagCompound stack = new NBTTagCompound();
+                stack.setString(CLASS_TAG, item.getClass().getName());
+                stack.set("item", CraftItemStack.asNMSCopy(item).getOrCreateTag());
+
+                return stack;
+            }
+            case "offlineplayer": {
+                OfflinePlayer p = (OfflinePlayer) v;
+                NBTTagCompound player = new NBTTagCompound();
+                player.setString(CLASS_TAG, p.getClass().getName());
+                player.setString("id", p.getUniqueId().toString());
+
+                return player;
+            }
+            case "location": {
+                Location l = (Location) v;
+                NBTTagCompound loc = new NBTTagCompound();
+                loc.setString(CLASS_TAG, l.getClass().getName());
+                loc.setDouble("x", l.getX());
+                loc.setDouble("y", l.getY());
+                loc.setDouble("z", l.getZ());
+                loc.setFloat("yaw", l.getYaw());
+                loc.setFloat("pitch", l.getPitch());
+                loc.setString("world", l.getWorld().getName());
+                return loc;
+            }
+            case "vector": {
+                Vector vec = (Vector) v;
+                NBTTagCompound vector = new NBTTagCompound();
+                vector.setString(CLASS_TAG, vec.getClass().getName());
+                vector.setDouble("x", vec.getX());
+                vector.setDouble("y", vec.getY());
+                vector.setDouble("z", vec.getZ());
+                return vector;
+            }
+            default: return NBTTagString.a(v.toString());
+        }
+    }
+
+    private static Object deserialize(NBTBase v) {
+        if (v instanceof NBTTagList) {
+            NBTTagList list = (NBTTagList) v;
+            List<Object> l = new ArrayList<>();
+            list.stream().map(ChipUtil1_15_R1::deserialize).forEach(l::add);
+            return l.toArray();
+        }
+
+        if (v instanceof NBTTagCompound) {
+            NBTTagCompound cmp = (NBTTagCompound) v;
+            boolean isClass = cmp.get(CLASS_TAG) != null && cmp.get(CLASS_TAG) instanceof NBTTagString && !cmp.getString(CLASS_TAG).isEmpty();
+
+            if (isClass) {
+                String className = cmp.getString(CLASS_TAG);
+                try {
+                    Class<?> clazz = Class.forName(className);
+
+                    if (clazz.isEnum()) return Enum.valueOf(clazz.asSubclass(Enum.class), cmp.getString("value"));
+
+                    if (ConfigurationSerializable.class.isAssignableFrom(clazz)) {
+                        try {
+                            Method deserialize = clazz.getDeclaredMethod("deserialize", Map.class);
+                            deserialize.setAccessible(true);
+                            return clazz.cast(deserialize.invoke(null, deserialize(cmp.getCompound("value"))));
+                        } catch (NoSuchMethodException e) {
+                            Bukkit.getLogger().severe("Class does not have deserialize method: " + className);
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        } catch (InvocationTargetException e) {
+                            Bukkit.getLogger().severe("Failed to deserialize class: " + className);
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        } catch (ReflectiveOperationException e) {
+                            Bukkit.getLogger().severe(e.getMessage());
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        }
+                    }
+
+                    switch (clazz.getSimpleName()) {
+                        case "map": {
+                            Map<String, Object> map = new HashMap<>();
+                            for (String key : cmp.getKeys()) map.put(key, deserialize(cmp.get(key)));
+                            return map;
+                        }
+                        case "collection": {
+                            int id = cmp.getInt("id");
+                            NBTTagList list = cmp.getList("values", id);
+
+                            List<? super Object> l = new ArrayList<>();
+                            list.stream().map(ChipUtil1_15_R1::deserialize).forEach(l::add);
+                            return new ArrayList<>(l);
+                        }
+                        case "uuid": {
+                            long most = cmp.getLong("most");
+                            long least = cmp.getLong("least");
+                            return new UUID(most, least);
+                        }
+                        case "offlineplayer": {
+                            UUID uid = UUID.fromString(cmp.getString("id"));
+                            return Bukkit.getOfflinePlayer(uid);
+                        }
+                        case "namespacedkey": {
+                            String namespace = cmp.getString("namespace");
+                            String key = cmp.getString("key");
+                            return new NamespacedKey(namespace, key);
+                        }
+                        case "itemstack": {
+                            NBTTagCompound item = cmp.getCompound("item");
+                            return CraftItemStack.asBukkitCopy(net.minecraft.server.v1_15_R1.ItemStack.a(item));
+                        }
+                        case "location": {
+                            String world = cmp.getString("world");
+                            World w = Bukkit.getWorld(world);
+                            if (w == null) throw new IllegalArgumentException("World not found: " + world);
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            float yaw = cmp.getFloat("yaw");
+                            float pitch = cmp.getFloat("pitch");
+                            return new Location(w, x, y, z, yaw, pitch);
+                        }
+                        case "vector": {
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            return new Vector(x, y, z);
+                        }
+                    }
+                } catch (ClassNotFoundException e) {
+                    throw new AssertionError("Unknown Class: " + className);
+                }
+            } else {
+                Map<String, Object> map = new HashMap<>();
+                for (String key : cmp.getKeys()) map.put(key, deserialize(cmp.get(key)));
+                return map;
+            }
+        }
+
+        switch (v.getTypeId()) {
+            case 1: return ((NBTTagByte) v).asByte();
+            case 2: return ((NBTTagShort) v).asShort();
+            case 3: return ((NBTTagInt) v).asInt();
+            case 4: return ((NBTTagLong) v).asLong();
+            case 5: return ((NBTTagFloat) v).asFloat();
+            case 6: return ((NBTTagDouble) v).asDouble();
+            case 7: return ((NBTTagByteArray) v).getBytes();
+            default: return v.asString();
+        }
+    }
+
+    private static class NBTSection1_15_R1 implements NBTSection {
+
+        private final NBTTagCompound tag;
+        private final Runnable saveFunc;
+
+        NBTSection1_15_R1(NBTTagCompound tag, Runnable saveFunc) {
+            this.tag = tag;
+            this.saveFunc = saveFunc;
+        }
+
+        NBTSection1_15_R1(Mob m) {
+            this.tag = new NBTTagCompound();
+            toNMS(m).save(tag);
+            this.saveFunc = () -> toNMS(m).f(tag);
+        }
+
+        private void save() {
+            saveFunc.run();
+        }
+
+        @Override
+        public @NotNull Map<String, Object> getValues(boolean deep) {
+            Map<String, Object> map = tag.getKeys().stream().filter(k -> !(tag.get(k) instanceof NBTTagCompound)).collect(Collectors.toMap(Function.identity(), k -> deserialize(tag.get(k))));
+            if (!deep) return map;
+
+            tag.getKeys().stream().filter(k -> (tag.get(k) instanceof NBTTagCompound)).forEach(s -> {
+                NBTSection sec = getSection(s);
+                sec.getValues(true).forEach((k, v) -> map.put(s + "." + k, v));
+            });
+
+            return map;
+        }
+
+        @Override
+        public void set(@Nullable String key, @Nullable Object value) {
+            if (key == null) return;
+            if (value == null) tag.remove(key);
+            else tag.set(key, serialize(value));
+            save();
+        }
+
+        @Override
+        public void remove(@Nullable String key) {
+            tag.remove(key);
+            save();
+        }
+
+        private <T> T get(String key) {
+            if (key == null) return null;
+            return (T) getValues(true).getOrDefault(key, null);
+        }
+
+        private boolean contains(String key) {
+            if (key == null) return false;
+            return getKeys(true).contains(key);
+        }
+
+        @Override
+        public double getDouble(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public double getDouble(@Nullable String key, double def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public int getInteger(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public int getInteger(@Nullable String key, int def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean getBoolean(@Nullable String key) {
+            return tag.getBoolean(key);
+        }
+
+        @Override
+        public boolean getBoolean(@Nullable String key, boolean def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable String getString(@Nullable String key) {
+            return contains(key) ? null : get(key);
+        }
+
+        @Override
+        public @Nullable String getString(@Nullable String key, @Nullable String def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key, @Nullable NamespacedKey def) {
+            return tag.get(key) == null ? def : get(key);
+        }
+
+        @Override
+        public @Nullable UUID getUUID(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable UUID getUUID(@Nullable String key, @Nullable UUID def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key, @Nullable OfflinePlayer def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass) {
+            return enumClass.cast(get(key));
+        }
+
+        @Override
+        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass, @Nullable T def) {
+            return contains(key) ? def : enumClass.cast(get(key));
+        }
+
+        @Override
+        public @Nullable Location getLocation(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Location getLocation(@Nullable String key, @Nullable Location def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable Vector getVector(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Vector getVector(@Nullable String key, @Nullable Vector def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable ItemStack getItemStack(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable ItemStack getItemStack(@Nullable String key, @Nullable ItemStack def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz) {
+            return clazz.cast(get(key));
+        }
+
+        @Override
+        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz, @Nullable T def) {
+            return contains(key) ? def : clazz.cast(get(key));
+        }
+
+        @Override
+        public @Nullable NBTSection getSection(@Nullable String key) {
+            return tag.get(key) == null ? null : new NBTSection1_15_R1(tag.getCompound(key), this::save);
+        }
+
+        @Override
+        public @Nullable NBTSection getSection(@Nullable String key, @Nullable NBTSection def) {
+            return tag.get(key) == null ? def : new NBTSection1_15_R1(tag.getCompound(key), this::save);
+        }
+
+        @Override
+        public @NotNull List<?> getList(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable List<?> getList(@Nullable String key, @Nullable List<?> def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @NotNull Map<String, Object> getMap(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Map<String, Object> getMap(@Nullable String key, @Nullable Map<String, Object> def) {
+            return contains(key) ? def : get(key);
+        }
+
+    }
+
+    private static final class EntityNBT1_15_R1 extends NBTSection1_15_R1 implements EntityNBT {
+
+        private final Mob mob;
+        private final EntityInsentient handle;
+
+        private final NBTTagCompound root;
+
+        EntityNBT1_15_R1(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new NBTTagCompound();
+            handle.d(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_15_R1(m);
     }
 
 }

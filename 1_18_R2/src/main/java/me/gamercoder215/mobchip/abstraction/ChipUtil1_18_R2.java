@@ -25,9 +25,13 @@ import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
+import me.gamercoder215.mobchip.nbt.NBTSection;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.Registry;
 import net.minecraft.core.*;
+import net.minecraft.nbt.*;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -72,6 +76,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftSound;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
@@ -88,10 +93,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -2300,5 +2302,462 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
     public boolean existsMemory(Memory<?> m) {
         if (m instanceof EntityMemory<?>) return true;
         return Registry.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
+    }
+
+    private static net.minecraft.nbt.Tag serialize(Object v) {
+        if (v.getClass().isArray()) {
+            ListTag tag = new ListTag();
+            for (int i = 0; i < Array.getLength(v); i++) tag.add(i, serialize(Array.get(v, i)));
+            return tag;
+        }
+
+        if (v instanceof Collection<?>) {
+            List<?> collection = new ArrayList<>((Collection<?>) v);
+            CompoundTag coll = new CompoundTag();
+
+            try {
+                coll.putString(CLASS_TAG, Collection.class.getName());
+                ListTag tag = new ListTag();
+                for (int i = 0; i < collection.size(); i++) tag.add(i, serialize(collection.get(i)));
+                coll.put("values", tag);
+
+                Field idF = ListTag.class.getDeclaredField("w");
+                idF.setAccessible(true);
+
+                coll.putByte("id", idF.getByte(tag));
+            } catch (ReflectiveOperationException e) {
+                Bukkit.getLogger().severe("Failed to serialize collection: " + e.getMessage());
+                for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+            }
+
+            return coll;
+        }
+
+        if (v instanceof Map<?, ?> map) {
+            CompoundTag tag = new CompoundTag();
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
+                tag.put(entry.getKey().toString(), serialize(entry.getValue()));
+            }
+            return tag;
+        }
+
+        if (v instanceof Enum<?> enumeration) {
+            CompoundTag tag = new CompoundTag();
+            tag.putString(CLASS_TAG, enumeration.getClass().getName());
+            tag.putString("value", ((Enum<?>) v).name());
+            return tag;
+        }
+
+        if (v instanceof ConfigurationSerializable serializable) {
+            CompoundTag tag = new CompoundTag();
+            tag.putString(CLASS_TAG, serializable.getClass().getName());
+            tag.put("value", serialize(serializable.serialize()));
+            return tag;
+        }
+
+        return switch (v.getClass().getSimpleName().toLowerCase()) {
+            case "short" -> ShortTag.valueOf((short) v);
+            case "float" -> FloatTag.valueOf((float) v);
+            case "long" -> LongTag.valueOf((long) v);
+            case "byte" -> ByteTag.valueOf((byte) v);
+            case "integer", "int" -> IntTag.valueOf((int) v);
+            case "double" -> DoubleTag.valueOf((double) v);
+            case "uuid" -> {
+                UUID uid = (UUID) v;
+                CompoundTag uuid = new CompoundTag();
+                uuid.putString(CLASS_TAG, uid.getClass().getName());
+                uuid.putLong("least", uid.getLeastSignificantBits());
+                uuid.putLong("most", uid.getMostSignificantBits());
+                yield uuid;
+            }
+            case "namespacedkey" -> {
+                NamespacedKey key = (NamespacedKey) v;
+                CompoundTag nmsKey = new CompoundTag();
+                nmsKey.putString(CLASS_TAG, key.getClass().getName());
+                nmsKey.putString("namespace", key.getNamespace());
+                nmsKey.putString("key", key.getKey());
+                yield nmsKey;
+            }
+            case "itemstack" -> {
+                ItemStack item = (ItemStack) v;
+                CompoundTag stack = new CompoundTag();
+                stack.putString(CLASS_TAG, item.getClass().getName());
+                stack.put("item", CraftItemStack.asNMSCopy(item).getOrCreateTag());
+
+                yield stack;
+            }
+            case "offlineplayer" -> {
+                OfflinePlayer p = (OfflinePlayer) v;
+                CompoundTag player = new CompoundTag();
+                player.putString(CLASS_TAG, p.getClass().getName());
+                player.putString("id", p.getUniqueId().toString());
+
+                yield player;
+            }
+            case "location" -> {
+                Location l = (Location) v;
+                CompoundTag loc = new CompoundTag();
+                loc.putString(CLASS_TAG, l.getClass().getName());
+                loc.putDouble("x", l.getX());
+                loc.putDouble("y", l.getY());
+                loc.putDouble("z", l.getZ());
+                loc.putFloat("yaw", l.getYaw());
+                loc.putFloat("pitch", l.getPitch());
+                loc.putString("world", l.getWorld().getName());
+                yield loc;
+            }
+            case "vector" -> {
+                Vector vec = (Vector) v;
+                CompoundTag vector = new CompoundTag();
+                vector.putString(CLASS_TAG, vec.getClass().getName());
+                vector.putDouble("x", vec.getX());
+                vector.putDouble("y", vec.getY());
+                vector.putDouble("z", vec.getZ());
+                yield vector;
+            }
+            default -> StringTag.valueOf(v.toString());
+        };
+    }
+
+    private static Object deserialize(Tag v) {
+        if (v instanceof ListTag list) {
+            List<Object> l = new ArrayList<>();
+            list.stream().map(ChipUtil1_18_R2::deserialize).forEach(l::add);
+            return l.toArray();
+        }
+
+        if (v instanceof CompoundTag cmp) {
+            boolean isClass = cmp.get(CLASS_TAG) != null && cmp.get(CLASS_TAG) instanceof StringTag && !cmp.getString(CLASS_TAG).isEmpty();
+
+            if (isClass) {
+                String className = cmp.getString(CLASS_TAG);
+                try {
+                    Class<?> clazz = Class.forName(className);
+
+                    if (clazz.isEnum()) return Enum.valueOf(clazz.asSubclass(Enum.class), cmp.getString("value"));
+
+                    if (ConfigurationSerializable.class.isAssignableFrom(clazz)) {
+                        try {
+                            Method deserialize = clazz.getDeclaredMethod("deserialize", Map.class);
+                            deserialize.setAccessible(true);
+                            return clazz.cast(deserialize.invoke(null, deserialize(cmp.getCompound("value"))));
+                        } catch (NoSuchMethodException e) {
+                            Bukkit.getLogger().severe("Class does not have deserialize method: " + className);
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        } catch (InvocationTargetException e) {
+                            Bukkit.getLogger().severe("Failed to deserialize class: " + className);
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        } catch (ReflectiveOperationException e) {
+                            Bukkit.getLogger().severe(e.getMessage());
+                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                        }
+                    }
+
+                    return switch (clazz.getSimpleName()) {
+                        case "map" -> {
+                            Map<String, Object> map = new HashMap<>();
+                            for (String key : cmp.getAllKeys()) map.put(key, deserialize(cmp.get(key)));
+                            yield map;
+                        }
+                        case "collection" -> {
+                            int id = cmp.getInt("id");
+                            ListTag list = cmp.getList("values", id);
+
+                            List<? super Object> l = new ArrayList<>();
+                            list.stream().map(ChipUtil1_18_R2::deserialize).forEach(l::add);
+                            yield new ArrayList<>(l);
+                        }
+                        case "uuid" -> {
+                            long most = cmp.getLong("most");
+                            long least = cmp.getLong("least");
+                            yield new UUID(most, least);
+                        }
+                        case "offlineplayer" -> {
+                            UUID uid = UUID.fromString(cmp.getString("id"));
+                            yield Bukkit.getOfflinePlayer(uid);
+                        }
+                        case "namespacedkey" -> {
+                            String namespace = cmp.getString("namespace");
+                            String key = cmp.getString("key");
+                            yield new NamespacedKey(namespace, key);
+                        }
+                        case "itemstack" -> {
+                            CompoundTag item = cmp.getCompound("item");
+                            yield CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.of(item));
+                        }
+                        case "location" -> {
+                            String world = cmp.getString("world");
+                            World w = Bukkit.getWorld(world);
+                            if (w == null) throw new IllegalArgumentException("World not found: " + world);
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            float yaw = cmp.getFloat("yaw");
+                            float pitch = cmp.getFloat("pitch");
+                            yield new Location(w, x, y, z, yaw, pitch);
+                        }
+                        case "vector" -> {
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            yield new Vector(x, y, z);
+                        }
+                        default -> throw new AssertionError("Unknown Class: " + clazz.getSimpleName());
+                    };
+                } catch (ClassNotFoundException e) {
+                    throw new AssertionError("Unknown Class: " + className);
+                }
+            } else {
+                Map<String, Object> map = new HashMap<>();
+                for (String key : cmp.getAllKeys()) map.put(key, deserialize(cmp.get(key)));
+                return map;
+            }
+        }
+
+        return switch (v.getId()) {
+            case 1 -> ((ByteTag) v).getAsByte();
+            case 2 -> ((ShortTag) v).getAsShort();
+            case 3 -> ((IntTag) v).getAsInt();
+            case 4 -> ((LongTag) v).getAsLong();
+            case 5 -> ((FloatTag) v).getAsFloat();
+            case 6 -> ((DoubleTag) v).getAsDouble();
+            case 7 -> ((ByteArrayTag) v).getAsByteArray();
+            default -> v.getAsString();
+        };
+    }
+
+    private static class NBTSection1_18_R2 implements NBTSection {
+
+        private final CompoundTag tag;
+        private final Runnable saveFunc;
+
+        NBTSection1_18_R2(CompoundTag tag, Runnable saveFunc) {
+            this.tag = tag;
+            this.saveFunc = saveFunc;
+        }
+
+        NBTSection1_18_R2(Mob m) {
+            this.tag = new CompoundTag();
+            toNMS(m).saveWithoutId(tag);
+            this.saveFunc = () -> toNMS(m).load(tag);
+        }
+
+        private void save() {
+            saveFunc.run();
+        }
+
+        @Override
+        public @NotNull Map<String, Object> getValues(boolean deep) {
+            Map<String, Object> map = tag.getAllKeys().stream().filter(k -> !(tag.get(k) instanceof CompoundTag)).collect(Collectors.toMap(Function.identity(), k -> deserialize(tag.get(k))));
+            if (!deep) return map;
+
+            tag.getAllKeys().stream().filter(k -> (tag.get(k) instanceof CompoundTag)).forEach(s -> {
+                NBTSection sec = getSection(s);
+                sec.getValues(true).forEach((k, v) -> map.put(s + "." + k, v));
+            });
+
+            return map;
+        }
+
+        @Override
+        public void set(@Nullable String key, @Nullable Object value) {
+            if (key == null) return;
+            if (value == null) tag.remove(key);
+            else tag.put(key, serialize(value));
+            save();
+        }
+
+        @Override
+        public void remove(@Nullable String key) {
+            tag.remove(key);
+            save();
+        }
+
+        private <T> T get(String key) {
+            if (key == null) return null;
+            return (T) getValues(true).getOrDefault(key, null);
+        }
+
+        private boolean contains(String key) {
+            if (key == null) return false;
+            return getKeys(true).contains(key);
+        }
+
+        @Override
+        public double getDouble(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public double getDouble(@Nullable String key, double def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public int getInteger(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public int getInteger(@Nullable String key, int def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public boolean getBoolean(@Nullable String key) {
+            return tag.getBoolean(key);
+        }
+
+        @Override
+        public boolean getBoolean(@Nullable String key, boolean def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable String getString(@Nullable String key) {
+            return contains(key) ? null : get(key);
+        }
+
+        @Override
+        public @Nullable String getString(@Nullable String key, @Nullable String def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key, @Nullable NamespacedKey def) {
+            return tag.get(key) == null ? def : get(key);
+        }
+
+        @Override
+        public @Nullable UUID getUUID(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable UUID getUUID(@Nullable String key, @Nullable UUID def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key, @Nullable OfflinePlayer def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass) {
+            return enumClass.cast(get(key));
+        }
+
+        @Override
+        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass, @Nullable T def) {
+            return contains(key) ? def : enumClass.cast(get(key));
+        }
+
+        @Override
+        public @Nullable Location getLocation(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Location getLocation(@Nullable String key, @Nullable Location def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable Vector getVector(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Vector getVector(@Nullable String key, @Nullable Vector def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @Nullable ItemStack getItemStack(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable ItemStack getItemStack(@Nullable String key, @Nullable ItemStack def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz) {
+            return clazz.cast(get(key));
+        }
+
+        @Override
+        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz, @Nullable T def) {
+            return contains(key) ? def : clazz.cast(get(key));
+        }
+
+        @Override
+        public @Nullable NBTSection getSection(@Nullable String key) {
+            return tag.get(key) == null ? null : new NBTSection1_18_R2(tag.getCompound(key), this::save);
+        }
+
+        @Override
+        public @Nullable NBTSection getSection(@Nullable String key, @Nullable NBTSection def) {
+            return tag.get(key) == null ? def : new NBTSection1_18_R2(tag.getCompound(key), this::save);
+        }
+
+        @Override
+        public @NotNull List<?> getList(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable List<?> getList(@Nullable String key, @Nullable List<?> def) {
+            return contains(key) ? def : get(key);
+        }
+
+        @Override
+        public @NotNull Map<String, Object> getMap(@Nullable String key) {
+            return get(key);
+        }
+
+        @Override
+        public @Nullable Map<String, Object> getMap(@Nullable String key, @Nullable Map<String, Object> def) {
+            return contains(key) ? def : get(key);
+        }
+
+    }
+
+    private static final class EntityNBT1_18_R2 extends NBTSection1_18_R2 implements EntityNBT {
+
+        private final Mob mob;
+        private final net.minecraft.world.entity.Mob handle;
+
+        private final CompoundTag root;
+
+        EntityNBT1_18_R2(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new CompoundTag();
+            handle.saveWithoutId(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_18_R2(m);
     }
 }
