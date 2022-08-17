@@ -17,6 +17,7 @@ public final class EntityMemories {
      * @throws IllegalArgumentException if memory is null
      */
     public static boolean registerMemory(@NotNull Memory<?> memory) throws IllegalArgumentException {
+        if (memory == null) throw new IllegalArgumentException("Memory cannot be null");
         if (memory instanceof EntityMemory<?>) return false;
         if (w.existsMemory(memory)) return false;
 
