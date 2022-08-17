@@ -124,7 +124,7 @@ class NBTSection1_17_R1 implements NBTSection {
             case "offlineplayer" -> {
                 OfflinePlayer p = (OfflinePlayer) v;
                 NBTTagCompound player = new NBTTagCompound();
-                player.setString(ChipUtil.CLASS_TAG, p.getClass().getName());
+                player.setString(ChipUtil.CLASS_TAG, OfflinePlayer.class.getName());
                 player.setString("id", p.getUniqueId().toString());
 
                 yield player;
