@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -24,14 +25,16 @@ import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.*;
+import net.minecraft.nbt.*;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
@@ -74,8 +77,9 @@ import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.RecipeItemStack;
 import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.pathfinder.PathPoint;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.PathEntity;
+import net.minecraft.world.level.pathfinder.PathPoint;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeModifier;
@@ -87,8 +91,8 @@ import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.*;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftNamespacedKey;
-import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -96,10 +100,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -448,10 +449,6 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
     private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
-    }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return IRegistry.ar.get(new MinecraftKey(mem.getKey().getKey()));
     }
 
     @Override
@@ -1062,6 +1059,26 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 return false;
             }
         }
+
+        @Override
+        public boolean isInBubbleColumn() {
+            return nmsMob.t.getType(nmsMob.getChunkCoordinates()).a(Blocks.lq);
+        }
+
+        @Override
+        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
+            return nmsMob.isInvulnerable(toNMS(cause));
+        }
+
+        @Override
+        public int getMaxFallDistance() {
+            return nmsMob.ce();
+        }
+
+        @Override
+        public boolean isPushableBy(@Nullable Entity entity) {
+            return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
     }
 
     @Override
@@ -1606,7 +1623,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         }
     }
 
-    private static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -2277,6 +2294,50 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     public void updateActivities(Creature c) {
         EntityCreature nms = toNMS(c);
         if (c instanceof Axolotl) AxolotlAi.a((net.minecraft.world.entity.animal.axolotl.Axolotl) nms);
+    }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return IRegistry.ar.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<MemoryModuleType<?>> writable = server.getCustomRegistry().b(IRegistry.F);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.a(IRegistry.F, toNMS(m.getKey()));
+        writable.a(nmsKey, toNMS(m), Lifecycle.stable());
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return IRegistry.ar.c(new MinecraftKey(m.getKey().getNamespace(), m.getKey().getKey()));
+    }
+
+    private static final class EntityNBT1_17_R1 extends NBTSection1_17_R1 implements EntityNBT {
+
+        private final Mob mob;
+        private final EntityInsentient handle;
+
+        private final NBTTagCompound root;
+
+        EntityNBT1_17_R1(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new NBTTagCompound();
+            handle.d(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_17_R1(m);
     }
 
 }

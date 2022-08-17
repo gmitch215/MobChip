@@ -439,3 +439,76 @@ public class MyPlugin extends JavaPlugin {
     
 }
 ```
+
+### NBT Editor
+MobChip v1.5.0 introduces a new NBT Editor for editing an entity's NBT Data. The syntax is similar to a bukkit [ConfigurationSection](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/configuration/ConfigurationSection.html) rather than requiring wrappers for setting/fetching values.
+
+#### Fetching and Comparing NBT Data
+Fetching and Comparing NBT Data is similar to how you would fetch and compare values in a FileConfiguration. 
+```java
+
+import me.gamercoder215.mobchip.bukkit.BukkitBrain;
+import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.nbt.*;
+
+public class MyPlugin extends JavaPlugin {
+
+    public void fetchNBT(Mob m) {
+        EntityBrain brain = BukkitBrain.getBrain(m);
+        EntityNBT editor = brain.getNBTEditor();
+        
+        // Fetch the value of the "Health" tag
+        double health = editor.getDouble("Health");
+        
+        // Fetch the value of the "CustomName" tag
+        String customName = editor.getString("CustomName", "No Custom Name"); // Specify a default value
+        
+        // Supports multiple bukkit classes, including NamespacedKeys, Colors, UUIDs, Vectors, Locations, and more!
+        NamespacedKey key = editor.getKey("MyEntityID");
+        
+        // Use this to create and fetch NBT Sections
+        NBTSection section = editor.getOrCreateSection("Directions");
+        
+        // Supports child syntax, similar to ConfigurationSection
+        Vector directions;
+        if (editor.isVector("Directions.EntityDirections")) {
+            directions = editor.getVector("Directions.EntityDirections");
+        } else {
+            directions = new Vector(0, 0, 0);
+        }
+        
+        Location loc = directions.toLocation(m.getWorld());
+    }
+
+}
+
+
+```
+
+#### Setting NBT Data
+Setting NBT Data is also similar to how you would do it in a ConfigurationSection. The NBT will automatically save to the Mob, so there is no need to save anything.
+```java
+
+import me.gamercoder215.mobchip.bukkit.BukkitBrain;
+import me.gamercoder215.mobchip.EntityBrain;
+import me.gamercoder215.mobchip.nbt.*;
+
+public class MyPlugin extends JavaPlugin {
+
+    public void editNBT(Mob m) {
+        EntityBrain brain = BukkitBrain.getBrain(m);
+        EntityNBT editor = brain.getNBTEditor();
+        
+        if (!editor.isLong("MyPlugin.ExistenceDuration")) {
+            editor.set("MyPlugin.ExistenceDuration", 0L);
+        }
+        
+        // Supports ConfigurationSerializable classes
+        editor.set("MyObject", new MySerializableObject());
+        ConfigurationSerializable serializable = editor.get("MyObject", MySerializableObject.class);
+        
+        // Serializes as an OfflinePlayer
+        editor.set("MyPlugin.PlayerOwner", Bukkit.getPlayer("PlayerName"));
+        OfflinePlayer owner = editor.getOfflinePlayer("MyPlugin.PlayerOwner");
+    }
+```

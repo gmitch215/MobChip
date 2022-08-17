@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -24,9 +25,11 @@ import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.Registry;
 import net.minecraft.core.*;
+import net.minecraft.nbt.*;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -37,10 +40,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.control.JumpControl;
@@ -70,6 +70,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
@@ -84,6 +85,10 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.*;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -91,10 +96,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -449,10 +451,6 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
 
     private static LivingEntity fromNMS(net.minecraft.world.entity.LivingEntity l) {
         return (LivingEntity) l.getBukkitEntity();
-    }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(mem.getKey().getKey()));
     }
 
     @Override
@@ -1068,6 +1066,26 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
                 return false;
             }
         }
+
+        @Override
+        public boolean isInBubbleColumn() {
+            return nmsMob.level.getBlockState(nmsMob.blockPosition()).is(Blocks.BUBBLE_COLUMN);
+        }
+
+        @Override
+        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
+            return nmsMob.isInvulnerableTo(toNMS(cause));
+        }
+
+        @Override
+        public int getMaxFallDistance() {
+            return nmsMob.getMaxFallDistance();
+        }
+
+        @Override
+        public boolean isPushableBy(@Nullable Entity entity) {
+            return EntitySelector.pushableBy(toNMS(entity)).test(toNMS(entity));
+        }
     }
 
     @Override
@@ -1629,7 +1647,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         }
     }
 
-    private static net.minecraft.world.entity.Mob toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    static net.minecraft.world.entity.Mob toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -2313,5 +2331,52 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         else if (c instanceof Frog) FrogAi.updateActivity((net.minecraft.world.entity.animal.frog.Frog) nms);
         else if (c instanceof org.bukkit.entity.Warden) WardenAi.updateActivity((Warden) nms);
     }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return Registry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new ResourceLocation(mem.getKey().getKey()) : new ResourceLocation(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, false);
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        WritableRegistry<MemoryModuleType<?>> writable = (WritableRegistry<MemoryModuleType<?>>) server.registryAccess().ownedRegistryOrThrow(Registry.MEMORY_MODULE_TYPE_REGISTRY);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.create(Registry.MEMORY_MODULE_TYPE_REGISTRY, toNMS(m.getKey()));
+        writable.register(nmsKey, toNMS(m), Lifecycle.stable());
+        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, true);
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return Registry.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
+    }
+
+    private static final class EntityNBT1_19_R1 extends NBTSection1_19_R1 implements EntityNBT {
+
+        private final Mob mob;
+        private final net.minecraft.world.entity.Mob handle;
+
+        private final CompoundTag root;
+
+        EntityNBT1_19_R1(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new CompoundTag();
+            handle.saveWithoutId(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_19_R1(m);
+    }
+
 }
 

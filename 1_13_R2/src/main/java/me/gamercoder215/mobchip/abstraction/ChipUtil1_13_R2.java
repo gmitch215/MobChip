@@ -21,6 +21,7 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.World;
@@ -41,9 +42,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -941,6 +940,26 @@ public class ChipUtil1_13_R2 implements ChipUtil {
         public boolean isPeacefulCompatible() {
             return false; // doesn't exist
         }
+
+        @Override
+        public boolean isInBubbleColumn() {
+            return nmsMob.world.getType(nmsMob.getChunkCoordinates()).getBlock().equals(Blocks.BUBBLE_COLUMN);
+        }
+
+        @Override
+        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
+            return nmsMob.isInvulnerable(toNMS(cause));
+        }
+
+        @Override
+        public int getMaxFallDistance() {
+            return nmsMob.bn();
+        }
+
+        @Override
+        public boolean isPushableBy(@Nullable Entity entity) {
+            return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
     }
 
     @Override
@@ -1325,7 +1344,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
         }
     }
 
-    private static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -1983,6 +2002,43 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_13_R2(dragon, toNMS(dragon).getDragonControllerManager().a());
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        // doesn't exist
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        // doesn't exist
+        return false;
+    }
+
+    private static final class EntityNBT1_13_R2 extends NBTSection1_13_R2 implements EntityNBT {
+
+        private final Mob mob;
+        private final EntityInsentient handle;
+
+        private final NBTTagCompound root;
+
+        EntityNBT1_13_R2(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new NBTTagCompound();
+            handle.d(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_13_R2(m);
     }
 
 }

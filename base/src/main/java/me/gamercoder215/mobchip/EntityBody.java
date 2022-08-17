@@ -4,6 +4,7 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -379,5 +380,31 @@ public interface EntityBody {
      * @return true if peaceful, else false
      */
     boolean isPeacefulCompatible();
+
+    /**
+     * Whether this Mob is currently in a Bubble Column.
+     * @return true if in bubble column, else false
+     */
+    boolean isInBubbleColumn();
+
+    /**
+     * Whether this Mob is immune to being damaged by this DamageCause.
+     * @param cause DamageCause to check
+     * @return true if immune, else false
+     */
+    boolean isInvulnerableTo(@Nullable EntityDamageEvent.DamageCause cause);
+
+    /**
+     * Fetches the maximum distance this Mob can fall before taking damage.
+     * @return Maximum Fall Distance
+     */
+    int getMaxFallDistance();
+
+    /**
+     * Whether this Mob is pushable by this entity.
+     * @param entity Entity to check
+     * @return true if entity can push this mob, else false
+     */
+    boolean isPushableBy(@Nullable Entity entity);
 
 }

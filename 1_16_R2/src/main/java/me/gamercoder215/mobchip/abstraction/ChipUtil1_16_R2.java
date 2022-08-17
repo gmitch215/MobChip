@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
@@ -23,6 +24,7 @@ import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.nbt.EntityNBT;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.World;
@@ -45,10 +47,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -399,10 +398,6 @@ public class ChipUtil1_16_R2 implements ChipUtil {
 
     private static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
-    }
-
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(mem.getKey().getKey()));
     }
 
     @Override
@@ -1039,6 +1034,26 @@ public class ChipUtil1_16_R2 implements ChipUtil {
                 return false;
             }
         }
+
+        @Override
+        public boolean isInBubbleColumn() {
+            return nmsMob.world.getType(nmsMob.getChunkCoordinates()).a(Blocks.BUBBLE_COLUMN);
+        }
+
+        @Override
+        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
+            return nmsMob.isInvulnerable(toNMS(cause));
+        }
+
+        @Override
+        public int getMaxFallDistance() {
+            return nmsMob.bO();
+        }
+
+        @Override
+        public boolean isPushableBy(@Nullable Entity entity) {
+            return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
     }
 
     @Override
@@ -1633,7 +1648,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         }
     }
 
-    private static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -2070,17 +2085,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
 
     @Override
     public boolean existsAttribute(NamespacedKey key) {
-        try {
-            DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-            RegistryMaterials<AttributeBase> registry = (RegistryMaterials<AttributeBase>) server.aX().b(IRegistry.y);
-
-            Field res = RegistryMaterials.class.getDeclaredField("bh");
-            res.setAccessible(true);
-            Map<MinecraftKey, AttributeBase> map = (Map<MinecraftKey, AttributeBase>) res.get(registry);
-            return map.containsKey(toNMS(key));
-        } catch (Exception e) {
-            return false;
-        }
+        return IRegistry.ATTRIBUTE.getOptional(toNMS(key)).isPresent();
     }
 
     private static MinecraftKey toNMS(NamespacedKey key) {
@@ -2400,6 +2405,50 @@ public class ChipUtil1_16_R2 implements ChipUtil {
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
         return new DragonPhase1_16_R2(dragon, toNMS(dragon).getDragonControllerManager().a());
+    }
+
+    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+        return IRegistry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
+    }
+
+    @Override
+    public void registerMemory(Memory<?> m) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<MemoryModuleType<?>> writable = server.aX().b(IRegistry.D);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.a(IRegistry.D, toNMS(m.getKey()));
+        writable.a(nmsKey, toNMS(m), Lifecycle.stable());
+    }
+
+    @Override
+    public boolean existsMemory(Memory<?> m) {
+        if (m instanceof EntityMemory<?>) return true;
+        return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
+    }
+
+    private static final class EntityNBT1_16_R2 extends NBTSection1_16_R2 implements EntityNBT {
+
+        private final Mob mob;
+        private final EntityInsentient handle;
+
+        private final NBTTagCompound root;
+
+        EntityNBT1_16_R2(Mob m) {
+            super(m);
+            this.mob = m;
+            this.handle = toNMS(m);
+            this.root = new NBTTagCompound();
+            handle.d(root);
+        }
+
+        @Override
+        public @NotNull Mob getEntity() {
+            return mob;
+        }
+    }
+
+    @Override
+    public EntityNBT getNBTEditor(Mob m) {
+        return new EntityNBT1_16_R2(m);
     }
 
 }
