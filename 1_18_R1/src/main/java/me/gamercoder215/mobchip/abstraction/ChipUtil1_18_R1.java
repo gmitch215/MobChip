@@ -22,7 +22,6 @@ import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
-import me.gamercoder215.mobchip.nbt.NBTSection;
 import me.gamercoder215.mobchip.util.Position;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
@@ -31,7 +30,6 @@ import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import net.minecraft.core.*;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -42,10 +40,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.control.JumpControl;
@@ -71,12 +66,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
@@ -86,6 +81,10 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.*;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -1059,6 +1058,26 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
                 return false;
             }
         }
+
+        @Override
+        public boolean isInBubbleColumn() {
+            return nmsMob.level.getBlockState(nmsMob.blockPosition()).is(Blocks.BUBBLE_COLUMN);
+        }
+
+        @Override
+        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
+            return nmsMob.isInvulnerableTo(toNMS(cause));
+        }
+
+        @Override
+        public int getMaxFallDistance() {
+            return nmsMob.getMaxFallDistance();
+        }
+
+        @Override
+        public boolean isPushableBy(@Nullable Entity entity) {
+            return EntitySelector.pushableBy(toNMS(entity)).test(toNMS(entity));
+        }
     }
 
     @Override
@@ -1603,7 +1622,7 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
         }
     }
 
-    private static net.minecraft.world.entity.Mob toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    static net.minecraft.world.entity.Mob toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
     private static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
@@ -2279,611 +2298,6 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
     public boolean existsMemory(Memory<?> m) {
         if (m instanceof EntityMemory<?>) return true;
         return Registry.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
-    }
-
-    private static net.minecraft.nbt.Tag serialize(Object v) {
-        if (v.getClass().isArray()) {
-            ListTag tag = new ListTag();
-            for (int i = 0; i < Array.getLength(v); i++) tag.add(i, serialize(Array.get(v, i)));
-            return tag;
-        }
-
-        if (v instanceof Collection<?>) {
-            List<?> collection = new ArrayList<>((Collection<?>) v);
-            CompoundTag coll = new CompoundTag();
-
-            try {
-                coll.putString(CLASS_TAG, Collection.class.getName());
-                ListTag tag = new ListTag();
-                for (int i = 0; i < collection.size(); i++) tag.add(i, serialize(collection.get(i)));
-                coll.put("values", tag);
-
-                Field idF = ListTag.class.getDeclaredField("w");
-                idF.setAccessible(true);
-
-                coll.putByte("id", idF.getByte(tag));
-            } catch (ReflectiveOperationException e) {
-                Bukkit.getLogger().severe("Failed to serialize collection: " + e.getMessage());
-                for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
-            }
-
-            return coll;
-        }
-
-        if (v instanceof Map<?, ?> map) {
-            CompoundTag tag = new CompoundTag();
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
-                tag.put(entry.getKey().toString(), serialize(entry.getValue()));
-            }
-            return tag;
-        }
-
-        if (v instanceof Enum<?> enumeration) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString(CLASS_TAG, enumeration.getClass().getName());
-            tag.putString("value", ((Enum<?>) v).name());
-            return tag;
-        }
-
-        if (v instanceof ConfigurationSerializable serializable) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString(CLASS_TAG, serializable.getClass().getName());
-            tag.put("value", serialize(serializable.serialize()));
-            return tag;
-        }
-
-        return switch (v.getClass().getSimpleName().toLowerCase()) {
-            case "short" -> ShortTag.valueOf((short) v);
-            case "float" -> FloatTag.valueOf((float) v);
-            case "long" -> LongTag.valueOf((long) v);
-            case "byte" -> ByteTag.valueOf((byte) v);
-            case "integer", "int" -> IntTag.valueOf((int) v);
-            case "double" -> DoubleTag.valueOf((double) v);
-            case "uuid" -> {
-                UUID uid = (UUID) v;
-                CompoundTag uuid = new CompoundTag();
-                uuid.putString(CLASS_TAG, uid.getClass().getName());
-                uuid.putLong("least", uid.getLeastSignificantBits());
-                uuid.putLong("most", uid.getMostSignificantBits());
-                yield uuid;
-            }
-            case "namespacedkey" -> {
-                NamespacedKey key = (NamespacedKey) v;
-                CompoundTag nmsKey = new CompoundTag();
-                nmsKey.putString(CLASS_TAG, key.getClass().getName());
-                nmsKey.putString("namespace", key.getNamespace());
-                nmsKey.putString("key", key.getKey());
-                yield nmsKey;
-            }
-            case "itemstack" -> {
-                ItemStack item = (ItemStack) v;
-                CompoundTag stack = new CompoundTag();
-                stack.putString(CLASS_TAG, item.getClass().getName());
-                stack.put("item", CraftItemStack.asNMSCopy(item).getOrCreateTag());
-
-                yield stack;
-            }
-            case "offlineplayer" -> {
-                OfflinePlayer p = (OfflinePlayer) v;
-                CompoundTag player = new CompoundTag();
-                player.putString(CLASS_TAG, p.getClass().getName());
-                player.putString("id", p.getUniqueId().toString());
-
-                yield player;
-            }
-            case "location" -> {
-                Location l = (Location) v;
-                CompoundTag loc = new CompoundTag();
-                loc.putString(CLASS_TAG, l.getClass().getName());
-                loc.putDouble("x", l.getX());
-                loc.putDouble("y", l.getY());
-                loc.putDouble("z", l.getZ());
-                loc.putFloat("yaw", l.getYaw());
-                loc.putFloat("pitch", l.getPitch());
-                loc.putString("world", l.getWorld().getName());
-                yield loc;
-            }
-            case "vector" -> {
-                Vector vec = (Vector) v;
-                CompoundTag vector = new CompoundTag();
-                vector.putString(CLASS_TAG, vec.getClass().getName());
-                vector.putDouble("x", vec.getX());
-                vector.putDouble("y", vec.getY());
-                vector.putDouble("z", vec.getZ());
-                yield vector;
-            }
-            case "color" -> {
-                Color color = (Color) v;
-                CompoundTag clr = new CompoundTag();
-                clr.putString(CLASS_TAG, color.getClass().getName());
-                clr.putInt("rgb", color.asRGB());
-                yield clr;
-            }
-            default -> StringTag.valueOf(v.toString());
-        };
-    }
-
-    private static Object deserialize(Tag v) {
-        if (v instanceof ListTag list) {
-            List<Object> l = new ArrayList<>();
-            list.stream().map(ChipUtil1_18_R1::deserialize).forEach(l::add);
-            return l.toArray();
-        }
-
-        if (v instanceof CompoundTag cmp) {
-            boolean isClass = cmp.get(CLASS_TAG) != null && cmp.get(CLASS_TAG) instanceof StringTag && !cmp.getString(CLASS_TAG).isEmpty();
-
-            if (isClass) {
-                String className = cmp.getString(CLASS_TAG);
-                try {
-                    Class<?> clazz = Class.forName(className);
-
-                    if (clazz.isEnum()) return Enum.valueOf(clazz.asSubclass(Enum.class), cmp.getString("value"));
-
-                    if (ConfigurationSerializable.class.isAssignableFrom(clazz)) {
-                        try {
-                            Method deserialize = clazz.getDeclaredMethod("deserialize", Map.class);
-                            deserialize.setAccessible(true);
-                            return clazz.cast(deserialize.invoke(null, deserialize(cmp.getCompound("value"))));
-                        } catch (NoSuchMethodException e) {
-                            Bukkit.getLogger().severe("Class does not have deserialize method: " + className);
-                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
-                        } catch (InvocationTargetException e) {
-                            Bukkit.getLogger().severe("Failed to deserialize class: " + className);
-                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
-                        } catch (ReflectiveOperationException e) {
-                            Bukkit.getLogger().severe(e.getMessage());
-                            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
-                        }
-                    }
-
-                    return switch (clazz.getSimpleName()) {
-                        case "map" -> {
-                            Map<String, Object> map = new HashMap<>();
-                            for (String key : cmp.getAllKeys()) map.put(key, deserialize(cmp.get(key)));
-                            yield map;
-                        }
-                        case "collection" -> {
-                            int id = cmp.getInt("id");
-                            ListTag list = cmp.getList("values", id);
-
-                            List<? super Object> l = new ArrayList<>();
-                            list.stream().map(ChipUtil1_18_R1::deserialize).forEach(l::add);
-                            yield new ArrayList<>(l);
-                        }
-                        case "uuid" -> {
-                            long most = cmp.getLong("most");
-                            long least = cmp.getLong("least");
-                            yield new UUID(most, least);
-                        }
-                        case "offlineplayer" -> {
-                            UUID uid = UUID.fromString(cmp.getString("id"));
-                            yield Bukkit.getOfflinePlayer(uid);
-                        }
-                        case "namespacedkey" -> {
-                            String namespace = cmp.getString("namespace");
-                            String key = cmp.getString("key");
-                            yield new NamespacedKey(namespace, key);
-                        }
-                        case "itemstack" -> {
-                            CompoundTag item = cmp.getCompound("item");
-                            yield CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.of(item));
-                        }
-                        case "location" -> {
-                            String world = cmp.getString("world");
-                            World w = Bukkit.getWorld(world);
-                            if (w == null) throw new IllegalArgumentException("World not found: " + world);
-                            double x = cmp.getDouble("x");
-                            double y = cmp.getDouble("y");
-                            double z = cmp.getDouble("z");
-                            float yaw = cmp.getFloat("yaw");
-                            float pitch = cmp.getFloat("pitch");
-                            yield new Location(w, x, y, z, yaw, pitch);
-                        }
-                        case "vector" -> {
-                            double x = cmp.getDouble("x");
-                            double y = cmp.getDouble("y");
-                            double z = cmp.getDouble("z");
-                            yield new Vector(x, y, z);
-                        }
-                        case "color" -> {
-                            int rgb = cmp.getInt("rgb");
-                            yield Color.fromRGB(rgb);
-                        }
-                        default -> throw new AssertionError("Unknown Class: " + clazz.getSimpleName());
-                    };
-                } catch (ClassNotFoundException e) {
-                    throw new AssertionError("Unknown Class: " + className);
-                }
-            } else {
-                Map<String, Object> map = new HashMap<>();
-                for (String key : cmp.getAllKeys()) map.put(key, deserialize(cmp.get(key)));
-                return map;
-            }
-        }
-
-        return switch (v.getId()) {
-            case 1 -> ((ByteTag) v).getAsByte();
-            case 2 -> ((ShortTag) v).getAsShort();
-            case 3 -> ((IntTag) v).getAsInt();
-            case 4 -> ((LongTag) v).getAsLong();
-            case 5 -> ((FloatTag) v).getAsFloat();
-            case 6 -> ((DoubleTag) v).getAsDouble();
-            case 7 -> ((ByteArrayTag) v).getAsByteArray();
-            default -> v.getAsString();
-        };
-    }
-
-    private static class NBTSection1_18_R1 implements NBTSection {
-
-        private final CompoundTag tag;
-        private final Runnable saveFunc;
-
-        private final String currentPath;
-
-        NBTSection1_18_R1(CompoundTag tag, Runnable saveFunc, String path) {
-            this.tag = tag;
-            this.saveFunc = saveFunc;
-            this.currentPath = path;
-        }
-
-        NBTSection1_18_R1(Mob m) {
-            this.tag = new CompoundTag();
-            this.currentPath = "";
-            toNMS(m).saveWithoutId(tag);
-            this.saveFunc = () -> toNMS(m).load(tag);
-        }
-
-        private void save() {
-            saveFunc.run();
-        }
-
-        @Override
-        public @NotNull String getCurrentPath() {
-            return currentPath;
-        }
-
-        @Override
-        public @NotNull Map<String, Object> getValues(boolean deep) {
-            Map<String, Object> map = tag.getAllKeys().stream().filter(k -> !(tag.get(k) instanceof CompoundTag)).collect(Collectors.toMap(Function.identity(), k -> deserialize(tag.get(k))));
-            if (!deep) return map;
-
-            tag.getAllKeys().stream().filter(k -> (tag.get(k) instanceof CompoundTag)).forEach(s -> {
-                NBTSection sec = getSection(s);
-                sec.getValues(true).forEach((k, v) -> map.put(s + "." + k, v));
-            });
-
-            return map;
-        }
-
-        @Override
-        public void set(@Nullable String key, @Nullable Object value) {
-            if (key == null) return;
-            if (key.equals(CLASS_TAG)) return;
-
-            if (value == null) tag.remove(key);
-            else tag.put(key, serialize(value));
-            save();
-        }
-
-        @Override
-        public boolean isSet(@Nullable String key) {
-            return false;
-        }
-
-        @Override
-        public void remove(@Nullable String key) {
-            tag.remove(key);
-            save();
-        }
-
-        private <T> T get(String key) {
-            if (key == null) return null;
-            return (T) getValues(true).getOrDefault(key, null);
-        }
-
-        private boolean contains(String key) {
-            if (key == null) return false;
-            return getKeys(true).contains(key);
-        }
-
-        @Override
-        public double getDouble(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public double getDouble(@Nullable String key, double def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isDouble(@Nullable String key) {
-            return contains(key) && (get(key) instanceof Double || isInt(key));
-        }
-
-        @Override
-        public int getInteger(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public int getInteger(@Nullable String key, int def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isInt(@Nullable String key) {
-            return contains(key) && get(key) instanceof Integer;
-        }
-
-        @Override
-        public boolean getBoolean(@Nullable String key) {
-            return tag.getBoolean(key);
-        }
-
-        @Override
-        public boolean getBoolean(@Nullable String key, boolean def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isBoolean(@Nullable String key) {
-            return contains(key) && get(key) instanceof Boolean;
-        }
-
-        @Override
-        public float getFloat(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public float getFloat(@Nullable String key, float def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isFloat(@Nullable String key) {
-            return contains(key) && (get(key) instanceof Float || isInt(key));
-        }
-
-        @Override
-        public long getLong(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public long getLong(@Nullable String key, long def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isLong(@Nullable String key) {
-            return contains(key) && get(key) instanceof Long;
-        }
-
-        @Override
-        public byte getByte(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public byte getByte(@Nullable String key, byte def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isByte(@Nullable String key) {
-            return contains(key) && get(key) instanceof Byte;
-        }
-
-        @Override
-        public @Nullable String getString(@Nullable String key) {
-            return contains(key) ? null : get(key);
-        }
-
-        @Override
-        public @Nullable String getString(@Nullable String key, @Nullable String def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isString(@Nullable String key) {
-            return contains(key) && get(key) instanceof String;
-        }
-
-        @Override
-        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable NamespacedKey getNamespacedKey(@Nullable String key, @Nullable NamespacedKey def) {
-            return tag.get(key) == null ? def : get(key);
-        }
-
-        @Override
-        public boolean isNamespacedKey(@Nullable String key) {
-            return contains(key) && get(key) instanceof NamespacedKey;
-        }
-
-        @Override
-        public @Nullable UUID getUUID(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable UUID getUUID(@Nullable String key, @Nullable UUID def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isUUID(@Nullable String key) {
-            return contains(key) && get(key) instanceof UUID;
-        }
-
-        @Override
-        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key, @Nullable OfflinePlayer def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isOfflinePlayer(@Nullable String key) {
-            return contains(key) && get(key) instanceof OfflinePlayer;
-        }
-
-        @Override
-        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass) {
-            return enumClass.cast(get(key));
-        }
-
-        @Override
-        public <T extends Enum<T>> @Nullable T getEnum(@Nullable String key, Class<T> enumClass, @Nullable T def) {
-            return contains(key) ? def : enumClass.cast(get(key));
-        }
-
-        @Override
-        public boolean isEnum(@Nullable String key) {
-            return contains(key) && get(key) instanceof Enum;
-        }
-
-        @Override
-        public <T extends Enum<T>> boolean isEnum(@Nullable String key, Class<T> enumClass) throws IllegalArgumentException {
-            return contains(key) && get(key) instanceof Enum && enumClass.isAssignableFrom(get(key).getClass());
-        }
-
-        @Override
-        public @Nullable Location getLocation(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable Location getLocation(@Nullable String key, @Nullable Location def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isLocation(@Nullable String key) {
-            return contains(key) && get(key) instanceof Location;
-        }
-
-        @Override
-        public @Nullable Vector getVector(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable Vector getVector(@Nullable String key, @Nullable Vector def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isVector(@Nullable String key) {
-            return contains(key) && get(key) instanceof Vector;
-        }
-
-        @Override
-        public @Nullable ItemStack getItemStack(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable ItemStack getItemStack(@Nullable String key, @Nullable ItemStack def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isItemStack(@Nullable String key) {
-            return contains(key) && get(key) instanceof ItemStack;
-        }
-
-        @Override
-        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz) {
-            return clazz.cast(get(key));
-        }
-
-        @Override
-        public <T extends ConfigurationSerializable> @Nullable T getObject(@Nullable String key, @NotNull Class<T> clazz, @Nullable T def) {
-            return contains(key) ? def : clazz.cast(get(key));
-        }
-
-        @Override
-        public @Nullable Color getColor(@Nullable String path) {
-            return get(path);
-        }
-
-        @Override
-        public @Nullable Color getColor(@Nullable String path, @Nullable Color def) {
-            return contains(path) ? def : get(path);
-        }
-
-        @Override
-        public boolean isColor(@Nullable String path) {
-            return contains(path) && get(path) instanceof Color;
-        }
-
-        @Override
-        public @Nullable NBTSection getSection(@Nullable String key) {
-            return tag.get(key) == null ? null : new NBTSection1_18_R1(tag.getCompound(key), this::save, currentPath + "." + key);
-        }
-
-        @Override
-        public @Nullable NBTSection getSection(@Nullable String key, @Nullable NBTSection def) {
-            return tag.get(key) == null ? def : new NBTSection1_18_R1(tag.getCompound(key), this::save, currentPath + "." + key);
-        }
-
-        @Override
-        public @NotNull NBTSection getOrCreateSection(@NotNull String key) throws IllegalArgumentException {
-            return getSection(key, new NBTSection1_18_R1(new CompoundTag(), this::save, currentPath + "." + key));
-        }
-
-        @Override
-        public @NotNull NBTSection getOrCreateSection(@NotNull String key, Map<String, Object> map) throws IllegalArgumentException {
-            NBTSection sec = getOrCreateSection(key);
-            map.forEach(sec::set);
-            return sec;
-        }
-
-        @Override
-        public boolean isSection(@Nullable String key) {
-            return isSet(key) && tag.get(key) instanceof CompoundTag && tag.getCompound(key).getString(CLASS_TAG).isEmpty();
-        }
-
-        @Override
-        public @NotNull List<?> getList(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable List<?> getList(@Nullable String key, @Nullable List<?> def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isList(@Nullable String key) {
-            return contains(key) && get(key) instanceof List;
-        }
-
-        @Override
-        public @NotNull Map<String, Object> getMap(@Nullable String key) {
-            return get(key);
-        }
-
-        @Override
-        public @Nullable Map<String, Object> getMap(@Nullable String key, @Nullable Map<String, Object> def) {
-            return contains(key) ? def : get(key);
-        }
-
-        @Override
-        public boolean isMap(@Nullable String key) {
-            return contains(key) && get(key) instanceof Map<?, ?>;
-        }
-
     }
 
     private static final class EntityNBT1_18_R1 extends NBTSection1_18_R1 implements EntityNBT {
