@@ -1894,6 +1894,11 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             }
             return false;
         }
+
+        @Override
+        public boolean hasLastDamageCancelled() {
+            return toNMS(m).forceExplosionKnockback;
+        }
     }
 
     @Override

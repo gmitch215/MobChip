@@ -2219,6 +2219,11 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         public boolean isInCombat() {
             return handle.isInCombat();
         }
+
+        @Override
+        public boolean hasLastDamageCancelled() {
+            return toNMS(m).lastDamageCancelled;
+        }
     }
 
     @Override
