@@ -11,10 +11,6 @@ import org.jetbrains.annotations.Nullable;
 public enum EntityAnimation implements Keyed {
 
     /**
-     * Represents an Empty Animation
-     */
-    EMPTY(""),
-    /**
      * Represents the Damage Animation when taking damage
      */
     DAMAGE("hurt"),

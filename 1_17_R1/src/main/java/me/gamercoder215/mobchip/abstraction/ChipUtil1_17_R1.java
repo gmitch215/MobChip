@@ -1696,7 +1696,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                     Field f = clazz.getDeclaredField(name);
                     f.setAccessible(true);
                     return cast.cast(f.get(o));
-                } catch (NoSuchFieldException e) {
+                } catch (NoSuchFieldException | ClassCastException e) {
                     if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                     else break;
                 }
