@@ -54,4 +54,10 @@ public interface EntityCombatTracker {
      * @return true if in combat, else false
      */
     boolean isInCombat();
+
+    /**
+     * Whether this Mob had its last damage cancelled.
+     * @return true if last damage was cancelled, else false
+     */
+    boolean hasLastDamageCancelled();
 }

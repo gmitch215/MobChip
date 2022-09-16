@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "deprecation"})
 class NBTSection1_18_R1 implements NBTSection {
 
     private final CompoundTag tag;
@@ -159,6 +160,15 @@ class NBTSection1_18_R1 implements NBTSection {
                 clr.putInt("rgb", color.asRGB());
                 yield clr;
             }
+            case "eulerangle" -> {
+                EulerAngle angle = (EulerAngle) v;
+                CompoundTag euler = new CompoundTag();
+                euler.putString(ChipUtil.CLASS_TAG, angle.getClass().getName());
+                euler.putDouble("x", angle.getX());
+                euler.putDouble("y", angle.getY());
+                euler.putDouble("z", angle.getZ());
+                yield euler;
+            }
             default -> StringTag.valueOf(v.toString());
         };
     }
@@ -249,6 +259,12 @@ class NBTSection1_18_R1 implements NBTSection {
                         case "color" -> {
                             int rgb = cmp.getInt("rgb");
                             yield Color.fromRGB(rgb);
+                        }
+                        case "eulerangle" -> {
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            yield new EulerAngle(x, y, z);
                         }
                         default -> throw new AssertionError("Unknown Class: " + clazz.getSimpleName());
                     };
@@ -622,6 +638,21 @@ class NBTSection1_18_R1 implements NBTSection {
     @Override
     public boolean isMap(@Nullable String key) {
         return contains(key) && get(key) instanceof Map<?, ?>;
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path) {
+        return get(path);
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path, @Nullable EulerAngle def) {
+        return contains(path) ? def : get(path);
+    }
+
+    @Override
+    public boolean isEulerAngle(@Nullable String path) {
+        return contains(path) && get(path) instanceof EulerAngle;
     }
 
 }

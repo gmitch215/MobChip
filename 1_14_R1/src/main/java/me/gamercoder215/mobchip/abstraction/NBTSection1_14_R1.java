@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"unchecked", "deprecation"})
 class NBTSection1_14_R1 implements NBTSection {
 
     private final NBTTagCompound tag;
@@ -161,6 +163,15 @@ class NBTSection1_14_R1 implements NBTSection {
                 clr.setInt("rgb", color.asRGB());
                 return clr;
             }
+            case "eulerangle": {
+                EulerAngle angle = (EulerAngle) v;
+                NBTTagCompound euler = new NBTTagCompound();
+                euler.setString(ChipUtil.CLASS_TAG, angle.getClass().getName());
+                euler.setDouble("x", angle.getX());
+                euler.setDouble("y", angle.getY());
+                euler.setDouble("z", angle.getZ());
+                return euler;
+            }
             default: return new NBTTagString(v.toString());
         }
     }
@@ -253,6 +264,12 @@ class NBTSection1_14_R1 implements NBTSection {
                         case "color": {
                             int rgb = cmp.getInt("rgb");
                             return Color.fromRGB(rgb);
+                        }
+                        case "eulerangle": {
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            return new EulerAngle(x, y, z);
                         }
                     }
                 } catch (ClassNotFoundException e) {
@@ -625,6 +642,21 @@ class NBTSection1_14_R1 implements NBTSection {
     @Override
     public boolean isMap(@Nullable String key) {
         return contains(key) && get(key) instanceof Map<?, ?>;
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path) {
+        return get(path);
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path, @Nullable EulerAngle def) {
+        return contains(path) ? def : get(path);
+    }
+
+    @Override
+    public boolean isEulerAngle(@Nullable String path) {
+        return contains(path) && get(path) instanceof EulerAngle;
     }
 
 }

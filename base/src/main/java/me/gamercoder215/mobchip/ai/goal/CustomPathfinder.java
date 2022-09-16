@@ -91,7 +91,7 @@ public abstract class CustomPathfinder extends Pathfinder {
      * <br><br>
      * Any actions that this Pathfinder will call <strong>when it stops</strong> should be in here. This method will run automatically.
      */
-    public void stop() {};
+    public void stop() {}
 
     /**
      * Whether this Pathfinder Goal can be interrupted. Default: true

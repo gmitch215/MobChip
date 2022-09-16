@@ -2182,6 +2182,11 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         public boolean isInCombat() {
             return handle.e();
         }
+
+        @Override
+        public boolean hasLastDamageCancelled() {
+            return toNMS(m).forceExplosionKnockback;
+        }
     }
 
     @Override

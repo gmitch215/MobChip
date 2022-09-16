@@ -121,7 +121,7 @@ public interface ChipUtil {
 
     EntityNBT getNBTEditor(Mob m);
 
-    default void updateActivities(Creature c) {};
+    default void updateActivities(Creature c) {}
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {
         return new BehaviorResult() {
