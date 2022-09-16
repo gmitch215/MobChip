@@ -1715,7 +1715,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                     Field f = clazz.getDeclaredField(name);
                     f.setAccessible(true);
                     return cast.cast(f.get(o));
-                } catch (NoSuchFieldException e) {
+                } catch (NoSuchFieldException | ClassCastException e) {
                     if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                     else break;
                 }
@@ -1736,7 +1736,10 @@ public class ChipUtil1_16_R3 implements ChipUtil {
 
     private static BlockPosition toNMS(Location l) { return new BlockPosition(l.getX(), l.getY(), l.getZ()); }
 
-    private static List<ItemStack> fromNMS(RecipeItemStack in) { return Arrays.stream(in.choices).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
+    private static List<ItemStack> fromNMS(RecipeItemStack in) {
+        in.buildChoices();
+        return Arrays.stream(in.choices).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList());
+    }
 
     private static Sound fromNMS(SoundEffect s) { return CraftSound.getBukkit(s); }
 
