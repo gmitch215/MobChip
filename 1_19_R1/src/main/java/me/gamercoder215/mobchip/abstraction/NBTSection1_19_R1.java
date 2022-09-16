@@ -8,6 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"unchecked", "deprecation"})
 class NBTSection1_19_R1 implements NBTSection {
 
     private final CompoundTag tag;
@@ -158,6 +160,15 @@ class NBTSection1_19_R1 implements NBTSection {
                 clr.putInt("rgb", color.asRGB());
                 yield clr;
             }
+            case "eulerangle" -> {
+                EulerAngle angle = (EulerAngle) v;
+                CompoundTag euler = new CompoundTag();
+                euler.putString(ChipUtil.CLASS_TAG, angle.getClass().getName());
+                euler.putDouble("x", angle.getX());
+                euler.putDouble("y", angle.getY());
+                euler.putDouble("z", angle.getZ());
+                yield euler;
+            }
             default -> StringTag.valueOf(v.toString());
         };
     }
@@ -249,6 +260,12 @@ class NBTSection1_19_R1 implements NBTSection {
                             int rgb = cmp.getInt("rgb");
                             yield Color.fromRGB(rgb);
                         }
+                        case "eulerangle" -> {
+                            double x = cmp.getDouble("x");
+                            double y = cmp.getDouble("y");
+                            double z = cmp.getDouble("z");
+                            yield new EulerAngle(x, y, z);
+                        }
                         default -> throw new AssertionError("Unknown Class: " + clazz.getSimpleName());
                     };
                 } catch (ClassNotFoundException e) {
@@ -333,7 +350,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public double getDouble(@Nullable String key, double def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -348,7 +365,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public int getInteger(@Nullable String key, int def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -363,7 +380,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public boolean getBoolean(@Nullable String key, boolean def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -378,7 +395,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public float getFloat(@Nullable String key, float def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -393,7 +410,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public long getLong(@Nullable String key, long def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -408,7 +425,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public byte getByte(@Nullable String key, byte def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -423,7 +440,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable String getString(@Nullable String key, @Nullable String def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -453,7 +470,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable UUID getUUID(@Nullable String key, @Nullable UUID def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -468,7 +485,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable OfflinePlayer getOfflinePlayer(@Nullable String key, @Nullable OfflinePlayer def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -503,7 +520,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable Location getLocation(@Nullable String key, @Nullable Location def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -518,7 +535,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable Vector getVector(@Nullable String key, @Nullable Vector def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -533,7 +550,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable ItemStack getItemStack(@Nullable String key, @Nullable ItemStack def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -600,7 +617,7 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable List<?> getList(@Nullable String key, @Nullable List<?> def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
@@ -615,12 +632,27 @@ class NBTSection1_19_R1 implements NBTSection {
 
     @Override
     public @Nullable Map<String, Object> getMap(@Nullable String key, @Nullable Map<String, Object> def) {
-        return contains(key) ? def : get(key);
+        return contains(key) ? get(key) : def;
     }
 
     @Override
     public boolean isMap(@Nullable String key) {
         return contains(key) && get(key) instanceof Map<?, ?>;
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path) {
+        return get(path);
+    }
+
+    @Override
+    public @Nullable EulerAngle getEulerAngle(@Nullable String path, @Nullable EulerAngle def) {
+        return contains(path) ? def : get(path);
+    }
+
+    @Override
+    public boolean isEulerAngle(@Nullable String path) {
+        return contains(path) && get(path) instanceof EulerAngle;
     }
 
 }

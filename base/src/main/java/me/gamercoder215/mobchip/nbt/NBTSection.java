@@ -3,6 +3,7 @@ package me.gamercoder215.mobchip.nbt;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -577,5 +578,29 @@ public interface NBTSection {
         if (getList(key) == null) return def;
         return getIntegerList(key);
     }
+
+    /**
+     * Fetches a EulerAngle from this Entity's NBT.
+     * @param path Key of the tag to fetch
+     * @return Value of the tag, or null if not found
+     */
+    @Nullable
+    EulerAngle getEulerAngle(@Nullable String path);
+
+    /**
+     * Fetches a EulerAngle from this Entity's NBT.
+     * @param path Key of the tag to fetch
+     * @param def Default value to return if the tag is not found
+     * @return Value of the tag, or default if not found
+     */
+    @Nullable
+    EulerAngle getEulerAngle(@Nullable String path, @Nullable EulerAngle def);
+
+    /**
+     * Whether this key's assignment is an EulerAngle.
+     * @param path Key to check
+     * @return true if key's assignment is an EulerAngle, false otherwise
+     */
+    boolean isEulerAngle(@Nullable String path);
 
 }
