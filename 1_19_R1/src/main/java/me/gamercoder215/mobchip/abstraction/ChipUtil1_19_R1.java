@@ -1720,7 +1720,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
                     Field f = clazz.getDeclaredField(name);
                     f.setAccessible(true);
                     return cast.cast(f.get(o));
-                } catch (NoSuchFieldException e) {
+                } catch (NoSuchFieldException | ClassCastException e) {
                     if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
                     else break;
                 }
@@ -1741,7 +1741,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
 
     private static BlockPos toNMS(Location l) { return new BlockPos(l.getX(), l.getY(), l.getZ()); }
 
-    private static List<ItemStack> fromNMS(Ingredient in) { return Arrays.stream(in.itemStacks).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
+    private static List<ItemStack> fromNMS(Ingredient in) { return Arrays.stream(in.getItems()).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
 
     private static Sound fromNMS(SoundEvent s) { return CraftSound.getBukkit(s); }
 
