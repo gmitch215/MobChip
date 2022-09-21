@@ -54,6 +54,7 @@ import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
 import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
@@ -180,7 +181,9 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         net.minecraft.world.entity.Mob m = toNMS(mob);
 
-        return switch (b.getInternalName()) {
+        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+
+        return switch (name) {
             case "AvoidTarget" -> {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
                 yield new AvoidEntityGoal<>((PathfinderMob) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
@@ -243,7 +246,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
             }
             case "FollowParent" -> {
                 PathfinderFollowParent p = (PathfinderFollowParent) b;
-                yield new FollowParentGoal((TamableAnimal) m, p.getSpeedModifier());
+                yield new FollowParentGoal((Animal) m, p.getSpeedModifier());
             }
             case "JumpOnBlock" -> {
                 PathfinderCatOnBlock p = (PathfinderCatOnBlock) b;
@@ -393,8 +396,6 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         net.minecraft.world.entity.Mob m = toNMS(mob);
         GoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
 
         final Goal g = toNMS(b);
         if (g == null) return;

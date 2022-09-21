@@ -143,7 +143,9 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
 
-        switch (b.getInternalName()) {
+        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+
+        switch (name) {
             case "AvoidTarget": {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
                 return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
@@ -200,7 +202,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             }
             case "FollowParent": {
                 PathfinderFollowParent p = (PathfinderFollowParent) b;
-                return new PathfinderGoalFollowParent((EntityTameableAnimal) m, p.getSpeedModifier());
+                return new PathfinderGoalFollowParent((EntityAnimal) m, p.getSpeedModifier());
             }
             case "JumpOnBlock": {
                 PathfinderCatOnBlock p = (PathfinderCatOnBlock) b;
@@ -342,7 +344,6 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         EntityInsentient m = toNMS(mob);
         PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
 
-        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
         PathfinderGoal g = toNMS(b);
 
         if (g == null) return;
