@@ -1686,7 +1686,9 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         for (Class<?> c : nms) {
 
             Class<? extends Entity> bukkit = fromNMS((Class<? extends net.minecraft.server.v1_16_R2.Entity>) c, Entity.class);
-            for (EntityType t : EntityType.values()) if (t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            for (EntityType t : EntityType.values()) {
+                if (t.getEntityClass() != null && t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            }
         }
         return types.toArray(new EntityType[0]);
     }
