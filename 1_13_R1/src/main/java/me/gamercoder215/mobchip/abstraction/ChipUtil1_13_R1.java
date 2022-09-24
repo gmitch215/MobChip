@@ -823,7 +823,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
 
         @Override
         public void setBodyRotation(float rotation) {
-            nmsMob.aQ = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aQ = normalizeRotation(rotation);
         }
 
         @Override
@@ -833,7 +833,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
 
         @Override
         public void setHeadRotation(float rotation) {
-            nmsMob.aS = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aS = normalizeRotation(rotation);
         }
 
         @Override
@@ -957,6 +957,36 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         @Override
         public boolean isPushableBy(@Nullable Entity entity) {
             return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
+
+        @Override
+        public float getYaw() {
+            return nmsMob.yaw;
+        }
+
+        @Override
+        public void setYaw(float rotation) {
+            nmsMob.yaw = normalizeRotation(rotation);
+        }
+
+        @Override
+        public float getPitch() {
+            return nmsMob.pitch;
+        }
+
+        @Override
+        public void setPitch(float rotation) {
+            nmsMob.pitch = normalizeRotation(rotation);
+        }
+
+        @Override
+        public float getMaxUpStep() {
+            return nmsMob.K;
+        }
+
+        @Override
+        public void setMaxUpStep(float maxUpStep) {
+            nmsMob.K = maxUpStep;
         }
     }
 

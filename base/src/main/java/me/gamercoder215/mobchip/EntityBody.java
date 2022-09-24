@@ -247,6 +247,10 @@ public interface EntityBody {
      */
     boolean isMoving();
 
+    default float normalizeRotation(float rotation) {
+        return rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+    }
+
     /**
      * Fetches the Mob's current body rotation (between 0.0F and 360.0F)
      * @return Current Body Rotation
@@ -274,6 +278,34 @@ public interface EntityBody {
      * @param rotation Head Rotation to set
      */
     void setHeadRotation(float rotation);
+
+    /**
+     * Fetches the Mob's current yaw (between 0.0F and 360.0F)
+     * @return Current Yaw
+     */
+    float getYaw();
+
+    /**
+     * Sets the Mob's current yaw.
+     * <br><br>
+     * If the rotation is not between 0.0F and 360.0F, it will be wrapped to be between 0.0F and 360.0F (e.g. 480.0F = 120.0F).
+     * @param rotation Yaw to set
+     */
+    void setYaw(float rotation);
+
+    /**
+     * Fetches the Mob's current pitch (between 0.0F and 360.0F)
+     * @return Current Pitch
+     */
+    float getPitch();
+
+    /**
+     * Sets the Mob's current pitch.
+     * <br><br>
+     * If the rotation is not between 0.0F and 360.0F, it will be wrapped to be between 0.0F and 360.0F (e.g. 480.0F = 120.0F).
+     * @param rotation Pitch to set
+     */
+    void setPitch(float rotation);
 
     /**
      * Fetches a set of all entities that this Mob will not collide with.
@@ -407,4 +439,15 @@ public interface EntityBody {
      */
     boolean isPushableBy(@Nullable Entity entity);
 
+    /**
+     * Fetches the maximum block height this entity can walk up without jumping.
+     * @return Maximum step height
+     */
+    float getMaxUpStep();
+
+    /**
+     * Sets the maximum block height this entity can walk up without jumping.
+     * @param maxUpStep Maximum step height
+     */
+    void setMaxUpStep(float maxUpStep);
 }
