@@ -12,7 +12,7 @@ improve the hassle of playing around with NMS and learning how to import and use
 
 ## Why?
 
-- **Small**: MobChip is currently below 1MB, and we will try to optimize and keep it as small as possible.
+- **Small**: MobChip is currently below 2MB, and we will try to optimize and keep it as small as possible.
 - **Simple**: MobChip has documentation, API usage, and other utilities to help ease the experience of working with Entity AI.
 - **Flexible**: With normal NMS, you're often limited with what fields you are able to pick, and obfuscated methods make knowing what to pick even harder. Even with the addition of Mojang Mappings, there's still a lot of things that both new and experienced developers don't know. MobChip uses Reflection to help 
 - **Transparent**: Instead of the getHandle() methods in previous versions, we have open wrappers that allow you to switch between MobChip and NMS for your MC Version. Depend on one of the wrapper modules according to your MC Version.
@@ -34,25 +34,20 @@ improve the hassle of playing around with NMS and learning how to import and use
     
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
         </repository>
     </repositories>
     
-    <!-- Base Module - Used for Base Interfaces & Built-In Template Classes -->
-    
     <dependencies>
         <dependency>
-            <groupId>com.github.GamerCoder215.MobChip</groupId>
-            <artifactId>mobchip-base</artifactId>
-            <version>[VERSION]</version>
-        </dependency>
-        
-        <!-- Bukkit Module - Used for Implmentation, Development & Events - Contains Base -->
-        <dependency>
-            <groupId>com.github.GamerCoder215.MobChip</groupId>
+            <groupId>me.gamercoder215</groupId>
             <artifactId>mobchip-bukkit</artifactId>
-            <version>[VERSION]</version> <!-- Example: 1.0.1 -->
+            <version>[VERSION]</version>
+            
+            <!-- Use master-SNAPSHOT for Experimental Features on master branch -->
+            
+            <!-- Use something like 1.5.1-SNAPSHOT for a stable release -->
         </dependency>
     </dependencies>
     
@@ -65,14 +60,14 @@ improve the hassle of playing around with NMS and learning how to import and use
 
 ```gradle
 repositories {
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.codemc.io/repository/maven-snapshots/' }
 }
 
 dependencies {
-    // Base Module - Used for Base Interfaces & Built-In Template Classes
-    implementation 'com.github.GamerCoder215.MobChip:mobchip-base:[VERSION]'
-    // Bukkit Module - Used for Implmentation, Development & Events - Contains Base
-    implementation 'com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION]'
+    implementation 'me.gamercoder215:mobchip-bukkit:[VERSION]'
+    
+    // Use "master-SNAPSHOT" as version for Experimental Features on master branch
+    // Use something like "1.5.1-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
@@ -82,14 +77,14 @@ dependencies {
 
 ```kotlin
 repositories {
-    maven(url = "https://jitpack.io")
+    maven(url = "https://repo.codemc.io/repository/maven-snapshots/")
 }
 
 dependencies {
-    // Base Module - Used for Base Interfaces & Built-In Template Classes
-    implementation("com.github.GamerCoder215.MobChip:mobchip-base:[VERSION]")
-    // Bukkit Module - Used for Implmentation, Development & Events - Contains Base
-    implementation ("com.github.GamerCoder215.MobChip:mobchip-bukkit:[VERSION]")
+    implementation('me.gamercoder215:mobchip-bukkit:[VERSION]')
+
+    // Use "master-SNAPSHOT" as version for Experimental Features on master branch
+    // Use something like "1.5.1-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
