@@ -108,7 +108,6 @@ public interface EntityController {
     /**
      * Performs a Natural Entity Movement to the specified Entity.
      * @param en Entity to move to
-     * @param speedMod Speed Modifier
      * @param type Natural Movement Type
      * @return this controller, for chaining
      */
@@ -119,7 +118,6 @@ public interface EntityController {
     /**
      * Performs a Natural Entity Movement to the specified Location.
      * @param l Location to move to
-     * @param speedMod Speed Modifier
      * @param type Type of Natural Movement
      * @return this controller, for chaining
      */
@@ -132,7 +130,6 @@ public interface EntityController {
      * @param x X coord
      * @param y Y coord
      * @param z Z coord
-     * @param speedMod Speed Modifier
      * @param type Natural Movement Type
      * @return this controller, for chaining
      */
