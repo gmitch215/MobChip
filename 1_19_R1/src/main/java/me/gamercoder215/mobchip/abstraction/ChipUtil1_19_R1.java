@@ -55,14 +55,8 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-<<<<<<< HEAD
-import net.minecraft.world.entity.animal.AbstractSchoolingFish;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.ShoulderRidingEntity;
-=======
 import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.*;
->>>>>>> 1129017528a09198700ad5363905d8e931e6e88f
 import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
 import net.minecraft.world.entity.animal.frog.FrogAi;
