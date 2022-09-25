@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Setup Project
-        run: mvn package install -Dmaven.javadoc.skip=true
+        run: mvn package -Dmaven.javadoc.skip=true
       - name: Maven Information
         run: mvn dependency:tree
 
@@ -40,7 +40,7 @@ jobs:
           java-version: '16'
           cache: 'maven'
       - name: Build Project
-        run: mvn clean install -pl "!1_18_R1,!1_18_R2,!1_19_R1" -Dmaven.javadoc.skip=true
+        run: mvn clean package -pl "!1_18_R1,!1_18_R2,!1_19_R1" -Dmaven.javadoc.skip=true
   build:
     needs: setup
     strategy:
@@ -59,7 +59,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
       - name: Build Project
-        run: mvn clean install -Dmaven.javadoc.skip=true
+        run: mvn clean package -Dmaven.javadoc.skip=true
 
   deploy:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
           cache: 'maven'
 
       - name: Build Project
-        run: mvn package
+        run: mvn install
 
       - name: Build JavaDocs
         run: bash javadoc.sh ${GITHUB_SHA::7}
