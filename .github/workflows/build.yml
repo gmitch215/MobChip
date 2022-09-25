@@ -22,9 +22,7 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Setup Project
-        run: mvn package -Dmaven.javadoc.skip=true
-      - name: Maven Information
-        run: mvn dependency:tree
+        run: mvn package dependency:tree -Dmaven.javadoc.skip=true
 
   build-16:
     needs: setup
