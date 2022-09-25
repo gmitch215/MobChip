@@ -941,7 +941,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public void setBodyRotation(float rotation) {
-            nmsMob.aX = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aX = normalizeRotation(rotation);
         }
 
         @Override
@@ -951,7 +951,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
         @Override
         public void setHeadRotation(float rotation) {
-            nmsMob.aZ = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aZ = normalizeRotation(rotation);
         }
 
         @Override
@@ -1078,6 +1078,36 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         @Override
         public boolean isPushableBy(@Nullable Entity entity) {
             return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
+
+        @Override
+        public float getYaw() {
+            return nmsMob.getYRot();
+        }
+
+        @Override
+        public void setYaw(float rotation) {
+            nmsMob.setYRot(normalizeRotation(rotation));
+        }
+
+        @Override
+        public float getPitch() {
+            return nmsMob.getXRot();
+        }
+
+        @Override
+        public void setPitch(float rotation) {
+            nmsMob.setXRot(normalizeRotation(rotation));
+        }
+
+        @Override
+        public float getMaxUpStep() {
+            return nmsMob.O;
+        }
+
+        @Override
+        public void setMaxUpStep(float maxUpStep) {
+            nmsMob.O = maxUpStep;
         }
     }
 
@@ -1630,7 +1660,9 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         for (Class<?> c : nms) {
 
             Class<? extends Entity> bukkit = fromNMS((Class<? extends net.minecraft.world.entity.Entity>) c, Entity.class);
-            for (EntityType t : EntityType.values()) if (t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            for (EntityType t : EntityType.values()) {
+                if (t.getEntityClass() != null && t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            }
         }
         return types.toArray(new EntityType[0]);
     }
