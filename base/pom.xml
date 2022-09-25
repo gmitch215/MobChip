@@ -28,7 +28,6 @@
 						<link>https://hub.spigotmc.org/javadocs/spigot/</link>
 						<link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
 					</links>
-					<excludePackageNames>*.util</excludePackageNames>
 				</configuration>
 				<executions>
 					<execution>
