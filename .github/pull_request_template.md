@@ -17,7 +17,7 @@ OS:
 
 #### JDK Builds
 Tested on:
-- [ ] JDK Versuib 8/11
+- [ ] JDK Version 8/11
 - [ ] JDK Version 17/18
 
 ## Demonstration

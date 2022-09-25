@@ -188,7 +188,9 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
 
-        switch (b.getInternalName()) {
+        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
+
+        switch (name) {
             case "AvoidTarget": {
                 PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
                 return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
@@ -245,7 +247,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
             }
             case "FollowParent": {
                 PathfinderFollowParent p = (PathfinderFollowParent) b;
-                return new PathfinderGoalFollowParent((EntityTameableAnimal) m, p.getSpeedModifier());
+                return new PathfinderGoalFollowParent((EntityAnimal) m, p.getSpeedModifier());
             }
             case "JumpOnBlock": {
                 PathfinderCatOnBlock p = (PathfinderCatOnBlock) b;
@@ -386,8 +388,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
         PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        String name = b.getInternalName().startsWith("PathfinderGoal") ? b.getInternalName().replace("PathfinderGoal", "") : b.getInternalName();
 
         PathfinderGoal g = toNMS(b);
 
@@ -933,7 +933,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
         @Override
         public void setBodyRotation(float rotation) {
-            nmsMob.aL = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aL = normalizeRotation(rotation);
         }
 
         @Override
@@ -943,7 +943,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
         @Override
         public void setHeadRotation(float rotation) {
-            nmsMob.aN = rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
+            nmsMob.aN = normalizeRotation(rotation);
         }
 
         @Override
@@ -1074,6 +1074,36 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         @Override
         public boolean isPushableBy(@Nullable Entity entity) {
             return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
+        }
+
+        @Override
+        public float getYaw() {
+            return nmsMob.yaw;
+        }
+
+        @Override
+        public void setYaw(float rotation) {
+            nmsMob.yaw = normalizeRotation(rotation);
+        }
+
+        @Override
+        public float getPitch() {
+            return nmsMob.pitch;
+        }
+
+        @Override
+        public void setPitch(float rotation) {
+            nmsMob.pitch = normalizeRotation(rotation);
+        }
+
+        @Override
+        public float getMaxUpStep() {
+            return nmsMob.K;
+        }
+
+        @Override
+        public void setMaxUpStep(float maxUpStep) {
+            nmsMob.K = maxUpStep;
         }
     }
 
@@ -1661,7 +1691,9 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         for (Class<?> c : nms) {
 
             Class<? extends Entity> bukkit = fromNMS((Class<? extends net.minecraft.server.v1_14_R1.Entity>) c, Entity.class);
-            for (EntityType t : EntityType.values()) if (t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            for (EntityType t : EntityType.values()) {
+                if (t.getEntityClass() != null && t.getEntityClass().isAssignableFrom(bukkit)) types.add(t);
+            }
         }
         return types.toArray(new EntityType[0]);
     }
