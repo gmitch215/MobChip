@@ -38,7 +38,7 @@ jobs:
           java-version: '16'
           cache: 'maven'
       - name: Build Project
-        run: mvn clean package -pl "!1_18_R1,!1_18_R2,!1_19_R1" -Dmaven.javadoc.skip=true
+        run: mvn clean install -pl "!1_18_R1,!1_18_R2,!1_19_R1"
   build:
     needs: setup
     strategy:
@@ -57,7 +57,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
       - name: Build Project
-        run: mvn clean package -Dmaven.javadoc.skip=true
+        run: mvn clean install
 
   deploy:
     runs-on: ubuntu-latest
