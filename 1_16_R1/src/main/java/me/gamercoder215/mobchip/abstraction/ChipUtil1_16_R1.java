@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -48,7 +49,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -547,6 +551,22 @@ public class ChipUtil1_16_R1 implements ChipUtil {
             moveC.a();
             nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
             nms.getNavigation().c();
+            return this;
+        }
+
+        @Override
+        public EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type) {
+            Vec3D vec = new Vec3D(x, y, z);
+            final EnumMoveType m;
+            switch (type) {
+                default: m = EnumMoveType.SELF; break;
+                case PLAYER: m = EnumMoveType.PLAYER; break;
+                case PISTON: m = EnumMoveType.PISTON; break;
+                case SHULKER_BOX: m = EnumMoveType.SHULKER_BOX; break;
+                case SHULKER: m = EnumMoveType.SHULKER; break;
+            }
+
+            nms.move(m, vec);
             return this;
         }
 
@@ -1150,6 +1170,13 @@ public class ChipUtil1_16_R1 implements ChipUtil {
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.G = maxUpStep;
         }
+
+        @Override
+        public Position getLastLavaContact() {
+            // doesn't exist
+            return null;
+        }
+
     }
 
     @Override

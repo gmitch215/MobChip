@@ -11,6 +11,7 @@ import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -509,6 +510,22 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             moveC.a();
             nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
             nms.getNavigation().c();
+            return this;
+        }
+
+        @Override
+        public EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type) {
+            Vec3D vec = new Vec3D(x, y, z);
+            final EnumMoveType m;
+            switch (type) {
+                default: m = EnumMoveType.SELF; break;
+                case PLAYER: m = EnumMoveType.PLAYER; break;
+                case PISTON: m = EnumMoveType.PISTON; break;
+                case SHULKER_BOX: m = EnumMoveType.SHULKER_BOX; break;
+                case SHULKER: m = EnumMoveType.SHULKER; break;
+            }
+
+            nms.move(m, vec);
             return this;
         }
 
@@ -1106,6 +1123,13 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.H = maxUpStep;
         }
+
+        @Override
+        public Position getLastLavaContact() {
+            // doesn't exist
+            return null;
+        }
+
     }
 
     @Override

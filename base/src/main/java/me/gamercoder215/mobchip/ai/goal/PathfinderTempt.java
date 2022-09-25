@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.goal;
 
+import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.ai.SpeedModifier;
 import org.bukkit.entity.Creature;
 import org.bukkit.inventory.ItemStack;
@@ -46,12 +47,12 @@ public final class PathfinderTempt extends Pathfinder implements SpeedModifier {
      * @param items Collection of ItemStacks to be tempted by
      * @throws IllegalArgumentException if items are null or empty
      */
-    public PathfinderTempt(@NotNull Creature m, double speedMod, @NotNull Collection<? extends ItemStack> items) throws IllegalArgumentException {
+    public PathfinderTempt(@NotNull Creature m, double speedMod, @NotNull Iterable<? extends ItemStack> items) throws IllegalArgumentException {
         super(m);
         if(items == null) throw new IllegalArgumentException("items cannot be null");
-        if (items.size() < 0) throw new IllegalArgumentException("items cannot be empty");
+        if (!items.iterator().hasNext()) throw new IllegalArgumentException("items cannot be empty");
 
-        this.items = new HashSet<>(items);
+        this.items = new HashSet<>(ImmutableList.copyOf(items));
         this.speedMod = speedMod;
     }
 
@@ -78,9 +79,9 @@ public final class PathfinderTempt extends Pathfinder implements SpeedModifier {
      * @param items Items to add
      * @throws IllegalArgumentException if items are null
      */
-    public void addItems(@NotNull Collection<? extends ItemStack> items) throws IllegalArgumentException {
+    public void addItems(@NotNull Iterable<? extends ItemStack> items) throws IllegalArgumentException {
         if (items == null) throw new IllegalArgumentException("items cannot be null");
-        this.items.addAll(items);
+        this.items.addAll(ImmutableList.copyOf(items));
     }
 
     /**
@@ -97,9 +98,9 @@ public final class PathfinderTempt extends Pathfinder implements SpeedModifier {
      * @param items Items to remove
      * @throws IllegalArgumentException if items are null
      */
-    public void removeItems(@NotNull Collection<? extends ItemStack> items) throws IllegalArgumentException {
+    public void removeItems(@NotNull Iterable<? extends ItemStack> items) throws IllegalArgumentException {
         if (items == null) throw new IllegalArgumentException("items cannot be null");
-        this.items.removeAll(items);
+        ImmutableList.copyOf(items).forEach(this.items::remove);
     }
     
     /**
@@ -107,10 +108,10 @@ public final class PathfinderTempt extends Pathfinder implements SpeedModifier {
      * @param items Collection of Items to use
      * @throws IllegalArgumentException if Items are null or empty
      */
-    public void setItems(@NotNull Collection<? extends ItemStack> items) throws IllegalArgumentException {
+    public void setItems(@NotNull Iterable<? extends ItemStack> items) throws IllegalArgumentException {
         if(items == null) throw new IllegalArgumentException("items cannot be null");
-        if (items.size() < 0) throw new IllegalArgumentException("items cannot be empty");
-        this.items = new HashSet<>(items);
+        if (!items.iterator().hasNext()) throw new IllegalArgumentException("items cannot be empty");
+        this.items = new HashSet<>(ImmutableList.copyOf(items));
     }
 
     /**

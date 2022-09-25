@@ -11,6 +11,7 @@ import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
@@ -651,6 +652,21 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
         }
 
         @Override
+        public EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type) {
+            Vec3 vec = new Vec3(x, y, z);
+            MoverType m = switch (type) {
+                default -> MoverType.SELF;
+                case PLAYER -> MoverType.PLAYER;
+                case PISTON -> MoverType.PISTON;
+                case SHULKER_BOX -> MoverType.SHULKER_BOX;
+                case SHULKER -> MoverType.SHULKER;
+            };
+
+            nms.move(m, vec);
+            return this;
+        }
+
+        @Override
         public EntityController strafe(float fwd, float right) {
             moveC.strafe(fwd, right);
             moveC.tick();
@@ -1226,6 +1242,13 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
         @Override
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.maxUpStep = maxUpStep;
+        }
+
+        @Override
+        public Position getLastLavaContact() {
+            BlockPos p = nmsMob.lastLavaContact;
+            if (p == null) return null;
+            return new Position(p.getX(), p.getY(), p.getZ());
         }
     }
 

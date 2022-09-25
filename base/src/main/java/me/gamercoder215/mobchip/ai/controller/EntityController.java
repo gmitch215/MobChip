@@ -106,6 +106,36 @@ public interface EntityController {
     EntityController moveTo(double x, double y, double z, double speedMod);
 
     /**
+     * Performs a Natural Entity Movement to the specified Entity.
+     * @param en Entity to move to
+     * @param type Natural Movement Type
+     * @return this controller, for chaining
+     */
+    default EntityController naturalMoveTo(Entity en, NaturalMoveType type) {
+        return naturalMoveTo(en.getLocation(), type);
+    }
+
+    /**
+     * Performs a Natural Entity Movement to the specified Location.
+     * @param l Location to move to
+     * @param type Type of Natural Movement
+     * @return this controller, for chaining
+     */
+    default EntityController naturalMoveTo(Location l, NaturalMoveType type) {
+        return naturalMoveTo(l.getX(), l.getY(), l.getZ(), type);
+    }
+
+    /**
+     * Performs a Natural Entity Movement.
+     * @param x X coord
+     * @param y Y coord
+     * @param z Z coord
+     * @param type Natural Movement Type
+     * @return this controller, for chaining
+     */
+    EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type);
+
+    /**
      * Makes this Entity strafe.
      * @param fwd Amount to strafe <strong>forwards</strong> (negative for backwards)
      * @param right Amount to strafe <strong>right</strong> (negative for left)
