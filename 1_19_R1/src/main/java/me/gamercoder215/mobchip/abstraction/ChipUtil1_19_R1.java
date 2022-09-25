@@ -1,6 +1,8 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
@@ -29,7 +31,7 @@ import me.gamercoder215.mobchip.nbt.EntityNBT;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.Registry;
 import net.minecraft.core.*;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -53,16 +55,24 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+<<<<<<< HEAD
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
+=======
+import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.minecraft.world.entity.animal.*;
+>>>>>>> 1129017528a09198700ad5363905d8e931e6e88f
 import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
 import net.minecraft.world.entity.animal.frog.FrogAi;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.warden.WardenAi;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -85,11 +95,32 @@ import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R1.entity.*;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Bee;
+import org.bukkit.entity.Cat;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Cod;
+import org.bukkit.entity.Cow;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fox;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.MushroomCow;
+import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Panda;
+import org.bukkit.entity.Parrot;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.PolarBear;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Salmon;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Squid;
+import org.bukkit.entity.TropicalFish;
+import org.bukkit.entity.Turtle;
+import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -97,7 +128,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -157,16 +191,113 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         if (value) s.enableControlFlag(toNMS(flag)); else s.disableControlFlag(toNMS(flag));
     }
 
+    private static final BiMap<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>>builder()
+            .put(LivingEntity.class, net.minecraft.world.entity.LivingEntity.class) // EntityLiving
+            .put(Mob.class, net.minecraft.world.entity.Mob.class) // EntityInsentient
+            .put(Tameable.class, TamableAnimal.class) // EntityTameableAnimal
+
+            // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
+            .put(AbstractHorse.class, net.minecraft.world.entity.animal.horse.AbstractHorse.class)
+            .put(Allay.class, net.minecraft.world.entity.animal.allay.Allay.class)
+            .put(Ambient.class, AmbientCreature.class)
+            .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
+            .put(Bat.class, net.minecraft.world.entity.ambient.Bat.class)
+            .put(Bee.class, net.minecraft.world.entity.animal.Bee.class)
+            .put(Blaze.class, net.minecraft.world.entity.monster.Blaze.class)
+            .put(Cat.class, net.minecraft.world.entity.animal.Cat.class)
+            .put(CaveSpider.class, net.minecraft.world.entity.monster.CaveSpider.class)
+            .put(Chicken.class, net.minecraft.world.entity.animal.Chicken.class)
+            .put(Cod.class, net.minecraft.world.entity.animal.Cod.class)
+            .put(Cow.class, net.minecraft.world.entity.animal.Cow.class)
+            .put(Creeper.class, net.minecraft.world.entity.monster.Creeper.class)
+            .put(Donkey.class, net.minecraft.world.entity.animal.horse.Donkey.class)
+            .put(Dolphin.class, net.minecraft.world.entity.animal.Dolphin.class)
+            .put(Drowned.class, net.minecraft.world.entity.monster.Drowned.class)
+            .put(Endermite.class, net.minecraft.world.entity.monster.Endermite.class)
+            .put(Enderman.class, EnderMan.class)
+            .put(EnderDragon.class, net.minecraft.world.entity.boss.enderdragon.EnderDragon.class)
+            .put(ElderGuardian.class, net.minecraft.world.entity.monster.ElderGuardian.class)
+            .put(Evoker.class, net.minecraft.world.entity.monster.Evoker.class)
+            .put(Fox.class, net.minecraft.world.entity.animal.Fox.class)
+            .put(Frog.class, net.minecraft.world.entity.animal.frog.Frog.class)
+            .put(Ghast.class, net.minecraft.world.entity.monster.Ghast.class)
+            .put(Giant.class, net.minecraft.world.entity.monster.Giant.class)
+            .put(Goat.class, net.minecraft.world.entity.animal.goat.Goat.class)
+            .put(Golem.class, AbstractGolem.class)
+            .put(Guardian.class, net.minecraft.world.entity.monster.Guardian.class)
+            .put(Hoglin.class, net.minecraft.world.entity.monster.hoglin.Hoglin.class)
+            .put(Horse.class, net.minecraft.world.entity.animal.horse.Horse.class)
+            .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
+            .put(HumanEntity.class, net.minecraft.world.entity.player.Player.class)
+            .put(IronGolem.class, net.minecraft.world.entity.animal.IronGolem.class)
+            .put(Llama.class, net.minecraft.world.entity.animal.horse.Llama.class)
+            .put(MagmaCube.class, net.minecraft.world.entity.monster.MagmaCube.class)
+            .put(MushroomCow.class, net.minecraft.world.entity.animal.MushroomCow.class)
+            .put(Mule.class, net.minecraft.world.entity.animal.horse.Mule.class)
+            .put(Ocelot.class, net.minecraft.world.entity.animal.Ocelot.class)
+            .put(Parrot.class, net.minecraft.world.entity.animal.Parrot.class)
+            .put(Panda.class, net.minecraft.world.entity.animal.Panda.class)
+            .put(PolarBear.class, net.minecraft.world.entity.animal.PolarBear.class)
+            .put(Phantom.class, net.minecraft.world.entity.monster.Phantom.class)
+            .put(Pig.class, net.minecraft.world.entity.animal.Pig.class)
+            .put(Piglin.class, net.minecraft.world.entity.monster.piglin.Piglin.class)
+            .put(PiglinBrute.class, net.minecraft.world.entity.monster.piglin.PiglinBrute.class)
+            .put(Pillager.class, net.minecraft.world.entity.monster.Pillager.class)
+            .put(PigZombie.class, ZombifiedPiglin.class)
+            .put(Player.class, ServerPlayer.class)
+            .put(PolarBear.class, net.minecraft.world.entity.animal.PolarBear.class)
+            .put(PufferFish.class, Pufferfish.class)
+            .put(Rabbit.class, net.minecraft.world.entity.animal.Rabbit.class)
+            .put(Raider.class, net.minecraft.world.entity.raid.Raider.class)
+            .put(Ravager.class, net.minecraft.world.entity.monster.Ravager.class)
+            .put(Salmon.class, net.minecraft.world.entity.animal.Salmon.class)
+            .put(Shulker.class, net.minecraft.world.entity.monster.Shulker.class)
+            .put(Silverfish.class, net.minecraft.world.entity.monster.Silverfish.class)
+            .put(Sheep.class, net.minecraft.world.entity.animal.Sheep.class)
+            .put(Skeleton.class, net.minecraft.world.entity.monster.Skeleton.class)
+            .put(SkeletonHorse.class, net.minecraft.world.entity.animal.horse.SkeletonHorse.class)
+            .put(Slime.class, net.minecraft.world.entity.monster.Slime.class)
+            .put(Shulker.class, net.minecraft.world.entity.monster.Shulker.class)
+            .put(Snowman.class, SnowGolem.class)
+            .put(Spider.class, net.minecraft.world.entity.monster.Spider.class)
+            .put(Squid.class, net.minecraft.world.entity.animal.Squid.class)
+            .put(Stray.class, net.minecraft.world.entity.monster.Stray.class)
+            .put(Strider.class, net.minecraft.world.entity.monster.Strider.class)
+            .put(Tadpole.class, net.minecraft.world.entity.animal.frog.Tadpole.class)
+            .put(TropicalFish.class, net.minecraft.world.entity.animal.TropicalFish.class)
+            .put(Turtle.class, net.minecraft.world.entity.animal.Turtle.class)
+            .put(TraderLlama.class, net.minecraft.world.entity.animal.horse.TraderLlama.class)
+            .put(TropicalFish.class, net.minecraft.world.entity.animal.TropicalFish.class)
+            .put(Vex.class, net.minecraft.world.entity.monster.Vex.class)
+            .put(Villager.class, net.minecraft.world.entity.npc.Villager.class)
+            .put(Vindicator.class, net.minecraft.world.entity.monster.Vindicator.class)
+            .put(WanderingTrader.class, net.minecraft.world.entity.npc.WanderingTrader.class)
+            .put(org.bukkit.entity.Warden.class, Warden.class)
+            .put(Witch.class, net.minecraft.world.entity.monster.Witch.class)
+            .put(Wither.class, WitherBoss.class)
+            .put(WitherSkeleton.class, net.minecraft.world.entity.monster.WitherSkeleton.class)
+            .put(Wolf.class, net.minecraft.world.entity.animal.Wolf.class)
+            .put(Zoglin.class, net.minecraft.world.entity.monster.Zoglin.class)
+            .put(Zombie.class, net.minecraft.world.entity.monster.Zombie.class)
+            .put(ZombieHorse.class, net.minecraft.world.entity.animal.horse.ZombieHorse.class)
+            .put(ZombieVillager.class, net.minecraft.world.entity.monster.ZombieVillager.class)
+            .build();
+
     private static Class<? extends net.minecraft.world.entity.LivingEntity> toNMS(Class<? extends LivingEntity> clazz) {
+        if (BUKKIT_NMS_MAP.containsKey(clazz)) return BUKKIT_NMS_MAP.get(clazz);
+
+        Class<? extends net.minecraft.world.entity.LivingEntity> nms = null;
         try {
-            Method m = clazz.getDeclaredMethod("getHandle");
-            return m.getReturnType().asSubclass(net.minecraft.world.entity.LivingEntity.class);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            
-            return null;
-        }
+            // Sometimes we can get lucky...
+            nms = Class.forName(PathfinderMob.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
+
+            // Some Pre-Mojang Mapping Classes start with "Entity"
+            if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
+        } catch (ClassNotFoundException ignored) {}
+
+        if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
+
+        return nms;
     }
 
     private static net.minecraft.world.item.ItemStack toNMS(ItemStack i) {
@@ -1816,23 +1947,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
     }
 
     private static Goal custom(CustomPathfinder p) {
-        Goal g = new Goal() {
-            @Override
-            public boolean canUse() { return p.canStart(); }
-            @Override
-            public boolean canContinueToUse() {return p.canContinueToUse(); }
-            @Override
-            public boolean isInterruptable() { return p.canInterrupt(); }
-
-            @Override
-            public void start() { p.start(); }
-
-            @Override
-            public void tick() { p.tick(); }
-
-            @Override
-            public void stop() { p.stop(); }
-        };
+        CustomGoal1_19_R1 g = new CustomGoal1_19_R1(p);
         EnumSet<Goal.Flag> set = EnumSet.noneOf(Goal.Flag.class);
         Arrays.stream(p.getFlags()).map(ChipUtil1_19_R1::toNMS).forEach(set::add);
         g.setFlags(set);
@@ -1964,6 +2079,12 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
+
+                // Custom
+                case "CustomGoal1_19_R1" -> {
+                    CustomGoal1_19_R1 goal = (CustomGoal1_19_R1) g;
+                    yield goal.getPathfinder();
+                }
 
                 default -> custom(g);
             };

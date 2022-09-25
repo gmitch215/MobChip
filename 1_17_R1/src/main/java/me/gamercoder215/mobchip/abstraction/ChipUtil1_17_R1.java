@@ -1,6 +1,8 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
@@ -56,20 +58,23 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryTarget;
 import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
 import net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition;
+import net.minecraft.world.entity.ambient.EntityAmbient;
+import net.minecraft.world.entity.ambient.EntityBat;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
-import net.minecraft.world.entity.animal.horse.EntityHorseAbstract;
-import net.minecraft.world.entity.animal.horse.EntityLlama;
+import net.minecraft.world.entity.animal.horse.*;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
+import net.minecraft.world.entity.boss.wither.EntityWither;
 import net.minecraft.world.entity.item.EntityItem;
-import net.minecraft.world.entity.monster.EntityCreeper;
-import net.minecraft.world.entity.monster.EntityMonster;
-import net.minecraft.world.entity.monster.EntityZombie;
-import net.minecraft.world.entity.monster.IRangedEntity;
+import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.hoglin.EntityHoglin;
+import net.minecraft.world.entity.monster.piglin.EntityPiglin;
+import net.minecraft.world.entity.monster.piglin.EntityPiglinBrute;
 import net.minecraft.world.entity.npc.EntityVillager;
 import net.minecraft.world.entity.npc.EntityVillagerAbstract;
+import net.minecraft.world.entity.npc.EntityVillagerTrader;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.entity.raid.EntityRaider;
@@ -161,18 +166,110 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         s.a(toNMS(flag), value);
     }
 
+    private static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
+            .put(LivingEntity.class, EntityLiving.class)
+            .put(Mob.class, EntityInsentient.class)
+            .put(Tameable.class, EntityTameableAnimal.class)
+
+            // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
+            .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(Ambient.class, EntityAmbient.class)
+            .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
+            .put(Bat.class, EntityBat.class)
+            .put(Bee.class, EntityBee.class)
+            .put(Blaze.class, EntityBlaze.class)
+            .put(Cat.class, EntityCat.class)
+            .put(CaveSpider.class, EntityCaveSpider.class)
+            .put(Chicken.class, EntityChicken.class)
+            .put(Cod.class, EntityCod.class)
+            .put(Cow.class, EntityCow.class)
+            .put(Creeper.class, EntityCreeper.class)
+            .put(Donkey.class, EntityHorseDonkey.class)
+            .put(Dolphin.class, EntityDolphin.class)
+            .put(Drowned.class, EntityDrowned.class)
+            .put(Endermite.class, EntityEndermite.class)
+            .put(Enderman.class, EntityEnderman.class)
+            .put(EnderDragon.class, EntityEnderDragon.class)
+            .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Evoker.class, EntityEvoker.class)
+            .put(Fox.class, EntityFox.class)
+            .put(Ghast.class, EntityGhast.class)
+            .put(Giant.class, EntityGiantZombie.class)
+            .put(Goat.class, net.minecraft.world.entity.animal.goat.Goat.class)
+            .put(Golem.class, EntityGolem.class)
+            .put(Guardian.class, EntityGuardian.class)
+            .put(Hoglin.class, EntityHoglin.class)
+            .put(Horse.class, EntityHorse.class)
+            .put(Husk.class, EntityZombieHusk.class)
+            .put(HumanEntity.class, EntityHuman.class)
+            .put(IronGolem.class, EntityIronGolem.class)
+            .put(Llama.class, EntityLlama.class)
+            .put(MagmaCube.class, EntityMagmaCube.class)
+            .put(MushroomCow.class, EntityMushroomCow.class)
+            .put(Mule.class, EntityHorseMule.class)
+            .put(Ocelot.class, EntityOcelot.class)
+            .put(Parrot.class, EntityParrot.class)
+            .put(Panda.class, EntityPanda.class)
+            .put(PolarBear.class, EntityPolarBear.class)
+            .put(Phantom.class, EntityPhantom.class)
+            .put(Pig.class, EntityPig.class)
+            .put(Piglin.class, EntityPiglin.class)
+            .put(PiglinBrute.class, EntityPiglinBrute.class)
+            .put(Pillager.class, EntityPillager.class)
+            .put(PigZombie.class, EntityPigZombie.class)
+            .put(Player.class, EntityPlayer.class)
+            .put(PolarBear.class, EntityPolarBear.class)
+            .put(PufferFish.class, EntityPufferFish.class)
+            .put(Rabbit.class, EntityRabbit.class)
+            .put(Raider.class, EntityRaider.class)
+            .put(Ravager.class, EntityRavager.class)
+            .put(Salmon.class, EntitySalmon.class)
+            .put(Shulker.class, EntityShulker.class)
+            .put(Silverfish.class, EntitySilverfish.class)
+            .put(Sheep.class, EntitySheep.class)
+            .put(Skeleton.class, EntitySkeleton.class)
+            .put(SkeletonHorse.class, EntityHorseSkeleton.class)
+            .put(Slime.class, EntitySlime.class)
+            .put(Shulker.class, EntityShulker.class)
+            .put(Snowman.class, EntitySnowman.class)
+            .put(Spider.class, EntitySpider.class)
+            .put(Squid.class, EntitySquid.class)
+            .put(Stray.class, EntitySkeletonStray.class)
+            .put(Strider.class, EntityStrider.class)
+            .put(TropicalFish.class, EntityTropicalFish.class)
+            .put(Turtle.class, EntityTurtle.class)
+            .put(TraderLlama.class, EntityLlamaTrader.class)
+            .put(TropicalFish.class, EntityTropicalFish.class)
+            .put(Vex.class, EntityVex.class)
+            .put(Villager.class, EntityVillager.class)
+            .put(Vindicator.class, EntityVindicator.class)
+            .put(WanderingTrader.class, EntityVillagerTrader.class)
+            .put(Witch.class, EntityWitch.class)
+            .put(Wither.class, EntityWither.class)
+            .put(WitherSkeleton.class, EntitySkeletonWither.class)
+            .put(Wolf.class, EntityWolf.class)
+            .put(Zoglin.class, EntityZoglin.class)
+            .put(Zombie.class, EntityZombie.class)
+            .put(ZombieHorse.class, EntityHorseZombie.class)
+            .put(ZombieVillager.class, EntityZombieVillager.class)
+            .build();
+
     private static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
+        if (BUKKIT_NMS_MAP.containsKey(clazz)) return BUKKIT_NMS_MAP.get(clazz);
+
+        Class<? extends EntityLiving> nms = null;
         try {
-            Method m = clazz.getDeclaredMethod("getHandle");
-            return m.getReturnType().asSubclass(EntityLiving.class);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            // Sometimes we can get lucky...
+            nms = Class.forName(EntityInsentient.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(EntityLiving.class);
 
-            return null;
-        }
+            // Some Pre-Mojang Mapping Classes start with "Entity"
+            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackageName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+        } catch (ClassNotFoundException ignored) {}
+
+        if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
+
+        return nms;
     }
-
     private static net.minecraft.world.item.ItemStack toNMS(ItemStack i) {
         return CraftItemStack.asNMSCopy(i);
     }
@@ -1832,34 +1929,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     private static PathfinderGoal custom(CustomPathfinder p) {
-        PathfinderGoal g = new PathfinderGoal() {
-            @Override
-            public boolean a() {
-                return p.canStart();
-            }
-            @Override
-            public boolean b() {
-                return p.canContinueToUse();
-            }
-            @Override
-            public boolean C_() {
-                return p.canInterrupt();
-            }
-
-            @Override
-            public void c() {
-                p.start();
-            }
-
-            @Override
-            public void e() {
-                p.tick();
-            }
-
-            @Override
-            public void d() { p.stop(); }
-
-        };
+        CustomGoal1_17_R1 g = new CustomGoal1_17_R1(p);
         EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
         Arrays.stream(p.getFlags()).map(ChipUtil1_17_R1::toNMS).forEach(flags::add);
         g.a(flags);
@@ -1948,6 +2018,12 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+
+                // Custom
+                case "CustomGoal1_17_R1" -> {
+                    CustomGoal1_17_R1 goal = (CustomGoal1_17_R1) g;
+                    yield goal.getPathfinder();
+                }
 
                 default -> custom(g);
             };

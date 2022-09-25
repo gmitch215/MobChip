@@ -1,6 +1,8 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
@@ -118,16 +120,41 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         s.a(toNMS(flag), value);
     }
 
-    private static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
-        try {
-            Method m = clazz.getDeclaredMethod("getHandle");
-            return m.getReturnType().asSubclass(EntityLiving.class);
-        } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+    private static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
+            .put(LivingEntity.class, EntityLiving.class)
+            .put(Mob.class, EntityInsentient.class)
+            .put(Tameable.class, EntityTameableAnimal.class)
 
-            return null;
-        }
+            .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(Donkey.class, EntityHorseDonkey.class)
+            .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Golem.class, EntityGolem.class)
+            .put(Husk.class, EntityZombieHusk.class)
+            .put(HumanEntity.class, EntityHuman.class)
+            .put(Mule.class, EntityHorseMule.class)
+            .put(SkeletonHorse.class, EntityHorseSkeleton.class)
+            .put(Stray.class, EntitySkeletonStray.class)
+            .put(TraderLlama.class, EntityLlamaTrader.class)
+            .put(WanderingTrader.class, EntityVillagerTrader.class)
+            .put(WitherSkeleton.class, EntitySkeletonWither.class)
+            .put(ZombieHorse.class, EntityHorseZombie.class)
+            .build();
+
+    private static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
+        if (BUKKIT_NMS_MAP.containsKey(clazz)) return BUKKIT_NMS_MAP.get(clazz);
+
+        Class<? extends EntityLiving> nms = null;
+        try {
+            // Sometimes we can get lucky...
+            nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+
+            // Some Pre-Mojang Mapping Classes start with "Entity"
+            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+        } catch (ClassNotFoundException ignored) {}
+
+        if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
+
+        return nms;
     }
 
     private static net.minecraft.server.v1_16_R2.ItemStack toNMS(org.bukkit.inventory.ItemStack i) {
@@ -1833,34 +1860,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
     }
 
     private static PathfinderGoal custom(CustomPathfinder p) {
-        PathfinderGoal g = new PathfinderGoal() {
-            @Override
-            public boolean a() {
-                return p.canStart();
-            }
-            @Override
-            public boolean b() {
-                return p.canContinueToUse();
-            }
-            @Override
-            public boolean C_() {
-                return p.canInterrupt();
-            }
-
-            @Override
-            public void c() {
-                p.start();
-            }
-
-            @Override
-            public void e() {
-                p.tick();
-            }
-
-            @Override
-            public void d() { p.stop(); }
-
-        };
+        CustomGoal1_16_R2 g = new CustomGoal1_16_R2(p);
         EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
         Arrays.stream(p.getFlags()).map(ChipUtil1_16_R2::toNMS).forEach(flags::add);
         g.a(flags);
@@ -1989,6 +1989,12 @@ public class ChipUtil1_16_R2 implements ChipUtil {
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget": return new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed": return new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
+
+                // Custom
+                case "CustomGoal1_16_R2": {
+                    CustomGoal1_16_R2 goal = (CustomGoal1_16_R2) g;
+                    return goal.getPathfinder();
+                }
 
                 default: return custom(g);
             }
