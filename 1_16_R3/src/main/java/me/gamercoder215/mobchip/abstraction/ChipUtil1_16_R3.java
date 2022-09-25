@@ -523,7 +523,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                 case PISTON: m = EnumMoveType.PISTON; break;
                 case SHULKER_BOX: m = EnumMoveType.SHULKER_BOX; break;
                 case SHULKER: m = EnumMoveType.SHULKER; break;
-            };
+            }
 
             nms.move(m, vec);
             return this;
@@ -1128,6 +1128,12 @@ public class ChipUtil1_16_R3 implements ChipUtil {
         @Override
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.G = maxUpStep;
+        }
+
+        @Override
+        public Position getLastLavaContact() {
+            // doesn't exist
+            return null;
         }
     }
 

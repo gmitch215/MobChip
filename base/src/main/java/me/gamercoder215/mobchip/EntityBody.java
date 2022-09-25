@@ -2,6 +2,8 @@ package me.gamercoder215.mobchip;
 
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
+import me.gamercoder215.mobchip.util.Position;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -450,4 +452,10 @@ public interface EntityBody {
      * @param maxUpStep Maximum step height
      */
     void setMaxUpStep(float maxUpStep);
+
+    /**
+     * Fetches the last position this Entity touched {@link Material#LAVA}.
+     * @return Last Lava Position
+     */
+    Position getLastLavaContact();
 }

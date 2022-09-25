@@ -1222,6 +1222,12 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.O = maxUpStep;
         }
+
+        @Override
+        public Position getLastLavaContact() {
+            // doesn't exist
+            return null;
+        }
     }
 
     @Override
