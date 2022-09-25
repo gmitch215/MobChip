@@ -24,21 +24,6 @@ jobs:
       - name: Setup Project
         run: mvn clean install dependency:tree
 
-  build-16:
-    needs: setup
-    runs-on: ubuntu-latest
-    name: Build Java 16
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 16
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '16'
-          cache: 'maven'
-      - name: Build Project
-        run: mvn clean package -pl "!1_18_R1,!1_18_R2,!1_19_R1" -Dmaven.javadoc.skip=true
   build:
     needs: setup
     strategy:
