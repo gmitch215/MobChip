@@ -1243,7 +1243,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.maxUpStep = maxUpStep;
         }
-
+        
         @Override
         public Position getLastLavaContact() {
             BlockPos p = nmsMob.lastLavaContact;

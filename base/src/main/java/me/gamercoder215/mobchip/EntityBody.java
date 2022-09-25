@@ -452,7 +452,7 @@ public interface EntityBody {
      * @param maxUpStep Maximum step height
      */
     void setMaxUpStep(float maxUpStep);
-
+    
     /**
      * Fetches the last position this Entity touched {@link Material#LAVA}.
      * @return Last Lava Position

@@ -1129,6 +1129,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             // doesn't exist
             return null;
         }
+
     }
 
     @Override
