@@ -11,6 +11,7 @@ import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
+import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.*;
@@ -631,6 +632,21 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             moveC.a();
             nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
             nms.getNavigation().c();
+            return this;
+        }
+
+        @Override
+        public EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type) {
+            Vec3D vec = new Vec3D(x, y, z);
+            EnumMoveType m = switch (type) {
+                default -> EnumMoveType.a;
+                case PLAYER -> EnumMoveType.b;
+                case PISTON -> EnumMoveType.c;
+                case SHULKER_BOX -> EnumMoveType.d;
+                case SHULKER -> EnumMoveType.e;
+            };
+
+            nms.move(m, vec);
             return this;
         }
 
