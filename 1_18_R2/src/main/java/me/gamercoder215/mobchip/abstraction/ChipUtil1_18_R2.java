@@ -199,13 +199,13 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
             .put(Cod.class, net.minecraft.world.entity.animal.Cod.class)
             .put(Cow.class, net.minecraft.world.entity.animal.Cow.class)
             .put(Creeper.class, net.minecraft.world.entity.monster.Creeper.class)
-            .put(Donkey.class, net.minecraft.world.entity.animal.horse.Donkey.class)
             .put(Dolphin.class, net.minecraft.world.entity.animal.Dolphin.class)
+            .put(Donkey.class, net.minecraft.world.entity.animal.horse.Donkey.class)
             .put(Drowned.class, net.minecraft.world.entity.monster.Drowned.class)
-            .put(Endermite.class, net.minecraft.world.entity.monster.Endermite.class)
-            .put(Enderman.class, EnderMan.class)
-            .put(EnderDragon.class, net.minecraft.world.entity.boss.enderdragon.EnderDragon.class)
             .put(ElderGuardian.class, net.minecraft.world.entity.monster.ElderGuardian.class)
+            .put(EnderDragon.class, net.minecraft.world.entity.boss.enderdragon.EnderDragon.class)
+            .put(Enderman.class, EnderMan.class)
+            .put(Endermite.class, net.minecraft.world.entity.monster.Endermite.class)
             .put(Evoker.class, net.minecraft.world.entity.monster.Evoker.class)
             .put(Fox.class, net.minecraft.world.entity.animal.Fox.class)
             .put(Ghast.class, net.minecraft.world.entity.monster.Ghast.class)
@@ -215,23 +215,22 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
             .put(Guardian.class, net.minecraft.world.entity.monster.Guardian.class)
             .put(Hoglin.class, net.minecraft.world.entity.monster.hoglin.Hoglin.class)
             .put(Horse.class, net.minecraft.world.entity.animal.horse.Horse.class)
-            .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
             .put(HumanEntity.class, net.minecraft.world.entity.player.Player.class)
+            .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
             .put(IronGolem.class, net.minecraft.world.entity.animal.IronGolem.class)
             .put(Llama.class, net.minecraft.world.entity.animal.horse.Llama.class)
             .put(MagmaCube.class, net.minecraft.world.entity.monster.MagmaCube.class)
-            .put(MushroomCow.class, net.minecraft.world.entity.animal.MushroomCow.class)
             .put(Mule.class, net.minecraft.world.entity.animal.horse.Mule.class)
+            .put(MushroomCow.class, net.minecraft.world.entity.animal.MushroomCow.class)
             .put(Ocelot.class, net.minecraft.world.entity.animal.Ocelot.class)
-            .put(Parrot.class, net.minecraft.world.entity.animal.Parrot.class)
             .put(Panda.class, net.minecraft.world.entity.animal.Panda.class)
-            .put(PolarBear.class, net.minecraft.world.entity.animal.PolarBear.class)
+            .put(Parrot.class, net.minecraft.world.entity.animal.Parrot.class)
             .put(Phantom.class, net.minecraft.world.entity.monster.Phantom.class)
             .put(Pig.class, net.minecraft.world.entity.animal.Pig.class)
+            .put(PigZombie.class, ZombifiedPiglin.class)
             .put(Piglin.class, net.minecraft.world.entity.monster.piglin.Piglin.class)
             .put(PiglinBrute.class, net.minecraft.world.entity.monster.piglin.PiglinBrute.class)
             .put(Pillager.class, net.minecraft.world.entity.monster.Pillager.class)
-            .put(PigZombie.class, ZombifiedPiglin.class)
             .put(Player.class, ServerPlayer.class)
             .put(PolarBear.class, net.minecraft.world.entity.animal.PolarBear.class)
             .put(PufferFish.class, Pufferfish.class)
@@ -239,22 +238,20 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
             .put(Raider.class, net.minecraft.world.entity.raid.Raider.class)
             .put(Ravager.class, net.minecraft.world.entity.monster.Ravager.class)
             .put(Salmon.class, net.minecraft.world.entity.animal.Salmon.class)
+            .put(Sheep.class, net.minecraft.world.entity.animal.Sheep.class)
             .put(Shulker.class, net.minecraft.world.entity.monster.Shulker.class)
             .put(Silverfish.class, net.minecraft.world.entity.monster.Silverfish.class)
-            .put(Sheep.class, net.minecraft.world.entity.animal.Sheep.class)
             .put(Skeleton.class, net.minecraft.world.entity.monster.Skeleton.class)
             .put(SkeletonHorse.class, net.minecraft.world.entity.animal.horse.SkeletonHorse.class)
             .put(Slime.class, net.minecraft.world.entity.monster.Slime.class)
-            .put(Shulker.class, net.minecraft.world.entity.monster.Shulker.class)
             .put(Snowman.class, SnowGolem.class)
             .put(Spider.class, net.minecraft.world.entity.monster.Spider.class)
             .put(Squid.class, net.minecraft.world.entity.animal.Squid.class)
             .put(Stray.class, net.minecraft.world.entity.monster.Stray.class)
             .put(Strider.class, net.minecraft.world.entity.monster.Strider.class)
-            .put(TropicalFish.class, net.minecraft.world.entity.animal.TropicalFish.class)
-            .put(Turtle.class, net.minecraft.world.entity.animal.Turtle.class)
             .put(TraderLlama.class, net.minecraft.world.entity.animal.horse.TraderLlama.class)
             .put(TropicalFish.class, net.minecraft.world.entity.animal.TropicalFish.class)
+            .put(Turtle.class, net.minecraft.world.entity.animal.Turtle.class)
             .put(Vex.class, net.minecraft.world.entity.monster.Vex.class)
             .put(Villager.class, net.minecraft.world.entity.npc.Villager.class)
             .put(Vindicator.class, net.minecraft.world.entity.monster.Vindicator.class)
@@ -1243,7 +1240,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
         public void setMaxUpStep(float maxUpStep) {
             nmsMob.maxUpStep = maxUpStep;
         }
-        
+
         @Override
         public Position getLastLavaContact() {
             BlockPos p = nmsMob.lastLavaContact;
@@ -1991,6 +1988,10 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
     private static Location fromNMS(BlockPos p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     private Pathfinder fromNMS(Goal g) {
+        if (g instanceof CustomGoal1_18_R2 custom) {
+            return custom.getPathfinder();
+        }
+
         Mob m = getEntity(g);
         String name = g.getClass().getSimpleName();
 
@@ -2061,12 +2062,6 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", TargetingConditions.class).test(null, toNMS(l)));
-
-                // Custom
-                case "CustomGoal1_18_R2" -> {
-                    CustomGoal1_18_R2 goal = (CustomGoal1_18_R2) g;
-                    yield goal.getPathfinder();
-                }
 
                 default -> custom(g);
             };
@@ -2232,7 +2227,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
     private static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
         return net.minecraft.world.entity.ai.gossip.GossipType.byId(t.getKey().getKey());
     }
-    
+
     private static GossipType fromNMS(net.minecraft.world.entity.ai.gossip.GossipType t) {
         return GossipType.getByKey(NamespacedKey.minecraft(t.id));
     }

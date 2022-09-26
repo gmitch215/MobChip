@@ -1673,7 +1673,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
             if (name.contains("Entity")) name = name.replace("Entity", "");
 
             final Class<? extends Entity> bukkit;
-            
+
             switch (name) {
                 case "": bukkit = Entity.class; break;
                 case "Living": bukkit = LivingEntity.class; break;
@@ -1924,6 +1924,10 @@ public class ChipUtil1_16_R3 implements ChipUtil {
     private static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     private Pathfinder fromNMS(PathfinderGoal g) {
+        if (g instanceof CustomGoal1_16_R3) {
+            return ((CustomGoal1_16_R3) g).getPathfinder();
+        }
+
         Mob m = getEntity(g);
         String name = g.getClass().getSimpleName();
 
@@ -1993,12 +1997,6 @@ public class ChipUtil1_16_R3 implements ChipUtil {
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget": return new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed": return new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
-
-                // Custom
-                case "CustomGoal1_16_R3": {
-                    CustomGoal1_16_R3 goal = (CustomGoal1_16_R3) g;
-                    return goal.getPathfinder();
-                }
 
                 default: return custom(g);
             }
@@ -2501,5 +2499,5 @@ public class ChipUtil1_16_R3 implements ChipUtil {
     public EntityNBT getNBTEditor(Mob m) {
         return new EntityNBT1_16_R3(m);
     }
-    
+
 }
