@@ -1593,6 +1593,10 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     private static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     private Pathfinder fromNMS(PathfinderGoal g) {
+        if (g instanceof CustomGoal1_13_R2) {
+            return ((CustomGoal1_13_R2) g).getPathfinder();
+        }
+
         Mob m = getEntity(g);
         String name = g.getClass().getSimpleName();
 
@@ -1649,12 +1653,6 @@ public class ChipUtil1_13_R2 implements ChipUtil {
                 case "OwnerHurtByTarget": return new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget": return new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed": return new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"));
-
-                // Custom
-                case "CustomGoal1_13_R2": {
-                    CustomGoal1_13_R2 goal = (CustomGoal1_13_R2) g;
-                    return goal.getPathfinder();
-                }
 
                 default: return custom(g);
             }

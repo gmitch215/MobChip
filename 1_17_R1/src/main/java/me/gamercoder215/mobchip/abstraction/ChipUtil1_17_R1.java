@@ -185,13 +185,13 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Cod.class, EntityCod.class)
             .put(Cow.class, EntityCow.class)
             .put(Creeper.class, EntityCreeper.class)
-            .put(Donkey.class, EntityHorseDonkey.class)
             .put(Dolphin.class, EntityDolphin.class)
+            .put(Donkey.class, EntityHorseDonkey.class)
             .put(Drowned.class, EntityDrowned.class)
-            .put(Endermite.class, EntityEndermite.class)
-            .put(Enderman.class, EntityEnderman.class)
-            .put(EnderDragon.class, EntityEnderDragon.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(EnderDragon.class, EntityEnderDragon.class)
+            .put(Enderman.class, EntityEnderman.class)
+            .put(Endermite.class, EntityEndermite.class)
             .put(Evoker.class, EntityEvoker.class)
             .put(Fox.class, EntityFox.class)
             .put(Ghast.class, EntityGhast.class)
@@ -201,23 +201,22 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Guardian.class, EntityGuardian.class)
             .put(Hoglin.class, EntityHoglin.class)
             .put(Horse.class, EntityHorse.class)
-            .put(Husk.class, EntityZombieHusk.class)
             .put(HumanEntity.class, EntityHuman.class)
+            .put(Husk.class, EntityZombieHusk.class)
             .put(IronGolem.class, EntityIronGolem.class)
             .put(Llama.class, EntityLlama.class)
             .put(MagmaCube.class, EntityMagmaCube.class)
-            .put(MushroomCow.class, EntityMushroomCow.class)
             .put(Mule.class, EntityHorseMule.class)
+            .put(MushroomCow.class, EntityMushroomCow.class)
             .put(Ocelot.class, EntityOcelot.class)
-            .put(Parrot.class, EntityParrot.class)
             .put(Panda.class, EntityPanda.class)
-            .put(PolarBear.class, EntityPolarBear.class)
+            .put(Parrot.class, EntityParrot.class)
             .put(Phantom.class, EntityPhantom.class)
             .put(Pig.class, EntityPig.class)
+            .put(PigZombie.class, EntityPigZombie.class)
             .put(Piglin.class, EntityPiglin.class)
             .put(PiglinBrute.class, EntityPiglinBrute.class)
             .put(Pillager.class, EntityPillager.class)
-            .put(PigZombie.class, EntityPigZombie.class)
             .put(Player.class, EntityPlayer.class)
             .put(PolarBear.class, EntityPolarBear.class)
             .put(PufferFish.class, EntityPufferFish.class)
@@ -225,22 +224,20 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Raider.class, EntityRaider.class)
             .put(Ravager.class, EntityRavager.class)
             .put(Salmon.class, EntitySalmon.class)
+            .put(Sheep.class, EntitySheep.class)
             .put(Shulker.class, EntityShulker.class)
             .put(Silverfish.class, EntitySilverfish.class)
-            .put(Sheep.class, EntitySheep.class)
             .put(Skeleton.class, EntitySkeleton.class)
             .put(SkeletonHorse.class, EntityHorseSkeleton.class)
             .put(Slime.class, EntitySlime.class)
-            .put(Shulker.class, EntityShulker.class)
             .put(Snowman.class, EntitySnowman.class)
             .put(Spider.class, EntitySpider.class)
             .put(Squid.class, EntitySquid.class)
             .put(Stray.class, EntitySkeletonStray.class)
             .put(Strider.class, EntityStrider.class)
-            .put(TropicalFish.class, EntityTropicalFish.class)
-            .put(Turtle.class, EntityTurtle.class)
             .put(TraderLlama.class, EntityLlamaTrader.class)
             .put(TropicalFish.class, EntityTropicalFish.class)
+            .put(Turtle.class, EntityTurtle.class)
             .put(Vex.class, EntityVex.class)
             .put(Villager.class, EntityVillager.class)
             .put(Vindicator.class, EntityVindicator.class)
@@ -478,7 +475,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 PathfinderWildTarget p = (PathfinderWildTarget) b;
                 yield new PathfinderGoalRandomTargetNonTamed<>((EntityTameableAnimal) m, toNMS(p.getFilter()), p.mustSee(), l -> p.getCondition().test(fromNMS(l)));
             }
-            
+
             default -> {
                 if (b instanceof CustomPathfinder p) yield custom(p);
                 else yield null;
@@ -1970,6 +1967,10 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     private static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     private Pathfinder fromNMS(PathfinderGoal g) {
+        if (g instanceof CustomGoal1_17_R1 custom) {
+            return custom.getPathfinder();
+        }
+
         Mob m = getEntity(g);
         String name = g.getClass().getSimpleName();
 
@@ -2040,12 +2041,6 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 case "OwnerHurtByTarget" -> new PathfinderOwnerHurtByTarget((Tameable) m);
                 case "OwnerHurtTarget" -> new PathfinderOwnerHurtTarget((Tameable) m);
                 case "RandomTargetNonTamed" -> new PathfinderWildTarget<>((Tameable) m, fromNMS(getObject(g, "a", Class.class), LivingEntity.class), getBoolean(g, "f"), l -> getObject(g, "d", PathfinderTargetCondition.class).a(null, toNMS(l)));
-
-                // Custom
-                case "CustomGoal1_17_R1" -> {
-                    CustomGoal1_17_R1 goal = (CustomGoal1_17_R1) g;
-                    yield goal.getPathfinder();
-                }
 
                 default -> custom(g);
             };
