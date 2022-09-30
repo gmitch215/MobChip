@@ -1,17 +1,13 @@
 package me.gamercoder215.mobchip.abstraction;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 import me.gamercoder215.mobchip.EntityBody;
-import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
+import me.gamercoder215.mobchip.abstraction.v1_15_R1.*;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
-import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
@@ -22,20 +18,16 @@ import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
-import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
-import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
-import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.World;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_15_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.attribute.CraftAttributeInstance;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.entity.*;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -46,9 +38,7 @@ import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -62,7 +52,7 @@ import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ChipUtil1_15_R1 implements ChipUtil {
 
-    private static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_15_R1.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
+    public static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_15_R1.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
     @Override
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
@@ -122,7 +112,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         s.a(toNMS(flag), value);
     }
 
-    private static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
+    public static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
             .put(LivingEntity.class, EntityLiving.class)
             .put(Mob.class, EntityInsentient.class)
 
@@ -141,7 +131,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             .put(ZombieHorse.class, EntityHorseZombie.class)
             .build();
 
-    private static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
+    public static Class<? extends EntityLiving> toNMS(Class<? extends LivingEntity> clazz) {
         if (BUKKIT_NMS_MAP.containsKey(clazz)) return BUKKIT_NMS_MAP.get(clazz);
 
         Class<? extends EntityLiving> nms = null;
@@ -158,15 +148,15 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return nms;
     }
 
-    private static net.minecraft.server.v1_15_R1.ItemStack toNMS(org.bukkit.inventory.ItemStack i) {
+    public static net.minecraft.server.v1_15_R1.ItemStack toNMS(org.bukkit.inventory.ItemStack i) {
         return CraftItemStack.asNMSCopy(i);
     }
 
-    private static SoundEffect toNMS(Sound s) {
+    public static SoundEffect toNMS(Sound s) {
         return CraftSound.getSoundEffect(CraftSound.getSound(s));
     }
 
-    private static PathfinderGoal toNMS(Pathfinder b) {
+    public static PathfinderGoal toNMS(Pathfinder b) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
 
@@ -396,36 +386,12 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
     }
 
-    private static BehaviorResult.Status fromNMS(Behavior.Status status) {
+    public static BehaviorResult.Status fromNMS(Behavior.Status status) {
         if (status == Behavior.Status.STOPPED) return BehaviorResult.Status.STOPPED;
         return BehaviorResult.Status.RUNNING;
     }
 
-    private static final class BehaviorResult1_15_R1 extends BehaviorResult {
-        private final Behavior<? super EntityLiving> b;
-        private final EntityInsentient mob;
-        private final WorldServer l;
-
-        private BehaviorResult1_15_R1(Behavior<? super EntityLiving> b, EntityInsentient mob) {
-            this.b = b;
-            this.mob = mob;
-            this.l = toNMS(Bukkit.getWorld(mob.world.getWorld().getUID()));
-
-            b.e(l, mob, 0);
-        }
-
-        @Override
-        public @NotNull Status getStatus() {
-            return fromNMS(b.a());
-        }
-
-        @Override
-        public void stop() {
-            b.e(l, mob, 0);
-        }
-    }
-
-    private static LivingEntity fromNMS(EntityLiving l) {
+    public static LivingEntity fromNMS(EntityLiving l) {
         return (LivingEntity) l.getBukkitEntity();
     }
 
@@ -468,669 +434,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             return null;
         }
     }
-    private static EntityPlayer toNMS(Player p) { return ((CraftPlayer) p).getHandle(); }
-
-    private static final class EntityController1_15_R1 implements EntityController {
-
-        private final ControllerJump jumpC;
-        private final ControllerMove moveC;
-        private final ControllerLook lookC;
-
-        private final Mob m;
-        private final EntityInsentient nms;
-
-        public EntityController1_15_R1(Mob m) {
-            EntityInsentient nms = toNMS(m);
-            this.lookC = nms.getControllerLook();
-            this.moveC = nms.getControllerMove();
-            this.jumpC = nms.getControllerJump();
-            this.m = m;
-            this.nms = nms;
-        }
-
-        @Override
-        public EntityController jump() {
-            jumpC.jump();
-            jumpC.b();
-            return this;
-        }
-
-        @Override
-        public boolean isLookingAtTarget() {
-            Vector dir = m.getLocation().getDirection();
-            int x = dir.getBlockX();
-            int y = dir.getBlockY();
-            int z = dir.getBlockZ();
-            return lookC.d() == x && lookC.e() == y && lookC.f() == z;
-        }
-
-        @Override
-        public EntityController moveTo(double x, double y, double z, double speedMod) {
-            moveC.a(x, y, z, speedMod);
-            moveC.a();
-            nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
-            nms.getNavigation().c();
-            return this;
-        }
-
-        @Override
-        public EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type) {
-            Vec3D vec = new Vec3D(x, y, z);
-            final EnumMoveType m;
-            switch (type) {
-                default: m = EnumMoveType.SELF; break;
-                case PLAYER: m = EnumMoveType.PLAYER; break;
-                case PISTON: m = EnumMoveType.PISTON; break;
-                case SHULKER_BOX: m = EnumMoveType.SHULKER_BOX; break;
-                case SHULKER: m = EnumMoveType.SHULKER; break;
-            }
-
-            nms.move(m, vec);
-            return this;
-        }
-
-        @Override
-        public EntityController strafe(float fwd, float right) {
-            moveC.a(fwd, right);
-            moveC.a();
-            nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
-            nms.getNavigation().c();
-            return this;
-        }
-
-        @Override
-        public double getCurrentSpeedModifier() {
-            return moveC.c();
-        }
-
-        @Override
-        public Location getTargetMoveLocation() {
-            return new Location(m.getWorld(), moveC.d(), moveC.e(), moveC.f());
-        }
-
-        @Override
-        public Location getTargetLookLocation() {
-            return new Location(m.getWorld(), lookC.d(), lookC.e(), lookC.f());
-        }
-
-        @Override
-        public EntityController lookAt(double x, double y, double z) {
-            lookC.a(x, y, z);
-            lookC.a();
-            return this;
-        }
-
-    }
-
-    private static final class NavigationPath1_15_R1 implements NavigationPath {
-        private String name;
-        private final Mob m;
-        private final PathEntity handle;
-
-        NavigationPath1_15_R1(@NotNull PathEntity nms, @NotNull Mob m) {
-            this.m = m;
-            this.name = "bukkitpath";
-            this.handle = nms;
-        }
-
-        private final List<Position> nodes = new ArrayList<>();
-
-        /**
-         * Advances this path.
-         */
-        @Override
-        public void advance() {
-            this.handle.a();
-            PathPoint n = handle.d().get(handle.f());
-            new EntityController1_15_R1(m).moveTo(n.a, n.b, n.c);
-        }
-
-        /**
-         * Get this Path's Name.
-         * @return this path's name
-         */
-        public String getName() {
-            return this.name;
-        }
-
-        /**
-         * Sets this Path's Name.
-         * @param name this path's new name
-         */
-        public void setName(@NotNull String name) {
-            this.name = name;
-        }
-
-        /**
-         * Whether this NavigationPath is complete.
-         * @return true if complete, else false
-         */
-        @Override
-        public boolean isDone() {
-            return this.handle.b();
-        }
-
-        /**
-         * Get the size of this NavigationPath.
-         * @return size
-         */
-        public int size() {
-            return nodes.size();
-        }
-
-        /**
-         * Whether this NavigationPath is empty.
-         * @return true if empty, else false
-         */
-        @Override
-        public boolean isEmpty() {
-            return nodes.isEmpty();
-        }
-
-        /**
-         * Whether this Path contains this Navigation Node.
-         * @param o Position
-         * @return true if contains, else false
-         */
-        @Override
-        public boolean contains(@Nullable Position o) {
-            return nodes.contains(o);
-        }
-
-        @Override
-        @NotNull
-        public Iterator<Position> iterator() {
-            return nodes.iterator();
-        }
-
-        /**
-         * Converts this NavigationPath into an Array of Nodes.
-         * @return Array of Position
-         */
-        @NotNull
-        @Override
-        public Position[] toArray() {
-            return nodes.toArray(new Position[0]);
-        }
-
-        /**
-         * Returns the index of this Navigation Node.
-         * @param o Position to fetch
-         * @return Index found
-         * @see List#indexOf(Object)
-         */
-        @Override
-        public int indexOf(@Nullable Position o) {
-            return nodes.indexOf(o);
-        }
-
-        /**
-         * Returns the last index of this Navigation Node.
-         * @param o Position to fetch
-         * @return Index found
-         * @see List#lastIndexOf(Object)
-         */
-        @Override
-        public int lastIndexOf(@Nullable Position o) {
-            return nodes.lastIndexOf(o);
-        }
-    }
-
-    private static final class EntityNavigation1_15_R1 implements EntityNavigation {
-
-        private final NavigationAbstract handle;
-
-        private int speedMod;
-        private int range;
-        private final List<Position> points;
-        private BlockPosition finalPos;
-
-        private final Mob m;
-
-        EntityNavigation1_15_R1(Mob m) {
-            this.handle = toNMS(m).getNavigation();
-            this.points = new ArrayList<>();
-
-            this.speedMod = 1;
-            this.range = Integer.MAX_VALUE;
-            this.m = m;
-        }
-
-        @Override
-        public double getSpeedModifier() {
-            return this.speedMod;
-        }
-
-        @Override
-        public void setSpeedModifier(double mod) throws IllegalArgumentException {
-            if (mod > Integer.MAX_VALUE) throw new IllegalArgumentException("Must be integer");
-            this.speedMod = (int) Math.floor(mod);
-        }
-
-        @Override
-        public EntityNavigation recompute() {
-            this.handle.j();
-            return this;
-        }
-
-        @Override
-        public EntityNavigation addPoint(@NotNull Position point) {
-            this.points.add(point);
-            return this;
-        }
-
-        @Override
-        public EntityNavigation addPoint(int index, @NotNull Position point) {
-            this.points.add(index, point);
-            return this;
-        }
-
-        @Override
-        public EntityNavigation removePoint(@NotNull Position point) {
-            this.points.remove(point);
-            return this;
-        }
-
-        @Override
-        public EntityNavigation removePoint(int index) {
-            this.points.remove(index);
-            return this;
-        }
-
-        @Override
-        @NotNull
-        public NavigationPath buildPath() {
-            return new NavigationPath1_15_R1(handle.a(finalPos, range), m);
-        }
-
-        @Override
-        public EntityNavigation setFinalPoint(@NotNull Position node) {
-            this.finalPos = new BlockPosition(node.getX(), node.getY(), node.getZ());
-            return this;
-        }
-
-        @Override
-        public EntityNavigation setRange(int range) {
-            this.range = range;
-            return this;
-        }
-    }
-
-    private static final class EntityBody1_15_R1 implements EntityBody {
-        private final EntityInsentient nmsMob;
-
-        EntityBody1_15_R1(Mob nmsMob) {
-            this.nmsMob = toNMS(nmsMob);
-        }
-
-        /**
-         * Whether this Entity is Left Handed.
-         *
-         * @return true if left-handed, else false
-         */
-        @Override
-        public boolean isLeftHanded() {
-            return nmsMob.isLeftHanded();
-        }
-
-        /**
-         * Sets this Entity to be left-handed.
-         *
-         * @param leftHanded true if left-handed, else false
-         */
-        @Override
-        public void setLeftHanded(boolean leftHanded) {
-            nmsMob.p(leftHanded);
-        }
-
-        @Override
-        public boolean canBreatheUnderwater() {
-            return nmsMob.cB();
-        }
-
-        @Override
-        public boolean shouldDiscardFriction() {
-            return false;
-        }
-
-        @Override
-        public void setDiscardFriction(boolean discard) {
-            // doesn't exist
-        }
-
-        /**
-         * Makes this Mob interact with a Player.
-         *
-         * @param p Player to interact with
-         * @param hand Hand to use
-         * @return Result of interaction
-         */
-        @Override
-        public InteractionResult interact(@NotNull Player p, @Nullable InteractionHand hand) {
-            final EnumHand h;
-
-            if (hand == InteractionHand.OFF_HAND) h = EnumHand.OFF_HAND;
-            else h = EnumHand.MAIN_HAND;
-
-            if (nmsMob.b(toNMS(p), h)) return InteractionResult.SUCCESS;
-            else return InteractionResult.FAIL;
-        }
-
-        @Override
-        public boolean isSensitiveToWater() {
-            return nmsMob.dN();
-        }
-
-        @Override
-        public boolean isAffectedByPotions() {
-            return nmsMob.dM();
-        }
-
-        @Override
-        public boolean isBlocking() {
-            return nmsMob.isBlocking();
-        }
-
-        @Override
-        public float getArmorCoverPercentage() {
-            return nmsMob.dE();
-        }
-
-        @Override
-        public void useItem(@Nullable InteractionHand hand) {
-            if (hand == null) return;
-
-            final EnumHand h;
-            if (hand == InteractionHand.OFF_HAND) h = EnumHand.OFF_HAND;
-            else h = EnumHand.MAIN_HAND;
-
-            nmsMob.c(h);
-        }
-
-        @Override
-        public boolean isUsingItem() {
-            return nmsMob.isHandRaised();
-        }
-
-        @Override
-        public boolean isFireImmune() {
-            return nmsMob.isFireProof();
-        }
-
-        @Override
-        public boolean isSwinging() {
-            return nmsMob.aq;
-        }
-
-        @Override
-        public boolean canRideUnderwater() {
-            return nmsMob.bi();
-        }
-
-        @Override
-        public boolean isInvisibleTo(@Nullable Player p) {
-            return false;
-        }
-
-        @Override
-        public @NotNull InteractionHand getMainHand() {
-            if (nmsMob.getMainHand() == EnumMainHand.LEFT) return InteractionHand.OFF_HAND;
-            return InteractionHand.MAIN_HAND;
-        }
-
-        @Override
-        public List<ItemStack> getDefaultDrops() {
-            try {
-                Field dropsF = EntityLiving.class.getDeclaredField("drops");
-                dropsF.setAccessible(true);
-                List<ItemStack> drops = (List<ItemStack>) dropsF.get(nmsMob);
-                return new ArrayList<>(drops);
-            } catch (Exception e) {
-                return new ArrayList<>();
-            }
-        }
-
-        @Override
-        public void setDefaultDrops(@Nullable ItemStack... drops) {
-            try {
-                Field dropsF = EntityLiving.class.getDeclaredField("drops");
-                dropsF.setAccessible(true);
-                dropsF.set(nmsMob, drops == null ? new ArrayList<>() : Arrays.asList(drops));
-            } catch (Exception ignored) {}
-        }
-
-        @Override
-        public boolean isInCombat() {
-            try {
-                Field inCombat = nmsMob.combatTracker.getClass().getDeclaredField("f");
-                inCombat.setAccessible(true);
-                return inCombat.getBoolean(nmsMob.combatTracker);
-            } catch (Exception ignored) {}
-            return false;
-        }
-
-        @Override
-        public float getFlyingSpeed() {
-            return nmsMob.aL;
-        }
-
-        @Override
-        public void setFlyingSpeed(float speed) throws IllegalArgumentException {
-            if (speed < 0 || speed > 1) throw new IllegalArgumentException("Flying speed must be between 0.0F and 1.0F");
-            nmsMob.aL = speed;
-        }
-
-        @Override
-        public boolean isForcingDrops() {
-            try {
-                Field forceDrops = EntityLiving.class.getDeclaredField("forceDrops");
-                forceDrops.setAccessible(true);
-                return forceDrops.getBoolean(nmsMob);
-            } catch (Exception ignored) {}
-            return false;
-        }
-
-        @Override
-        public void setForcingDrops(boolean drop) {
-            try {
-                Field forceDrops = EntityLiving.class.getDeclaredField("forceDrops");
-                forceDrops.setAccessible(true);
-                forceDrops.set(nmsMob, drop);
-            } catch (Exception ignored) {}
-        }
-
-        @Override
-        public boolean isMoving() {
-            return false; // doesn't exist
-        }
-
-        @Override
-        public float getBodyRotation() {
-            return nmsMob.aI;
-        }
-
-        @Override
-        public void setBodyRotation(float rotation) {
-            nmsMob.aI = normalizeRotation(rotation);
-        }
-
-        @Override
-        public float getHeadRotation() {
-            return nmsMob.aK;
-        }
-
-        @Override
-        public void setHeadRotation(float rotation) {
-            nmsMob.aK = normalizeRotation(rotation);
-        }
-
-        @Override
-        public Set<? extends Entity> getCollideExemptions() {
-            return Collections.emptySet(); // doesn't exist
-        }
-
-        @Override
-        public void addCollideExemption(@NotNull Entity en) throws IllegalArgumentException {
-            // doesn't exist
-        }
-
-        @Override
-        public void removeCollideExemption(@NotNull Entity en) throws IllegalArgumentException {
-            // doesn't exist
-        }
-
-        @Override
-        public int getDroppedExperience() {
-            return nmsMob.expToDrop;
-        }
-
-        @Override
-        public void setDroppedExperience(int exp) throws IllegalArgumentException {
-            if (exp < 0) throw new IllegalArgumentException("Experience cannot be negative");
-            nmsMob.expToDrop = exp;
-        }
-
-        @Override
-        public void playAnimation(@NotNull EntityAnimation anim) {
-            switch (anim) {
-                case DAMAGE: {
-                    nmsMob.hurtDuration = 10;
-                    nmsMob.hurtTicks = nmsMob.hurtDuration;
-                    nmsMob.ax = 0.0F;
-                    break;
-                }
-                case CRITICAL_DAMAGE: {
-                    PacketPlayOutAnimation pkt = new PacketPlayOutAnimation(nmsMob, 4);
-                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).playerConnection.sendPacket(pkt);
-                    break;
-                }
-                case MAGICAL_CRITICAL_DAMAGE: {
-                    PacketPlayOutAnimation pkt = new PacketPlayOutAnimation(nmsMob, 5);
-                    for (Player p : fromNMS(nmsMob).getWorld().getPlayers()) toNMS(p).playerConnection.sendPacket(pkt);
-                    break;
-                }
-            }
-        }
-
-        @Override
-        public float getAnimationSpeed() {
-            return nmsMob.aD;
-        }
-
-        @Override
-        public void setAnimationSpeed(float speed) throws IllegalArgumentException {
-            if (speed < 0) throw new IllegalArgumentException("Animation speed cannot be negative");
-            nmsMob.aD = speed;
-        }
-
-        @Override
-        public boolean hasVerticalCollision() {
-            return nmsMob.v;
-        }
-
-        @Override
-        public void setVerticalCollision(boolean collision) {
-            nmsMob.v = collision;
-        }
-
-        @Override
-        public boolean hasHorizontalCollision() {
-            return nmsMob.positionChanged;
-        }
-
-        @Override
-        public void setHorizontalCollision(boolean collision) {
-            nmsMob.positionChanged = collision;
-        }
-
-        @Override
-        public float getWalkDistance() {
-            return nmsMob.A;
-        }
-
-        @Override
-        public float getMoveDistance() {
-            return nmsMob.B;
-        }
-
-        @Override
-        public float getFlyDistance() {
-            return 0F; // doesn't exist
-        }
-
-        @Override
-        public boolean isImmuneToExplosions() {
-            return nmsMob.ca();
-        }
-
-        @Override
-        public boolean isPeacefulCompatible() {
-            try {
-                Method m = EntityInsentient.class.getDeclaredMethod("J");
-                m.setAccessible(true);
-                return (boolean) m.invoke(nmsMob);
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        @Override
-        public boolean isInBubbleColumn() {
-            return nmsMob.world.getType(nmsMob.getChunkCoordinates()).getBlock().equals(Blocks.BUBBLE_COLUMN);
-        }
-
-        @Override
-        public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
-            return nmsMob.isInvulnerable(toNMS(cause));
-        }
-
-        @Override
-        public int getMaxFallDistance() {
-            return nmsMob.bD();
-        }
-
-        @Override
-        public boolean isPushableBy(@Nullable Entity entity) {
-            return IEntitySelector.a(toNMS(entity)).test(toNMS(entity));
-        }
-
-        @Override
-        public float getYaw() {
-            return nmsMob.yaw;
-        }
-
-        @Override
-        public void setYaw(float rotation) {
-            nmsMob.yaw = normalizeRotation(rotation);
-        }
-
-        @Override
-        public float getPitch() {
-            return nmsMob.pitch;
-        }
-
-        @Override
-        public void setPitch(float rotation) {
-            nmsMob.pitch = normalizeRotation(rotation);
-        }
-
-        @Override
-        public float getMaxUpStep() {
-            return nmsMob.H;
-        }
-
-        @Override
-        public void setMaxUpStep(float maxUpStep) {
-            nmsMob.H = maxUpStep;
-        }
-
-        @Override
-        public Position getLastLavaContact() {
-            // doesn't exist
-            return null;
-        }
-
-    }
+    public static EntityPlayer toNMS(Player p) { return ((CraftPlayer) p).getHandle(); }
 
     @Override
     public Attribute getDefaultAttribute(String s) {
@@ -1151,16 +455,16 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new Attribute1_15_R1(NamespacedKey.minecraft(s), a.getDefault(), Attribute1_15_R1.getDouble(a, "a"), a.maximum, a.c());
     }
 
-    private static Activity toNMS(me.gamercoder215.mobchip.ai.schedule.Activity a) {
+    public static Activity toNMS(me.gamercoder215.mobchip.ai.schedule.Activity a) {
         return IRegistry.ACTIVITY.get(new MinecraftKey(a.getKey().getKey()));
     }
 
-    private static me.gamercoder215.mobchip.ai.schedule.Activity fromNMS(Activity a) {
+    public static me.gamercoder215.mobchip.ai.schedule.Activity fromNMS(Activity a) {
         MinecraftKey key = IRegistry.ACTIVITY.getKey(a);
         return me.gamercoder215.mobchip.ai.schedule.Activity.getByKey(NamespacedKey.minecraft(key.getKey()));
     }
 
-    private static me.gamercoder215.mobchip.ai.schedule.Schedule fromNMS(Schedule s) {
+    public static me.gamercoder215.mobchip.ai.schedule.Schedule fromNMS(Schedule s) {
         me.gamercoder215.mobchip.ai.schedule.Schedule.Builder b = me.gamercoder215.mobchip.ai.schedule.Schedule.builder();
         for (int i = 0; i < 24000; i++) {
             if (s.a(i) == null) continue;
@@ -1171,7 +475,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return b.build();
     }
 
-    private static Schedule toNMS(me.gamercoder215.mobchip.ai.schedule.Schedule s) {
+    public static Schedule toNMS(me.gamercoder215.mobchip.ai.schedule.Schedule s) {
         ScheduleBuilder b = new ScheduleBuilder(new Schedule());
         for (int i = 0; i < 24000; i++) {
             if (!s.contains(i)) continue;
@@ -1182,7 +486,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return b.a();
     }
 
-    private static <T extends EntityLiving> Behavior<T> toNMS(Consumer<Mob> en) {
+    public static <T extends EntityLiving> Behavior<T> toNMS(Consumer<Mob> en) {
         return new Behavior<T>(Collections.emptyMap()) {
             @Override
             protected void d(WorldServer var0, T m, long var2) {
@@ -1197,7 +501,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return fromNMS(IRegistry.SCHEDULE.get(new MinecraftKey(key)));
     }
 
-    private static Set<me.gamercoder215.mobchip.ai.schedule.Activity> getActiveActivities(Mob m) {
+    public static Set<me.gamercoder215.mobchip.ai.schedule.Activity> getActiveActivities(Mob m) {
         EntityInsentient nmsMob = toNMS(m);
 
         try {
@@ -1212,82 +516,6 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
 
         return Collections.emptySet();
-    }
-
-    @SuppressWarnings("deprecation")
-    private static final class EntityScheduleManager1_15_R1 implements EntityScheduleManager {
-
-        private final EntityInsentient nmsMob;
-        private final Mob m;
-
-        EntityScheduleManager1_15_R1(Mob m) {
-            this.m = m;
-            this.nmsMob = toNMS(m);
-        }
-
-
-        @Override
-        public @Nullable me.gamercoder215.mobchip.ai.schedule.Schedule getCurrentSchedule() {
-            return fromNMS(nmsMob.getBehaviorController().getSchedule());
-        }
-
-        @Override
-        public void setSchedule(@NotNull me.gamercoder215.mobchip.ai.schedule.Schedule s) {
-            nmsMob.getBehaviorController().setSchedule(toNMS(s));
-        }
-
-        @Override
-        public @NotNull Set<me.gamercoder215.mobchip.ai.schedule.Activity> getActiveActivities() {
-            return ChipUtil1_15_R1.getActiveActivities(m);
-        }
-
-        @Override
-        public void setDefaultActivity(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
-            nmsMob.getBehaviorController().b(toNMS(a));
-        }
-
-        @Override
-        public void useDefaultActivity() {
-            // doesn't exist
-        }
-
-        @Override
-        public void setRunningActivity(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
-            nmsMob.getBehaviorController().a(toNMS(a));
-        }
-
-        @Override
-        public @Nullable me.gamercoder215.mobchip.ai.schedule.Activity getRunningActivity() {
-            return null; // doesn't exist
-        }
-
-        @Override
-        public boolean isRunning(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity a) {
-            return nmsMob.getBehaviorController().c(toNMS(a));
-        }
-
-        @Override
-        public int size() {
-            return Math.abs((int) nmsMob.getBehaviorController().d().count());
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return !nmsMob.getBehaviorController().d().findAny().isPresent();
-        }
-
-        @Nullable
-        @Override
-        public Consumer<Mob> put(@NotNull me.gamercoder215.mobchip.ai.schedule.Activity key, Consumer<Mob> value) {
-            nmsMob.getBehaviorController().a(toNMS(key), ImmutableList.of(new Pair<>(0, toNMS(value))));
-            return value;
-        }
-
-        @Override
-        public void clear() {
-            // doesn't exist
-        }
-
     }
 
     @Override
@@ -1308,7 +536,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new EntityBody1_15_R1(m);
     }
 
-    private static DamageSource toNMS(EntityDamageEvent.DamageCause c) {
+    public static DamageSource toNMS(EntityDamageEvent.DamageCause c) {
         switch (c) {
             case FIRE:
             case FIRE_TICK: return DamageSource.FIRE;
@@ -1332,11 +560,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static EntityLiving toNMS(LivingEntity en) {
+    public static EntityLiving toNMS(LivingEntity en) {
         return ((CraftLivingEntity) en).getHandle();
     }
 
-    private static Object toNMS(String key, Object value) {
+    public static Object toNMS(String key, Object value) {
         final Object nmsValue;
 
         if (value instanceof Player) {
@@ -1384,7 +612,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return nmsValue;
     }
 
-    private static AbstractDragonController toNMS(CustomPhase c) {
+    public static AbstractDragonController toNMS(CustomPhase c) {
         return new AbstractDragonController(toNMS(c.getDragon())) {
             @Override
             public DragonControllerPhase<? extends IDragonController> getControllerPhase() {
@@ -1423,7 +651,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         } catch (IndexOutOfBoundsException ignored) {}
     }
 
-    private static Object fromNMS(Mob m, String key, Object nmsValue) {
+    public static Object fromNMS(Mob m, String key, Object nmsValue) {
         Object value = nmsValue;
 
         if (nmsValue instanceof GlobalPos) {
@@ -1493,7 +721,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return value;
     }
 
-    private static EntityDamageEvent.DamageCause fromNMS(DamageSource c) {
+    public static EntityDamageEvent.DamageCause fromNMS(DamageSource c) {
         switch (c.translationIndex) {
             case "inFire": return FIRE;
             case "lightningBolt": return LIGHTNING;
@@ -1619,11 +847,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return nms.getEntitySenses().a(toNMS(en));
     }
 
-    private static net.minecraft.server.v1_15_R1.Entity toNMS(Entity en) {
+    public static net.minecraft.server.v1_15_R1.Entity toNMS(Entity en) {
         return ((CraftEntity) en).getHandle();
     }
 
-    private static VillagerProfession toNMS(Villager.Profession p) {
+    public static VillagerProfession toNMS(Villager.Profession p) {
         switch (p) {
             case FARMER: return VillagerProfession.FARMER;
             case FISHERMAN: return VillagerProfession.FISHERMAN;
@@ -1642,7 +870,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
             default: return VillagerProfession.NONE;
         }
     }
-    private static <T extends Entity> Class<? extends T> fromNMS(Class<? extends net.minecraft.server.v1_15_R1.Entity> clazz, Class<T> cast) {
+    public static <T extends Entity> Class<? extends T> fromNMS(Class<? extends net.minecraft.server.v1_15_R1.Entity> clazz, Class<T> cast) {
         try {
             String name = clazz.getSimpleName();
             if (name.contains("Entity")) name = name.replace("Entity", "");
@@ -1702,9 +930,9 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
+    public static EntityInsentient toNMS(Mob m) { return ((CraftMob) m).getHandle(); }
 
-    private static EntityType[] getEntityTypes(Class<?>... nms) {
+    public static EntityType[] getEntityTypes(Class<?>... nms) {
         List<EntityType> types = new ArrayList<>();
         for (Class<?> c : nms) {
 
@@ -1716,7 +944,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return types.toArray(new EntityType[0]);
     }
 
-    private static EnumDifficulty toNMS(org.bukkit.Difficulty d) {
+    public static EnumDifficulty toNMS(org.bukkit.Difficulty d) {
         switch (d) {
             case PEACEFUL: return EnumDifficulty.PEACEFUL;
             default: return EnumDifficulty.EASY;
@@ -1725,7 +953,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static org.bukkit.Difficulty fromNMS(EnumDifficulty d) {
+    public static org.bukkit.Difficulty fromNMS(EnumDifficulty d) {
         switch (d) {
             case PEACEFUL: return org.bukkit.Difficulty.PEACEFUL;
             default: return org.bukkit.Difficulty.EASY;
@@ -1734,9 +962,9 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
+    public static EntityCreature toNMS(Creature c) { return ((CraftCreature) c).getHandle();}
 
-    private static PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
+    public static PathfinderGoal.Type toNMS(Pathfinder.PathfinderFlag f) {
         switch (f) {
             default: return PathfinderGoal.Type.MOVE;
             case JUMPING: return PathfinderGoal.Type.JUMP;
@@ -1745,7 +973,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static Pathfinder.PathfinderFlag fromNMS(PathfinderGoal.Type f) {
+    public static Pathfinder.PathfinderFlag fromNMS(PathfinderGoal.Type f) {
         switch (f) {
             default: return Pathfinder.PathfinderFlag.MOVEMENT;
             case JUMP: return Pathfinder.PathfinderFlag.JUMPING;
@@ -1754,15 +982,15 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
+    public static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
 
-    private static double getDouble(PathfinderGoal o, String name) { return getObject(o, name, Double.class); }
+    public static double getDouble(PathfinderGoal o, String name) { return getObject(o, name, Double.class); }
 
-    private static boolean getBoolean(PathfinderGoal o, String name) { return getObject(o, name, Boolean.class); }
+    public static boolean getBoolean(PathfinderGoal o, String name) { return getObject(o, name, Boolean.class); }
 
-    private static int getInt(PathfinderGoal o, String name) { return getObject(o, name, Integer.class); }
+    public static int getInt(PathfinderGoal o, String name) { return getObject(o, name, Integer.class); }
 
-    private static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
+    public static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
         try {
             Class<? extends PathfinderGoal> clazz = o.getClass();
 
@@ -1784,20 +1012,20 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return null;
     }
 
-    private static Mob fromNMS(EntityInsentient m) { return (Mob) m.getBukkitEntity(); }
+    public static Mob fromNMS(EntityInsentient m) { return (Mob) m.getBukkitEntity(); }
 
-    private static org.bukkit.World fromNMS(net.minecraft.server.v1_15_R1.World l) { return l.getWorld(); }
+    public static org.bukkit.World fromNMS(net.minecraft.server.v1_15_R1.World l) { return l.getWorld(); }
 
-    private static WorldServer toNMS(org.bukkit.World w) { return ((CraftWorld) w).getHandle(); }
+    public static WorldServer toNMS(org.bukkit.World w) { return ((CraftWorld) w).getHandle(); }
 
-    private static BlockPosition toNMS(Location l) { return new BlockPosition(l.getX(), l.getY(), l.getZ()); }
+    public static BlockPosition toNMS(Location l) { return new BlockPosition(l.getX(), l.getY(), l.getZ()); }
 
-    private static List<ItemStack> fromNMS(RecipeItemStack in) {
+    public static List<ItemStack> fromNMS(RecipeItemStack in) {
         in.buildChoices();
         return Arrays.stream(in.choices).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList());
     }
 
-    private static Sound fromNMS(SoundEffect s) {
+    public static Sound fromNMS(SoundEffect s) {
         try {
             Field key = s.getClass().getDeclaredField("b");
             key.setAccessible(true);
@@ -1818,7 +1046,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static Mob getEntity(PathfinderGoal g) {
+    public static Mob getEntity(PathfinderGoal g) {
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
@@ -1842,7 +1070,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static Object invoke(PathfinderGoal g, String method, Object... args) {
+    public static Object invoke(PathfinderGoal g, String method, Object... args) {
         try {
             Method m = g.getClass().getDeclaredMethod(method);
             m.setAccessible(true);
@@ -1855,14 +1083,14 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static PathfinderGoal custom(CustomPathfinder p) {
+    public static PathfinderGoal custom(CustomPathfinder p) {
         CustomGoal1_15_R1 g = new CustomGoal1_15_R1(p);
         EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
         Arrays.stream(p.getFlags()).map(ChipUtil1_15_R1::toNMS).forEach(flags::add);
         g.a(flags);
         return g;
     }
-    private static CustomPathfinder custom(PathfinderGoal g) {
+    public static CustomPathfinder custom(PathfinderGoal g) {
         return new CustomPathfinder(getEntity(g)) {
             @Override
             public @NotNull PathfinderFlag[] getFlags() {
@@ -1901,7 +1129,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         };
     }
 
-    private static BlockPosition getPosWithBlock(net.minecraft.server.v1_15_R1.Block block, BlockPosition bp, IBlockAccess g) {
+    public static BlockPosition getPosWithBlock(net.minecraft.server.v1_15_R1.Block block, BlockPosition bp, IBlockAccess g) {
         if (g.getType(bp).getBlock().equals(block)) return bp;
         else {
             BlockPosition[] bp1 = new BlockPosition[]{new BlockPosition(bp.down()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPosition(bp.up())};
@@ -1910,7 +1138,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
+    public static Location fromNMS(BlockPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     private Pathfinder fromNMS(PathfinderGoal g) {
         if (g instanceof CustomGoal1_15_R1) {
@@ -1992,110 +1220,6 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         } else return custom(g);
     }
 
-    private static class Attribute1_15_R1 extends AttributeRanged implements Attribute {
-
-        private final NamespacedKey key;
-        private final double defaultV;
-        private final double min;
-        private final double max;
-
-        private static double getDouble(AttributeRanged r, String s) {
-            try {
-                Field f = r.getClass().getDeclaredField(s);
-                f.setAccessible(true);
-                return f.getDouble(r);
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-
-        public Attribute1_15_R1(NamespacedKey key, double defaultV, double min, double max, boolean clientSide) {
-            super(null, "attribute.name." +  key.getKey().toLowerCase(), defaultV, min, max);
-            this.key = key;
-            this.min = min;
-            this.defaultV = defaultV;
-            this.max = max;
-            this.a(clientSide);
-        }
-
-        public double getMinValue() {
-            return this.min;
-        }
-
-        public double getDefaultValue() {
-            return this.defaultV;
-        }
-
-        public double getMaxValue() {
-            return this.max;
-        }
-
-        @Override
-        public boolean isClientSide() {
-            return c();
-        }
-
-        @NotNull
-        @Override
-        public NamespacedKey getKey() {
-            return this.key;
-        }
-    }
-
-    private static class AttributeInstance1_15_R1 implements me.gamercoder215.mobchip.ai.attribute.AttributeInstance {
-
-        private final net.minecraft.server.v1_15_R1.AttributeInstance handle;
-        private final Attribute a;
-
-        AttributeInstance1_15_R1(Attribute a, net.minecraft.server.v1_15_R1.AttributeInstance handle) {
-            this.a = a;
-            this.handle = handle;
-        }
-
-        @Override
-        public @NotNull Attribute getGenericAttribute() {
-            return this.a;
-        }
-
-        @Override
-        public double getBaseValue() {
-            return handle.getBaseValue();
-        }
-
-        @Override
-        public void setBaseValue(double v) {
-            handle.setValue(v);
-        }
-
-        @NotNull
-        @Override
-        public Collection<org.bukkit.attribute.AttributeModifier> getModifiers() {
-            return handle.getModifiers().stream().map(CraftAttributeInstance::convert).collect(Collectors.toSet());
-        }
-
-        @Override
-        public void addModifier(@NotNull org.bukkit.attribute.AttributeModifier mod) {
-            Preconditions.checkArgument(mod != null, "modifier");
-            handle.addModifier(CraftAttributeInstance.convert(mod));
-        }
-
-        @Override
-        public void removeModifier(@NotNull org.bukkit.attribute.AttributeModifier mod) {
-            Preconditions.checkArgument(mod != null, "modifier");
-            handle.removeModifier(CraftAttributeInstance.convert(mod));
-        }
-
-        @Override
-        public double getValue() {
-            return handle.getValue();
-        }
-
-        @Override
-        public double getDefaultValue() {
-            return handle.getAttribute().getDefault();
-        }
-    }
-
     @Override
     public Attribute registerAttribute(NamespacedKey key, double defaultV, double min, double max, boolean client) {
         return CUSTOM_ATTRIBUTE_MAP.put(key, new Attribute1_15_R1(key, defaultV, min, max, client));
@@ -2106,11 +1230,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return CUSTOM_ATTRIBUTE_MAP.get(key) != null;
     }
 
-    private static MinecraftKey toNMS(NamespacedKey key) {
+    public static MinecraftKey toNMS(NamespacedKey key) {
         return CraftNamespacedKey.toMinecraft(key);
     }
 
-    private static final Map<NamespacedKey, Attribute> CUSTOM_ATTRIBUTE_MAP = new HashMap<>();
+    public static final Map<NamespacedKey, Attribute> CUSTOM_ATTRIBUTE_MAP = new HashMap<>();
     @Override
     public Attribute getAttribute(NamespacedKey key) {
         return CUSTOM_ATTRIBUTE_MAP.get(key);
@@ -2122,76 +1246,12 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new AttributeInstance1_15_R1(a, toNMS(m).getAttributeInstance(nmsAttribute));
     }
 
-    private static ReputationType toNMS(GossipType t) {
+    public static ReputationType toNMS(GossipType t) {
         return ReputationType.a(t.getKey().getKey());
     }
 
-    private static GossipType fromNMS(ReputationType t) {
+    public static GossipType fromNMS(ReputationType t) {
         return GossipType.getByKey(NamespacedKey.minecraft(t.f));
-    }
-
-    private static class EntityGossipContainer1_15_R1 implements EntityGossipContainer {
-        private final Reputation handle;
-
-        EntityGossipContainer1_15_R1(Villager v) {
-            this.handle = ((CraftVillager) v).getHandle().eN();
-        }
-
-        @Override
-        public void decay() {
-            handle.b();
-        }
-
-        @Override
-        public int getReputation(@NotNull Entity en, @Nullable GossipType... types) throws IllegalArgumentException {
-            return handle.a(en.getUniqueId(), g -> Arrays.asList(types).contains(fromNMS(g)));
-        }
-
-        @Override
-        public void put(@NotNull Entity en, @NotNull GossipType type, int maxCap) throws IllegalArgumentException {
-            handle.a(en.getUniqueId(), toNMS(type), maxCap);
-        }
-
-        @Override
-        public void remove(@NotNull Entity en, @NotNull GossipType type) throws IllegalArgumentException {
-            try {
-                Field map = Reputation.class.getDeclaredField("a");
-                map.setAccessible(true);
-                Map<UUID, ?> data = new HashMap<>((Map<UUID, ?>) map.get(handle));
-                data.remove(en.getUniqueId());
-                map.set(handle, data);
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-        }
-
-        @Override
-        public void removeAll(@NotNull GossipType type) throws IllegalArgumentException {
-            try {
-                Field map = Reputation.class.getDeclaredField("a");
-                map.setAccessible(true);
-                Map<UUID, ?> data = new HashMap<>((Map<UUID, ?>) map.get(handle));
-
-                for (UUID uuid : data.keySet()) {
-                    Object o = data.get(uuid);
-
-                    Method m = o.getClass().getDeclaredMethod("b", ReputationType.class);
-                    m.setAccessible(true);
-                    m.invoke(o, toNMS(type));
-
-                    Method empty = o.getClass().getDeclaredMethod("b");
-                    empty.setAccessible(true);
-                    if ((boolean) empty.invoke(o)) data.remove(uuid);
-                }
-                map.set(handle, data);
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-        }
     }
 
     @Override
@@ -2199,11 +1259,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new EntityGossipContainer1_15_R1(v);
     }
 
-    private static Entity fromNMS(net.minecraft.server.v1_15_R1.Entity en) {
+    public static Entity fromNMS(net.minecraft.server.v1_15_R1.Entity en) {
         return en.getBukkitEntity();
     }
 
-    private static me.gamercoder215.mobchip.combat.CombatEntry fromNMS(Mob m, net.minecraft.server.v1_15_R1.CombatEntry en) {
+    public static me.gamercoder215.mobchip.combat.CombatEntry fromNMS(Mob m, net.minecraft.server.v1_15_R1.CombatEntry en) {
         int time = 0;
         float health = 0;
 
@@ -2224,102 +1284,8 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
     }
 
-    private static net.minecraft.server.v1_15_R1.CombatEntry toNMS(me.gamercoder215.mobchip.combat.CombatEntry en) {
+    public static net.minecraft.server.v1_15_R1.CombatEntry toNMS(me.gamercoder215.mobchip.combat.CombatEntry en) {
         return new net.minecraft.server.v1_15_R1.CombatEntry(toNMS(en.getCause()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
-    }
-
-    private static class EntityCombatTracker1_15_R1 implements EntityCombatTracker {
-
-        private final CombatTracker handle;
-        private final Mob m;
-
-        EntityCombatTracker1_15_R1(Mob m) {
-            this.m = m;
-            this.handle = toNMS(m).getCombatTracker();
-        }
-
-        @Override
-        public @NotNull String getCurrentDeathMessage() {
-            return handle.getDeathMessage().getString();
-        }
-
-        @Override
-        public @Nullable me.gamercoder215.mobchip.combat.CombatEntry getLatestEntry() {
-            List<me.gamercoder215.mobchip.combat.CombatEntry> l = getCombatEntries();
-            return l.isEmpty() ? null : l.get(l.size() - 1);
-        }
-
-        @Override
-        public @NotNull List<me.gamercoder215.mobchip.combat.CombatEntry> getCombatEntries() {
-            List<me.gamercoder215.mobchip.combat.CombatEntry> entries = new ArrayList<>();
-            try {
-                Field f = CombatTracker.class.getDeclaredField("a");
-                f.setAccessible(true);
-                ((List<net.minecraft.server.v1_15_R1.CombatEntry>) f.get(handle)).stream().map(en -> fromNMS(m, en)).forEach(entries::add);
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-            return entries;
-        }
-
-        @Override
-        public void recordEntry(@NotNull CombatEntry entry) {
-            if (entry == null) return;
-            try {
-                Field f = CombatTracker.class.getDeclaredField("c");
-                f.setAccessible(true);
-                Object entries = f.get(handle);
-
-                Method m = List.class.getMethod("add", Object.class);
-                m.invoke(entries, toNMS(entry));
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-        }
-
-        @Override
-        public int getCombatDuration() {
-            return handle.f();
-        }
-
-        @Override
-        public boolean isTakingDamage() {
-            handle.g();
-            try {
-                Field damage = CombatTracker.class.getDeclaredField("g");
-                damage.setAccessible(true);
-                return damage.getBoolean(handle);
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-            return false;
-        }
-
-        @Override
-        public boolean isInCombat() {
-            handle.g();
-            try {
-                Field combat = CombatTracker.class.getDeclaredField("f");
-                combat.setAccessible(true);
-                return combat.getBoolean(handle);
-            } catch (Exception e) {
-                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                Bukkit.getLogger().severe(e.getMessage());
-                for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
-            }
-            return false;
-        }
-
-        @Override
-        public boolean hasLastDamageCancelled() {
-            return toNMS(m).forceExplosionKnockback;
-        }
     }
 
     @Override
@@ -2340,68 +1306,11 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         }
     }
 
-    private static final class DragonPhase1_15_R1 implements DragonPhase {
-
-        private final EnderDragon dragon;
-        private final IDragonController handle;
-
-        DragonPhase1_15_R1(EnderDragon dragon, IDragonController handle) {
-            this.dragon = dragon;
-            this.handle = handle;
-        }
-
-        @Override
-        public @NotNull EnderDragon getDragon() {
-            return this.dragon;
-        }
-
-        @Override
-        public @NotNull Location getTargetLocation() {
-            return fromNMS(handle.g(), dragon.getWorld());
-        }
-
-        @Override
-        public void start() {
-            handle.d();
-        }
-
-        @Override
-        public void stop() {
-            handle.e();
-        }
-
-        @Override
-        public void clientTick() {
-            handle.b();
-        }
-
-        @Override
-        public void serverTick() {
-            handle.c();
-        }
-
-        @Override
-        public boolean isSitting() {
-            return handle.a();
-        }
-
-        @Override
-        public float getFlyingSpeed() {
-            return handle.f();
-        }
-
-        @NotNull
-        @Override
-        public NamespacedKey getKey() {
-            return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
-        }
-    }
-
-    private static EntityEnderDragon toNMS(EnderDragon dragon) {
+    public static EntityEnderDragon toNMS(EnderDragon dragon) {
         return ((CraftEnderDragon) dragon).getHandle();
     }
 
-    private static Location fromNMS(IPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
+    public static Location fromNMS(IPosition p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     @Override
     public DragonPhase fromBukkit(EnderDragon d, EnderDragon.Phase phase) {
@@ -2429,7 +1338,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         return new DragonPhase1_15_R1(dragon, toNMS(dragon).getDragonControllerManager().a());
     }
 
-    private static MemoryModuleType<?> toNMS(Memory<?> mem) {
+    public static MemoryModuleType<?> toNMS(Memory<?> mem) {
         return IRegistry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new MinecraftKey(mem.getKey().getKey()) : new MinecraftKey(mem.getKey().getNamespace(), mem.getKey().getKey()));
     }
 
@@ -2444,27 +1353,6 @@ public class ChipUtil1_15_R1 implements ChipUtil {
     public boolean existsMemory(Memory<?> m) {
         if (m instanceof EntityMemory<?>) return true;
         return IRegistry.MEMORY_MODULE_TYPE.getOptional(toNMS(m.getKey())).isPresent();
-    }
-
-    private static final class EntityNBT1_15_R1 extends NBTSection1_15_R1 implements EntityNBT {
-
-        private final Mob mob;
-        private final EntityInsentient handle;
-
-        private final NBTTagCompound root;
-
-        EntityNBT1_15_R1(Mob m) {
-            super(m);
-            this.mob = m;
-            this.handle = toNMS(m);
-            this.root = new NBTTagCompound();
-            handle.d(root);
-        }
-
-        @Override
-        public @NotNull Mob getEntity() {
-            return mob;
-        }
     }
 
     @Override
