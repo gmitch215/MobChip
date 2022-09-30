@@ -24,6 +24,43 @@ jobs:
       - name: Setup Project
         run: mvn clean install dependency:tree
 
+  build-16:
+    needs: setup
+    runs-on: ubuntu-latest
+    name: Build Java 16
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+      - name: Build Project
+        run: mvn clean package -Dmaven.javadoc.skip=true -pl "base,abstraction,1_13_R1,1_13_R2,1_14_R1,1_15_R1,1_16_R1,1_16_R2,1_16_R3,1_17_R1,bukkit"
+
+  build-8_11:
+    needs: setup
+    strategy:
+      matrix:
+        java-version: [8, 11]
+
+    runs-on: ubuntu-latest
+    name: Build Java ${{ matrix.java-version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+      - name: Build Project
+        run: mvn clean package -Dmaven.javadoc.skip=true -pl "base,abstraction,1_13_R1,1_13_R2,1_14_R1,1_15_R1,1_16_R1,1_16_R2,1_16_R3,bukkit"
+
+
   build:
     needs: setup
     strategy:
