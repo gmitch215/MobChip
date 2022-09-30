@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip;
 
+import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -203,11 +203,22 @@ public interface EntityBody {
 
     /**
      * Sets the entity's current default drops.
-     * @param drops Collection of Default Drops
+     * @param drops Iterable of Default Drops
      */
-    default void setDefaultDrops(@Nullable Collection<ItemStack> drops) {
+    default void setDefaultDrops(@Nullable Iterable<ItemStack> drops) {
         if (drops == null) return;
-        setDefaultDrops(drops.toArray(new ItemStack[0]));
+        setDefaultDrops(ImmutableList.copyOf(drops).toArray(new ItemStack[0]));
+    }
+
+    /**
+     * Sets the entity's current default drops.
+     * @param drops Array of Default Drops
+     */
+    default void setDefaultDrops(@Nullable Material... drops) {
+        if (drops == null) return;
+        ItemStack[] items = new ItemStack[drops.length];
+        for (int i = 0; i < drops.length; i++) items[i] = new ItemStack(drops[i]);
+        setDefaultDrops(items);
     }
 
     /**
@@ -249,7 +260,12 @@ public interface EntityBody {
      */
     boolean isMoving();
 
-    default float normalizeRotation(float rotation) {
+    /**
+     * Utility Method to normalize the rotation value to be within {@code 0.0F} and {@code 360.0F}.
+     * @param rotation Rotation to normalize
+     * @return Normalized Rotation
+     */
+    static float normalizeRotation(float rotation) {
         return rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
     }
 
