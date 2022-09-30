@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -375,5 +377,35 @@ public final class EntityBody1_18_R1 implements EntityBody {
         BlockPos p = nmsMob.lastLavaContact;
         if (p == null) return null;
         return new Position(p.getX(), p.getY(), p.getZ());
+    }
+
+    @Override
+    public void setRiptideTicks(int ticks) {
+        if (ticks < 0) throw new IllegalArgumentException("Riptide ticks cannot be negative");
+        try {
+            Field f = LivingEntity.class.getDeclaredField("bC");
+            f.setAccessible(true);
+            f.setInt(nmsMob, ticks);
+
+            if (!nmsMob.level.isClientSide) {
+                Method setFlags = LivingEntity.class.getDeclaredMethod("c", int.class, boolean.class);
+                setFlags.setAccessible(true);
+                setFlags.invoke(nmsMob, 4, true);
+            }
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }
+    }
+
+    @Override
+    public int getRiptideTicks() {
+        try {
+            Field f = LivingEntity.class.getDeclaredField("bC");
+            f.setAccessible(true);
+            return f.getInt(nmsMob);
+        } catch (ReflectiveOperationException e) {
+            return 0;
+        }
     }
 }

@@ -474,4 +474,43 @@ public interface EntityBody {
      * @return Last Lava Position
      */
     Position getLastLavaContact();
+
+    /**
+     * <p>Sets the Mob's Riptiding Ticks.</p>
+     * <p>The mob will begin riptiding if {@link #isRiptiding()} returns false, and the number is greater than 0.</p>
+     * @param ticks Riptiding Ticks to set
+     * @throws IllegalArgumentException if ticks is negative
+     */
+    void setRiptideTicks(int ticks) throws IllegalArgumentException;
+
+    /**
+     * Makes this Mob stop riptiding.
+     */
+    default void stopRiptiding() {
+        setRiptideTicks(0);
+    }
+
+    /**
+     * Adds Riptiding Ticks to the Mob's current Riptiding Ticks.
+     * @param ticks Riptiding Ticks to add
+     * @throws IllegalArgumentException if ticks is negative
+     */
+    default void addRiptideTicks(int ticks) throws IllegalArgumentException {
+        if (ticks < 0) throw new IllegalArgumentException("Riptiding ticks cannot be negative!");
+        setRiptideTicks(getRiptideTicks() + ticks);
+    }
+
+    /**
+     * Fetches the Mob's current Riptiding Ticks.
+     * @return Current Riptiding Ticks
+     */
+    int getRiptideTicks();
+
+    /**
+     * Whether this Mob is currently riptiding.
+     * @return true if riptiding, else false
+     */
+    default boolean isRiptiding() {
+        return getRiptideTicks() == 0;
+    }
 }

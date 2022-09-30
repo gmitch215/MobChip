@@ -5,6 +5,7 @@ import me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_14_R1.*;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -396,6 +397,36 @@ public final class EntityBody1_14_R1 implements EntityBody {
     public Position getLastLavaContact() {
         // doesn't exist
         return null;
+    }
+
+    @Override
+    public void setRiptideTicks(int ticks) {
+        if (ticks < 0) throw new IllegalArgumentException("Riptide ticks cannot be negative");
+        try {
+            Field f = EntityLiving.class.getDeclaredField("bq");
+            f.setAccessible(true);
+            f.setInt(nmsMob, ticks);
+
+            if (!nmsMob.world.isClientSide) {
+                Method setFlags = EntityLiving.class.getDeclaredMethod("c", int.class, boolean.class);
+                setFlags.setAccessible(true);
+                setFlags.invoke(nmsMob, 4, true);
+            }
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }
+    }
+
+    @Override
+    public int getRiptideTicks() {
+        try {
+            Field f = EntityLiving.class.getDeclaredField("bq");
+            f.setAccessible(true);
+            return f.getInt(nmsMob);
+        } catch (ReflectiveOperationException e) {
+            return 0;
+        }
     }
 
 }

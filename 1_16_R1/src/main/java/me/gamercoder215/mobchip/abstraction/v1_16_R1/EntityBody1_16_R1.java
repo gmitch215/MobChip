@@ -410,4 +410,34 @@ public final class EntityBody1_16_R1 implements EntityBody {
         return null;
     }
 
+    @Override
+    public void setRiptideTicks(int ticks) {
+        if (ticks < 0) throw new IllegalArgumentException("Riptide ticks cannot be negative");
+        try {
+            Field f = EntityLiving.class.getDeclaredField("bm");
+            f.setAccessible(true);
+            f.setInt(nmsMob, ticks);
+
+            if (!nmsMob.world.isClientSide) {
+                Method setFlags = EntityLiving.class.getDeclaredMethod("c", int.class, boolean.class);
+                setFlags.setAccessible(true);
+                setFlags.invoke(nmsMob, 4, true);
+            }
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }
+    }
+
+    @Override
+    public int getRiptideTicks() {
+        try {
+            Field f = EntityLiving.class.getDeclaredField("bm");
+            f.setAccessible(true);
+            return f.getInt(nmsMob);
+        } catch (ReflectiveOperationException e) {
+            return 0;
+        }
+    }
+
 }
