@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
+          java-version: '16'
           cache: 'maven'
       - name: Build Project
         run: mvn clean package -Dmaven.javadoc.skip=true -pl "base,abstraction,1_13_R1,1_13_R2,1_14_R1,1_15_R1,1_16_R1,1_16_R2,1_16_R3,1_17_R1,bukkit"
