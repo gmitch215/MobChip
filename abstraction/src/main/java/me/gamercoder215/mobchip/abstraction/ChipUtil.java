@@ -157,6 +157,24 @@ public interface ChipUtil {
         }
     }
 
+    /**
+     * Finds the classes of an array of objects, using unboxed classes where possible.
+     * (ex. int.class rather than Integer.class)
+     * @param args Objects
+     * @return Classes of objects
+     */
+    static Class<?>[] getArgTypes(Object... args) {
+        Class<?> types[] = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            try {
+                types[i] = (Class<?>) args[i].getClass().getDeclaredField("TYPE").get(null);
+            } catch (ReflectiveOperationException ignored) {
+                types[i] = args[i].getClass();
+            }
+        }
+        return types;
+    }
+
     static String getServerVersion() {
         return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
     }
