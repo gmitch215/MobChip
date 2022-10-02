@@ -465,7 +465,7 @@ public class ChipUtil1_16_R1 implements ChipUtil {
 
         try {
             Class<?> bClass = Class.forName(packageName + "." + behaviorName);
-            Constructor<?> c = bClass.getConstructor(Arrays.stream(args).map(Object::getClass).toArray(Class[]::new));
+            Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
             Behavior<? super EntityLiving> b = (Behavior<? super EntityLiving>) c.newInstance(args);
             return new BehaviorResult1_16_R1(b, nms);
         } catch (Exception e) {
