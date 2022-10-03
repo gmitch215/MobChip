@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -337,6 +338,29 @@ public interface EntityBody {
      * @throws IllegalArgumentException if entity is null
      */
     void addCollideExemption(@NotNull Entity en) throws IllegalArgumentException;
+
+    /**
+     * Adds an array of entities that this Mob will not collide with.
+     * @param entities Entities to add
+     * @throws IllegalArgumentException if entities or any entity is null
+     */
+    default void addCollideExemptions(@NotNull Entity... entities) throws IllegalArgumentException {
+        if (entities == null) throw new IllegalArgumentException("Entities cannot be null!");
+        addCollideExemptions(Arrays.asList(entities));
+    }
+
+    /**
+     * Adds a collection of entities that this Mob will not collide with.
+     * @param entities Entities to add
+     * @throws IllegalArgumentException if entities or any entity is null
+     */
+    default void addCollideExemptions(@NotNull Iterable<Entity> entities) throws IllegalArgumentException {
+        if (entities == null) throw new IllegalArgumentException("Entities cannot be null!");
+        for (Entity en : entities) {
+            if (en == null) throw new IllegalArgumentException("Collection cannot contain any null entities!");
+            addCollideExemption(en);
+        }
+    }
 
     /**
      * Removes an entity that this Mob will not collide with.
