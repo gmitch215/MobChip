@@ -1,9 +1,7 @@
 package me.gamercoder215.mobchip.abstraction.v1_13_R2;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_13_R2;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
-import net.minecraft.server.v1_13_R2.EntityInsentient;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,12 +12,8 @@ import java.util.function.Consumer;
 
 public final class EntityScheduleManager1_13_R2 implements EntityScheduleManager {
 
-    private final EntityInsentient nmsMob;
-    private final Mob m;
-
     public EntityScheduleManager1_13_R2(Mob m) {
-        this.m = m;
-        this.nmsMob = ChipUtil1_13_R2.toNMS(m);
+        // doesn't exist
     }
 
 

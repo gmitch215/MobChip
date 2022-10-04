@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
 public final class EntityScheduleManager1_19_R1 implements EntityScheduleManager {
 
     private final net.minecraft.world.entity.Mob nmsMob;
-    private final Mob m;
 
     public EntityScheduleManager1_19_R1(Mob m) {
-        this.m = m;
         this.nmsMob = ChipUtil1_19_R1.toNMS(m);
     }
 

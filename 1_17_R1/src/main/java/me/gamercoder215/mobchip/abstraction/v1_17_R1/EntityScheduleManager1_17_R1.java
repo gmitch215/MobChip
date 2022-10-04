@@ -14,14 +14,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("deprecation")
 public final class EntityScheduleManager1_17_R1 implements EntityScheduleManager {
 
     private final EntityInsentient nmsMob;
-    private final Mob m;
-
+ 
     public EntityScheduleManager1_17_R1(Mob m) {
-        this.m = m;
         this.nmsMob = ChipUtil1_17_R1.toNMS(m);
     }
 
