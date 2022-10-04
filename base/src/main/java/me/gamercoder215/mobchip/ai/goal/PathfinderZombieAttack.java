@@ -1,17 +1,12 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import me.gamercoder215.mobchip.ai.SpeedModifier;
-import me.gamercoder215.mobchip.ai.goal.target.Targeting;
 import org.bukkit.entity.Zombie;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a Pathfinder for a special Zombie Melee Attack
  */
-public final class PathfinderZombieAttack extends PathfinderMeleeAttack implements SpeedModifier, Targeting {
-
-    private boolean mustSee;
-    private double speedMod;
+public final class PathfinderZombieAttack extends PathfinderMeleeAttack {
 
     /**
      * Constructs a PathfinderZombieAttack with no speed modifier.
