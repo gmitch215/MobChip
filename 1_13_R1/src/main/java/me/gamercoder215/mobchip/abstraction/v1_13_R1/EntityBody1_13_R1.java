@@ -278,6 +278,7 @@ public final class EntityBody1_13_R1 implements EntityBody {
                     ChipUtil1_13_R1.toNMS(p).playerConnection.sendPacket(pkt);
                 break;
             }
+            default: break;
         }
     }
 

@@ -47,7 +47,9 @@ public interface ChipUtil {
 
     void removePathfinder(Pathfinder p, boolean target);
 
-    void clearPathfinders(Mob mob, boolean target);
+    default void clearPathfinders(Mob mob, boolean target) {
+        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
+    }
 
     default void addPathfinders(Collection<? extends WrappedPathfinder> c, boolean target) {
         for (WrappedPathfinder p : c) addPathfinder(p.getPathfinder(), p.getPriority(), target);

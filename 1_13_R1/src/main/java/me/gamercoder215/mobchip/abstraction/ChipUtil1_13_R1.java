@@ -176,14 +176,6 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         s.a(g);
     }
 
-    @Override
-    public void clearPathfinders(Mob mob, boolean target) {
-        EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
-    }
-
     public static PathfinderGoal toNMS(Pathfinder b) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);

@@ -76,7 +76,7 @@ public class NBTSection1_14_R1 implements NBTSection {
         if (v instanceof Map<?, ?>) {
             Map<?, ?> map = (Map<?, ?>) v;
             NBTTagCompound tag = new NBTTagCompound();
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
                 tag.set(entry.getKey().toString(), serialize(entry.getValue()));
             }
             return tag;

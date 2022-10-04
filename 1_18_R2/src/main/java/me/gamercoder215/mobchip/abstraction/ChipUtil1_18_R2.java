@@ -526,7 +526,6 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
         net.minecraft.world.entity.Mob nms = toNMS(m);
-        String packageN = packageName.replace("{V}", "v1_18_R2");
 
         for (int i = 0; i < args.length; i++) {
             Object o = args[i];
@@ -571,6 +570,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
 
     public static Activity fromNMS(net.minecraft.world.entity.schedule.Activity a) {
         ResourceLocation key = Registry.ACTIVITY.getKey(a);
+        if (key == null) return null;
         return Activity.getByKey(NamespacedKey.minecraft(key.getPath()));
     }
 
@@ -765,6 +765,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
         if (nmsValue instanceof GlobalPos l) {
             BlockPos pos = l.pos();
             World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registryHolder.registryOrThrow(Registry.DIMENSION_REGISTRY).get(l.dimension()).getWorld();
+            if (w == null) w = Bukkit.getWorlds().get(0);
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
         else if (nmsValue instanceof List<?> li) {

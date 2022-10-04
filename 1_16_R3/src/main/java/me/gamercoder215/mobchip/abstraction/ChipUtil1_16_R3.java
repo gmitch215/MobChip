@@ -377,14 +377,6 @@ public class ChipUtil1_16_R3 implements ChipUtil {
         s.a(g);
     }
 
-    @Override
-    public void clearPathfinders(Mob mob, boolean target) {
-        EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
-    }
-
     public static BehaviorResult.Status fromNMS(Behavior.Status status) {
         if (status == Behavior.Status.STOPPED) return BehaviorResult.Status.STOPPED;
         return BehaviorResult.Status.RUNNING;
@@ -423,7 +415,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
         }
 
         try {
-            Class<?> bClass = Class.forName(packageName + "." + behaviorName);
+            Class<?> bClass = Class.forName(packageN + "." + behaviorName);
             Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
             Behavior<? super EntityLiving> b = (Behavior<? super EntityLiving>) c.newInstance(args);
             return new BehaviorResult1_16_R3(b, nms);

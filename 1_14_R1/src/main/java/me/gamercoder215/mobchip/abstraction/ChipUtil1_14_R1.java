@@ -167,14 +167,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         s.a(g);
     }
 
-    @Override
-    public void clearPathfinders(Mob mob, boolean target) {
-        EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.targetSelector : m.goalSelector;
-
-        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
-    }
-
     public static PathfinderGoal toNMS(Pathfinder b) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
@@ -423,7 +415,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         }
 
         try {
-            Class<?> bClass = Class.forName(packageName + "." + behaviorName);
+            Class<?> bClass = Class.forName(packageN + "." + behaviorName);
             Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
             Behavior<? super EntityLiving> b = (Behavior<? super EntityLiving>) c.newInstance(args);
             return new BehaviorResult1_14_R1(b, nms);
@@ -1350,7 +1342,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
     @Override
     public void registerMemory(Memory<?> m) {
-        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         IRegistryWritable<MemoryModuleType<?>> writable = IRegistry.MEMORY_MODULE_TYPE;
         writable.a(toNMS(m.getKey()), toNMS(m));
     }

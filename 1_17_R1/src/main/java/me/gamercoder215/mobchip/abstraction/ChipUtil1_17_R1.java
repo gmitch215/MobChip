@@ -508,7 +508,6 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
         EntityInsentient nms = toNMS(m);
-        String packageN = packageName.replace("{V}", "v1_17_R1");
 
         for (int i = 0; i < args.length; i++) {
             Object o = args[i];
@@ -648,21 +647,37 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 return DragonControllerPhase.k;
             }
 
+            @Override
             public void d() { c.start(); }
+
+            @Override
             public void e() { c.stop(); }
+
+            @Override
             public boolean a() { return c.isSitting(); }
+
+            @Override
             public void b() { c.clientTick(); }
+
+            @Override
             public void c() { c.serverTick(); }
+
+            @Override
             public void a(EntityEnderCrystal crystal, BlockPosition pos, DamageSource s, EntityHuman p) {
                 EnderCrystal bCrystal = (EnderCrystal) crystal.getBukkitEntity();
                 c.onCrystalDestroyed(bCrystal, fromNMS(s), p == null ? null : Bukkit.getPlayer(p.getUniqueID()));
             }
+
+            @Override
             public Vec3D g() {
                 Location l = c.getTargetLocation();
                 return new Vec3D(l.getX(), l.getY(), l.getZ());
             }
+            @Override
             public float f() { return c.getFlyingSpeed(); }
-            public float onHurt(DamageSource s, float damage) { return c.onDamage(fromNMS(s), damage); }
+
+            @Override
+            public float a(DamageSource s, float damage) { return c.onDamage(fromNMS(s), damage); }
         };
     }
 
