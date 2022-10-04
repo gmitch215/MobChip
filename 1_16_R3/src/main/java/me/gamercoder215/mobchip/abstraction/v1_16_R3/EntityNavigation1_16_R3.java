@@ -90,4 +90,9 @@ public final class EntityNavigation1_16_R3 implements EntityNavigation {
         this.range = range;
         return this;
     }
+
+    @Override
+    public int getRange() {
+        return this.range;
+    }
 }

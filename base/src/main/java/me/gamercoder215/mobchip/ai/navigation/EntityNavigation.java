@@ -166,6 +166,12 @@ public interface EntityNavigation extends SpeedModifier {
     EntityNavigation setRange(int range);
 
     /**
+     * Fetches the maximum range of this Navigation.
+     * @return Range of Navigation
+     */
+    int getRange();
+
+    /**
      * Constructs a NavigationPath.
      * @return Constructed NavigationPath
      * @throws IllegalArgumentException if final point is missing
