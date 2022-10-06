@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip.ai.controller;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
@@ -106,34 +107,42 @@ public interface EntityController {
     EntityController moveTo(double x, double y, double z, double speedMod);
 
     /**
-     * Performs a Natural Entity Movement to the specified Entity.
-     * @param en Entity to move to
-     * @param type Natural Movement Type
-     * @return this controller, for chaining
-     */
-    default EntityController naturalMoveTo(Entity en, NaturalMoveType type) {
-        return naturalMoveTo(en.getLocation(), type);
-    }
-
-    /**
-     * Performs a Natural Entity Movement to the specified Location.
-     * @param l Location to move to
-     * @param type Type of Natural Movement
-     * @return this controller, for chaining
-     */
-    default EntityController naturalMoveTo(Location l, NaturalMoveType type) {
-        return naturalMoveTo(l.getX(), l.getY(), l.getZ(), type);
-    }
-
-    /**
-     * Performs a Natural Entity Movement.
-     * @param x X coord
-     * @param y Y coord
-     * @param z Z coord
+     * <p>Performs a Natural Entity Movement.</p>
+     * <p>The X, Y, and Z are relative to the entity's current location.</p>
+     * <p>Example: {@code naturalMoveTo(1, 0, 3, }{@link NaturalMoveType#SELF}{@code )} is a natural movement by
+     * the entity's self +1 X-Axis step and +3 Z-Axis steps.</p>
+     * @param x Relative X to move by
+     * @param y Relative Y to move by
+     * @param z Relative Z to move by
      * @param type Natural Movement Type
      * @return this controller, for chaining
      */
     EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type);
+
+    /**
+     * <p>Performs a Natural Entity Movement.</p>
+     * <p>The Vector's X, Y, and Z are relative to the entity's current location.</p>
+     * <p>Example: {@code naturalMoveTo(new Vector(1, 0, 3), }{@link NaturalMoveType#SELF}{@code )} is a natural movement by
+     * the entity's self +1 X-Axis step and +3 Z-Axis steps.</p>
+     * @param vec Relative Vector to move by
+     * @param type Natural Movement Type
+     * @return this controller, for chaining
+     */
+    default EntityController naturalMoveTo(Vector vec, NaturalMoveType type) {
+        return naturalMoveTo(vec.getX(), vec.getY(), vec.getZ(), type);
+    }
+
+    /**
+     * <p>Performs a Natural Entity Movement.</p>
+     * <p>The X, Y, and Z are relative to the entity's current location.</p>
+     * @param add Relative Location to move by
+     * @param type Natural Movement Type
+     * @see #naturalMoveTo(double, double, double, NaturalMoveType)
+     * @return this controller, for chaining
+     */
+    default EntityController naturalMoveTo(Location add, NaturalMoveType type) {
+        return naturalMoveTo(add.toVector(), type);
+    }
 
     /**
      * Makes this Entity strafe.

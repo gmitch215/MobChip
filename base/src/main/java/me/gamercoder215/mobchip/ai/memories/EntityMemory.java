@@ -217,9 +217,9 @@ public final class EntityMemory<T> implements Memory<T> {
      */
     public static final EntityMemory<Integer> TIME_TO_REACH_ADMIRING_ITEM = new EntityMemory<>(Integer.class, "time_trying_to_reach_admire_item");
     /**
-     * Whether this Entity should walk to its admiring item.
+     * Whether this Entity should not walk to its admiring item.
      */
-    public static final EntityMemory<Boolean> WALKING_TO_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, "disable_walk_to_admire_item", true);
+    public static final EntityMemory<Boolean> DISABLE_WALKING_TO_ADMIRING_ITEM = new EntityMemory<>(Boolean.class, "disable_walk_to_admire_item");
     /**
      * Whether Admiring is Disabled.
      */
@@ -297,16 +297,9 @@ public final class EntityMemory<T> implements Memory<T> {
 
     private final String key;
 
-    private boolean inverse = false;
-
     private EntityMemory(Class<T> bukkit, String key) {
         this.bukkit = bukkit;
         this.key = key;
-    }
-
-    private EntityMemory(Class<T> clazz, String key, boolean inverse) {
-        this(clazz, key);
-        this.inverse = inverse;
     }
     
     /**

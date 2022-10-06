@@ -3,7 +3,7 @@
 	<parent>
     	<groupId>me.gamercoder215</groupId>
 		<artifactId>mobchip-parent</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
+		<version>1.6.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>mobchip-bukkit</artifactId>
 	<name>MobChip-Bukkit</name>
@@ -88,14 +88,11 @@
 								<exclude>net.minecraft.*</exclude>
 								<exclude>org.*</exclude>
 								<exclude>me.gamercoder215.mobchip.abstraction.*</exclude>
-
-								<dependencySourceExclude>net.minecraft.*</dependencySourceExclude>
-								<dependencySourceExclude>org.*</dependencySourceExclude>
-								<dependencySourceExclude>me.gamercoder215.mobchip.abstraction.*</dependencySourceExclude>
+								<exclude>me.gamercoder215.mobchip.abstraction.*.*</exclude>
 							</dependencySourceExcludes>
 
 							<sourceFileExcludes>
-								<exclude>**/me/gamercoder215/mobchip/abstraction/*.java</exclude>
+								<exclude>**/me/gamercoder215/mobchip/abstraction/**/*.java</exclude>
 							</sourceFileExcludes>
 						</configuration>
 					</execution>

@@ -75,6 +75,7 @@ public final class PathfinderMoveToBlock extends Pathfinder implements SpeedModi
         this.speedMod = speedMod;
         this.validBlock = (validBlock == null ? l -> true : validBlock);
         this.range = range;
+        this.vrange = vrange;
     }
 
     @Override
@@ -87,7 +88,7 @@ public final class PathfinderMoveToBlock extends Pathfinder implements SpeedModi
      * @return Vertical Range
      */
     public float getVerticalRange() {
-        return this.range;
+        return this.vrange;
     }
 
     /**

@@ -47,7 +47,7 @@ improve the hassle of playing around with NMS and learning how to import and use
             
             <!-- Use master-SNAPSHOT for Experimental Features on master branch -->
             
-            <!-- Use something like 1.6.0-SNAPSHOT for a stable release -->
+            <!-- Use something like 1.6.1-SNAPSHOT for a stable release -->
         </dependency>
     </dependencies>
     
@@ -67,7 +67,7 @@ dependencies {
     implementation 'me.gamercoder215:mobchip-bukkit:[VERSION]'
     
     // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.6.0-SNAPSHOT" as version for a stable release
+    // Use something like "1.6.1-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
@@ -84,7 +84,7 @@ dependencies {
     implementation('me.gamercoder215:mobchip-bukkit:[VERSION]')
 
     // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.6.0-SNAPSHOT" as version for a stable release
+    // Use something like "1.6.1-SNAPSHOT" as version for a stable release
 }
 ```
 </details>

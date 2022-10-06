@@ -47,7 +47,9 @@ public interface ChipUtil {
 
     void removePathfinder(Pathfinder p, boolean target);
 
-    void clearPathfinders(Mob mob, boolean target);
+    default void clearPathfinders(Mob mob, boolean target) {
+        getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
+    }
 
     default void addPathfinders(Collection<? extends WrappedPathfinder> c, boolean target) {
         for (WrappedPathfinder p : c) addPathfinder(p.getPathfinder(), p.getPriority(), target);
@@ -155,6 +157,24 @@ public interface ChipUtil {
             for (StackTraceElement s : e.getStackTrace())
                 Bukkit.getLogger().severe("[MobChip] " + s.toString());
         }
+    }
+
+    /**
+     * Finds the classes of an array of objects, using unboxed classes where possible.
+     * (ex. int.class rather than Integer.class)
+     * @param args Objects
+     * @return Classes of objects
+     */
+    static Class<?>[] getArgTypes(Object... args) {
+        Class<?> types[] = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            try {
+                types[i] = (Class<?>) args[i].getClass().getDeclaredField("TYPE").get(null);
+            } catch (ReflectiveOperationException ignored) {
+                types[i] = args[i].getClass();
+            }
+        }
+        return types;
     }
 
     static String getServerVersion() {

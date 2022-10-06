@@ -10,6 +10,8 @@ public final class EntityMemories {
 
     private static final ChipUtil w = ChipUtil.getWrapper();
 
+    private EntityMemories() { throw new UnsupportedOperationException(); }
+
     /**
      * Registers a new memory in the registry.
      * @param memory Memory to register

@@ -1,10 +1,13 @@
 package me.gamercoder215.mobchip;
 
+import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -12,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -203,11 +206,22 @@ public interface EntityBody {
 
     /**
      * Sets the entity's current default drops.
-     * @param drops Collection of Default Drops
+     * @param drops Iterable of Default Drops
      */
-    default void setDefaultDrops(@Nullable Collection<ItemStack> drops) {
+    default void setDefaultDrops(@Nullable Iterable<ItemStack> drops) {
         if (drops == null) return;
-        setDefaultDrops(drops.toArray(new ItemStack[0]));
+        setDefaultDrops(ImmutableList.copyOf(drops).toArray(new ItemStack[0]));
+    }
+
+    /**
+     * Sets the entity's current default drops.
+     * @param drops Array of Default Drops
+     */
+    default void setDefaultDrops(@Nullable Material... drops) {
+        if (drops == null) return;
+        ItemStack[] items = new ItemStack[drops.length];
+        for (int i = 0; i < drops.length; i++) items[i] = new ItemStack(drops[i]);
+        setDefaultDrops(items);
     }
 
     /**
@@ -249,7 +263,12 @@ public interface EntityBody {
      */
     boolean isMoving();
 
-    default float normalizeRotation(float rotation) {
+    /**
+     * Utility Method to normalize the rotation value to be within {@code 0.0F} and {@code 360.0F}.
+     * @param rotation Rotation to normalize
+     * @return Normalized Rotation
+     */
+    static float normalizeRotation(float rotation) {
         return rotation > 360 ? (rotation - (float) (360 * Math.floor(rotation / 360))) : rotation;
     }
 
@@ -321,6 +340,29 @@ public interface EntityBody {
      * @throws IllegalArgumentException if entity is null
      */
     void addCollideExemption(@NotNull Entity en) throws IllegalArgumentException;
+
+    /**
+     * Adds an array of entities that this Mob will not collide with.
+     * @param entities Entities to add
+     * @throws IllegalArgumentException if entities or any entity is null
+     */
+    default void addCollideExemptions(@NotNull Entity... entities) throws IllegalArgumentException {
+        if (entities == null) throw new IllegalArgumentException("Entities cannot be null!");
+        addCollideExemptions(Arrays.asList(entities));
+    }
+
+    /**
+     * Adds a collection of entities that this Mob will not collide with.
+     * @param entities Entities to add
+     * @throws IllegalArgumentException if entities or any entity is null
+     */
+    default void addCollideExemptions(@NotNull Iterable<Entity> entities) throws IllegalArgumentException {
+        if (entities == null) throw new IllegalArgumentException("Entities cannot be null!");
+        for (Entity en : entities) {
+            if (en == null) throw new IllegalArgumentException("Collection cannot contain any null entities!");
+            addCollideExemption(en);
+        }
+    }
 
     /**
      * Removes an entity that this Mob will not collide with.
@@ -458,4 +500,86 @@ public interface EntityBody {
      * @return Last Lava Position
      */
     Position getLastLavaContact();
+
+    /**
+     * <p>Sets the Mob's Riptiding Ticks.</p>
+     * <p>The mob will begin riptiding if {@link #isRiptiding()} returns false, and the number is greater than 0.</p>
+     * @param ticks Riptiding Ticks to set
+     * @throws IllegalArgumentException if ticks is negative
+     */
+    void setRiptideTicks(int ticks) throws IllegalArgumentException;
+
+    /**
+     * Makes this Mob stop riptiding.
+     */
+    default void stopRiptiding() {
+        setRiptideTicks(0);
+    }
+
+    /**
+     * Adds Riptiding Ticks to the Mob's current Riptiding Ticks.
+     * @param ticks Riptiding Ticks to add
+     * @throws IllegalArgumentException if ticks is negative
+     */
+    default void addRiptideTicks(int ticks) throws IllegalArgumentException {
+        if (ticks < 0) throw new IllegalArgumentException("Riptiding ticks cannot be negative!");
+        setRiptideTicks(getRiptideTicks() + ticks);
+    }
+
+    /**
+     * Fetches the Mob's current Riptiding Ticks.
+     * @return Current Riptiding Ticks
+     */
+    int getRiptideTicks();
+
+    /**
+     * Whether this Mob is currently riptiding.
+     * @return true if riptiding, else false
+     */
+    default boolean isRiptiding() {
+        return getRiptideTicks() == 0;
+    }
+
+    /**
+     * Fetches the entity this body belongs to.
+     * @return Body Owner
+     */
+    @NotNull
+    Mob getEntity();
+
+    /**
+     * Whether the entity would render at this location.
+     * @param x X Coordinate
+     * @param y Y Coordinate
+     * @param z Z Coordinate
+     * @return true if entity would render, else false
+     */
+    boolean shouldRenderFrom(double x, double y, double z);
+
+    /**
+     * Whether the entity would render at this location.
+     * @param l Location to check
+     * @return true if entity would render, else false
+     */
+    default boolean shouldRenderFrom(@NotNull Location l) {
+        if (l == null) return false;
+        if (!(getEntity().getWorld().getUID().equals(l.getWorld().getUID()))) return false;
+        return shouldRenderFrom(l.getX(), l.getY(), l.getZ());
+    }
+
+    /**
+     * Whether the entity would render.
+     * @param dist Distance from entity
+     * @return true if entity would render, else false
+     */
+    default boolean shouldRenderFrom(double dist) {
+        return shouldRenderFromSqr(dist * dist);
+    }
+
+    /**
+     * Whether the entity would render.
+     * @param dist Square Distance from entity
+     * @return true if entity would render, else false
+     */
+    boolean shouldRenderFromSqr(double dist);
 }
