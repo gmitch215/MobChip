@@ -28,9 +28,11 @@ import java.util.stream.Collectors;
 
 public final class EntityBody1_17_R1 implements EntityBody {
     private final EntityInsentient nmsMob;
+    private final Mob m;
 
-    public EntityBody1_17_R1(Mob nmsMob) {
-        this.nmsMob = ChipUtil1_17_R1.toNMS(nmsMob);
+    public EntityBody1_17_R1(Mob m) {
+        this.nmsMob = ChipUtil1_17_R1.toNMS(m);
+        this.m = m;
     }
 
     /**
@@ -408,5 +410,20 @@ public final class EntityBody1_17_R1 implements EntityBody {
         } catch (ReflectiveOperationException e) {
             return 0;
         }
+    }
+
+    @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
+    @Override
+    public boolean shouldRenderFrom(double x, double y, double z) {
+        return nmsMob.j(x, y, z);
+    }
+
+    @Override
+    public boolean shouldRenderFromSqr(double dist) {
+        return nmsMob.a(dist);
     }
 }

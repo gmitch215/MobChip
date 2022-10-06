@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableList;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.util.Position;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -537,4 +539,47 @@ public interface EntityBody {
     default boolean isRiptiding() {
         return getRiptideTicks() == 0;
     }
+
+    /**
+     * Fetches the entity this body belongs to.
+     * @return Body Owner
+     */
+    @NotNull
+    Mob getEntity();
+
+    /**
+     * Whether the entity would render at this location.
+     * @param x X Coordinate
+     * @param y Y Coordinate
+     * @param z Z Coordinate
+     * @return true if entity would render, else false
+     */
+    boolean shouldRenderFrom(double x, double y, double z);
+
+    /**
+     * Whether the entity would render at this location.
+     * @param l Location to check
+     * @return true if entity would render, else false
+     */
+    default boolean shouldRenderFrom(@NotNull Location l) {
+        if (l == null) return false;
+        if (!(getEntity().getWorld().getUID().equals(l.getWorld().getUID()))) return false;
+        return shouldRenderFrom(l.getX(), l.getY(), l.getZ());
+    }
+
+    /**
+     * Whether the entity would render.
+     * @param dist Distance from entity
+     * @return true if entity would render, else false
+     */
+    default boolean shouldRenderFrom(double dist) {
+        return shouldRenderFromSqr(dist * dist);
+    }
+
+    /**
+     * Whether the entity would render.
+     * @param dist Square Distance from entity
+     * @return true if entity would render, else false
+     */
+    boolean shouldRenderFromSqr(double dist);
 }

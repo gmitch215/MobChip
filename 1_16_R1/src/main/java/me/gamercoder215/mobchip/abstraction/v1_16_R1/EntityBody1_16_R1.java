@@ -22,9 +22,11 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public final class EntityBody1_16_R1 implements EntityBody {
     private final EntityInsentient nmsMob;
+    private final Mob m;
 
-    public EntityBody1_16_R1(Mob nmsMob) {
-        this.nmsMob = ChipUtil1_16_R1.toNMS(nmsMob);
+    public EntityBody1_16_R1(Mob m) {
+        this.m = m;
+        this.nmsMob = ChipUtil1_16_R1.toNMS(m);
     }
 
     /**
@@ -439,6 +441,23 @@ public final class EntityBody1_16_R1 implements EntityBody {
         } catch (ReflectiveOperationException e) {
             return 0;
         }
+    }
+
+    @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
+    @Override
+    public boolean shouldRenderFrom(double x, double y, double z) {
+        // doesn't exist
+        return false;
+    }
+
+    @Override
+    public boolean shouldRenderFromSqr(double dist) {
+        // doesn't exist
+        return false;
     }
 
 }

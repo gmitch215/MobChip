@@ -26,9 +26,11 @@ import java.util.stream.Collectors;
 
 public final class EntityBody1_19_R1 implements EntityBody {
     private final net.minecraft.world.entity.Mob nmsMob;
+    private final Mob m;
 
-    public EntityBody1_19_R1(Mob nmsMob) {
-        this.nmsMob = ChipUtil1_19_R1.toNMS(nmsMob);
+    public EntityBody1_19_R1(Mob m) {
+        this.m = m;
+        this.nmsMob = ChipUtil1_19_R1.toNMS(m);
     }
 
     /**
@@ -407,5 +409,20 @@ public final class EntityBody1_19_R1 implements EntityBody {
         } catch (ReflectiveOperationException e) {
             return 0;
         }
+    }
+
+    @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
+    @Override
+    public boolean shouldRenderFrom(double x, double y, double z) {
+        return nmsMob.shouldRender(x, y, z);
+    }
+
+    @Override
+    public boolean shouldRenderFromSqr(double dist) {
+        return nmsMob.shouldRenderAtSqrDistance(dist);
     }
 }
