@@ -102,7 +102,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
         Mob m = p.getEntity();
         EntityInsentient mob = toNMS(m);
-        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
+        PathfinderGoalSelector s = target ? mob.bQ : mob.bP;
 
         PathfinderGoal g = custom(p);
 
@@ -119,7 +119,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public Set<WrappedPathfinder> getGoals(Mob m, boolean target) {
         EntityInsentient mob = toNMS(m);
-        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
+        PathfinderGoalSelector s = target ? mob.bQ : mob.bP;
 
         Set<WrappedPathfinder> pF = new HashSet<>();
         s.c().forEach(w -> pF.add(new WrappedPathfinder(fromNMS(w.j()), w.h())));
@@ -130,7 +130,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public Collection<WrappedPathfinder> getRunningGoals(Mob m, boolean target) {
         EntityInsentient mob = toNMS(m);
-        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
+        PathfinderGoalSelector s = target ? mob.bQ : mob.bP;
 
         Collection<WrappedPathfinder> l = new HashSet<>();
         s.d().forEach(w -> l.add(new WrappedPathfinder(fromNMS(w.j()), w.h())));
@@ -141,7 +141,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public void setFlag(Mob m, Pathfinder.PathfinderFlag flag, boolean target, boolean value) {
         EntityInsentient mob = toNMS(m);
-        PathfinderGoalSelector s = target ? mob.bP : mob.bO;
+        PathfinderGoalSelector s = target ? mob.bQ : mob.bP;
         s.a(toNMS(flag), value);
     }
 
@@ -465,7 +465,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     public void addPathfinder(Pathfinder b, int priority, boolean target) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.bP : m.bO;
+        PathfinderGoalSelector s = target ? m.bQ : m.bP;
 
         final PathfinderGoal g = toNMS(b);
 
@@ -477,7 +477,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     public void removePathfinder(Pathfinder b, boolean target) {
         Mob mob = b.getEntity();
         EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.bP : m.bO;
+        PathfinderGoalSelector s = target ? m.bQ : m.bP;
 
         final PathfinderGoal g = toNMS(b);
         if (g == null) return;
@@ -487,7 +487,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public void clearPathfinders(Mob mob, boolean target) {
         EntityInsentient m = toNMS(mob);
-        PathfinderGoalSelector s = target ? m.bP : m.bO;
+        PathfinderGoalSelector s = target ? m.bQ : m.bP;
         s.a();
     }
 
@@ -898,7 +898,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public boolean isRestricted(Mob m) {
         EntityInsentient nms = toNMS(m);
-        return nms.fg();
+        return nms.fh();
     }
 
     @Override
@@ -916,20 +916,20 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public Location getRestriction(Mob m) {
         EntityInsentient nms = toNMS(m);
-        BlockPosition c = nms.fh();
+        BlockPosition c = nms.fi();
         return new Location(m.getWorld(), c.getX(), c.getY(), c.getZ());
     }
 
     @Override
     public int getRestrictionRadius(Mob m) {
         EntityInsentient nms = toNMS(m);
-        return ((int) nms.fi()) < 0 ? Integer.MAX_VALUE : (int) nms.fi();
+        return ((int) nms.fj()) < 0 ? Integer.MAX_VALUE : (int) nms.fj();
     }
 
     @Override
     public boolean hasRestriction(Mob m) {
         EntityInsentient nms = toNMS(m);
-        return nms.fk();
+        return nms.fl();
     }
 
     @Override

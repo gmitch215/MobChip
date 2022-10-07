@@ -95,12 +95,12 @@ public final class EntityBody1_17_R1 implements EntityBody {
 
     @Override
     public boolean isSensitiveToWater() {
-        return nmsMob.ew();
+        return nmsMob.ex();
     }
 
     @Override
     public boolean isAffectedByPotions() {
-        return nmsMob.eP();
+        return nmsMob.eQ();
     }
 
     @Override

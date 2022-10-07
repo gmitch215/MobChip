@@ -16,7 +16,7 @@ public class EntityGossipContainer1_17_R1 implements EntityGossipContainer {
     private final Reputation handle;
 
     public EntityGossipContainer1_17_R1(Villager v) {
-        this.handle = ((CraftVillager) v).getHandle().fS();
+        this.handle = ((CraftVillager) v).getHandle().fT();
     }
 
     @Override
