@@ -1193,7 +1193,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
                 case "LeapAtTarget": return new PathfinderLeapAtTarget(m, getFloat(g, "c"));
                 case "JumpOnBlock": return new PathfinderCatOnBlock((Cat) m, getDouble(g, "g"));
                 case "LlamaFollow": return new PathfinderLlamaFollowCaravan((Llama) m, getDouble(g, "b"));
-                case "LookAtPlayer": return new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "d", Class.class), LivingEntity.class), getFloat(g, "c"), getFloat(g, "g"));
+                case "LookAtPlayer": return new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "e", Class.class), LivingEntity.class), getFloat(g, "c"), getFloat(g, "d"));
                 case "LookAtTradingPlayer": return new PathfinderLookAtTradingPlayer((AbstractVillager) m);
                 case "MeleeAttack": return new PathfinderMeleeAttack((Creature) m, getDouble(g, "d"), getBoolean(g, "e"));
                 case "MoveThroughVillage": return new PathfinderMoveThroughVillage((Creature) m, getBoolean(g, "e"), getDouble(g, "b"), getInt(g, "g"), getBoolean(g, "e"));
