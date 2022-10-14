@@ -215,7 +215,7 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
             .put(PiglinBrute.class, net.minecraft.world.entity.monster.piglin.PiglinBrute.class)
             .put(PigZombie.class, ZombifiedPiglin.class)
             .put(Pillager.class, net.minecraft.world.entity.monster.Pillager.class)
-            .put(Player.class, ServerPlayer.class)
+            .put(Player.class, net.minecraft.world.entity.player.Player.class)
             .put(PolarBear.class, net.minecraft.world.entity.animal.PolarBear.class)
             .put(PufferFish.class, Pufferfish.class)
             .put(Rabbit.class, net.minecraft.world.entity.animal.Rabbit.class)

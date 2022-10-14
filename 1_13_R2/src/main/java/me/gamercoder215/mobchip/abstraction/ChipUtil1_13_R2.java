@@ -133,6 +133,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     public static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
             .put(LivingEntity.class, EntityLiving.class)
             .put(Mob.class, EntityInsentient.class)
+            .put(Player.class, EntityHuman.class)
 
             .put(AbstractHorse.class, EntityHorseAbstract.class)
             .put(Donkey.class, EntityHorseDonkey.class)

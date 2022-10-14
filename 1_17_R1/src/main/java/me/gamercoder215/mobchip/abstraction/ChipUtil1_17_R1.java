@@ -195,7 +195,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Piglin.class, EntityPiglin.class)
             .put(PiglinBrute.class, EntityPiglinBrute.class)
             .put(Pillager.class, EntityPillager.class)
-            .put(Player.class, EntityPlayer.class)
+            .put(Player.class, EntityHuman.class)
             .put(PolarBear.class, EntityPolarBear.class)
             .put(PufferFish.class, EntityPufferFish.class)
             .put(Rabbit.class, EntityRabbit.class)

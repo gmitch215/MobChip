@@ -117,6 +117,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
             .put(LivingEntity.class, EntityLiving.class)
             .put(Mob.class, EntityInsentient.class)
             .put(Tameable.class, EntityTameableAnimal.class)
+            .put(Player.class, EntityHuman.class)
 
             .put(AbstractHorse.class, EntityHorseAbstract.class)
             .put(Donkey.class, EntityHorseDonkey.class)
