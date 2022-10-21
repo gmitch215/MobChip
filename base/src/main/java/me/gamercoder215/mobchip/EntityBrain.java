@@ -1,6 +1,8 @@
 package me.gamercoder215.mobchip;
 
 import me.gamercoder215.mobchip.ai.EntityAI;
+import me.gamercoder215.mobchip.ai.attribute.Attribute;
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.Memory;
@@ -35,6 +37,14 @@ public interface EntityBrain {
      */
     @NotNull
     EntityAI getGoalAI();
+
+    /**
+     * Fetches a MobChip Attribute Instance.
+     * @param a Attribute to use
+     * @return AttributeInstance
+     */
+    @NotNull
+    AttributeInstance getAttributeInstance(@NotNull Attribute a);
 
     /**
      * Get the Entity Target AI associated with this Brain.

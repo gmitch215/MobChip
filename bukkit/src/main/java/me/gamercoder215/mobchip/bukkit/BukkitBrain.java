@@ -4,6 +4,8 @@ import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.EntityAI;
+import me.gamercoder215.mobchip.ai.attribute.Attribute;
+import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
@@ -55,6 +57,16 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public @NotNull EntityAI getGoalAI() {
 		return new BukkitAI(m, false);
+	}
+
+	/**
+	 * Fetches the MobChip Attribute Instance.
+	 * @param a Attribute to use
+	 * @return AttributeInstance
+	 */
+	@Override
+	public @NotNull AttributeInstance getAttributeInstance(@NotNull Attribute a) {
+		return w.getAttributeInstance(m, a);
 	}
 
 	/**
