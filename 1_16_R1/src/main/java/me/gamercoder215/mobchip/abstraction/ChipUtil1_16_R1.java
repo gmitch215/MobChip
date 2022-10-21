@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_16_R1.*;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
@@ -113,7 +112,7 @@ public class ChipUtil1_16_R1 implements ChipUtil {
         s.a(toNMS(flag), value);
     }
 
-    public static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
+    public static final Map<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
             .put(LivingEntity.class, EntityLiving.class)
             .put(Mob.class, EntityInsentient.class)
             .put(Tameable.class, EntityTameableAnimal.class)

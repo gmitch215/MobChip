@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_18_R2.*;
@@ -161,7 +160,7 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
         if (value) s.enableControlFlag(toNMS(flag)); else s.disableControlFlag(toNMS(flag));
     }
 
-    public static final BiMap<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>>builder()
+    public static final Map<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>> BUKKIT_NMS_MAP = ImmutableMap.<Class<? extends LivingEntity>, Class<? extends net.minecraft.world.entity.LivingEntity>>builder()
             .put(LivingEntity.class, net.minecraft.world.entity.LivingEntity.class) // EntityLiving
             .put(Mob.class, net.minecraft.world.entity.Mob.class) // EntityInsentient
             .put(Tameable.class, TamableAnimal.class) // EntityTameableAnimal

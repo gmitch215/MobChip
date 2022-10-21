@@ -1,7 +1,7 @@
 package me.gamercoder215.mobchip.abstraction;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_15_R1.*;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
@@ -25,7 +25,6 @@ import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.World;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_15_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
@@ -112,7 +111,7 @@ public class ChipUtil1_15_R1 implements ChipUtil {
         s.a(toNMS(flag), value);
     }
 
-    public static final BiMap<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableBiMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
+    public static final Map<Class<? extends LivingEntity>, Class<? extends EntityLiving>> BUKKIT_NMS_MAP = ImmutableMap.<Class<? extends LivingEntity>, Class<? extends EntityLiving>>builder()
             .put(LivingEntity.class, EntityLiving.class)
             .put(Mob.class, EntityInsentient.class)
             .put(Player.class, EntityHuman.class)
