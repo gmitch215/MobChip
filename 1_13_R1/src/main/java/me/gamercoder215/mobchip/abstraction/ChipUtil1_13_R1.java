@@ -155,9 +155,11 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         try {
             // Sometimes we can get lucky...
             nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+        } catch (ClassNotFoundException ignored) {}
 
+        if (nms == null) try {
             // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+            nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
         } catch (ClassNotFoundException ignored) {}
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");

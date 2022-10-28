@@ -151,6 +151,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
 
             // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
             .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(AbstractVillager.class, EntityVillagerAbstract.class)
             .put(Ambient.class, EntityAmbient.class)
             .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
             .put(Bat.class, EntityBat.class)

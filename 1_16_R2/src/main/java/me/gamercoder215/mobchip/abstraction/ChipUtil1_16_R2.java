@@ -117,6 +117,7 @@ public class ChipUtil1_16_R2 implements ChipUtil {
             .put(Player.class, EntityHuman.class)
 
             .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(AbstractVillager.class, EntityVillagerAbstract.class)
             .put(Donkey.class, EntityHorseDonkey.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
             .put(Golem.class, EntityGolem.class)
@@ -138,9 +139,11 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         try {
             // Sometimes we can get lucky...
             nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+        } catch (ClassNotFoundException ignored) {}
 
+        if (nms == null) try {
             // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+            nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
         } catch (ClassNotFoundException ignored) {}
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
