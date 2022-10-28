@@ -11,3 +11,5 @@ bukkit/target
 */target
 /target
 
+logs/*.log
+*/logs/*.log
