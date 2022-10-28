@@ -274,4 +274,36 @@ public final class Position {
     @NotNull
     public Vector toVector() { return new Vector(x, y, z); }
 
+    /**
+     * Sets the Position's X value.
+     * @param x X value to set
+     * @return this class, for chaining
+     */
+    @NotNull
+    public Position setX(int x) {
+        this.x = x;
+        return this;
+    }
+
+    /**
+     * Sets the Position's Y value.
+     * @param y Y value to set
+     * @return this class, for chaining
+     */
+    @NotNull
+    public Position setY(int y) {
+        this.y = y;
+        return this;
+    }
+
+    /**
+     * Sets the Position's Z value.
+     * @param z Z value to set
+     * @return this class, for chaining
+     */
+    @NotNull
+    public Position setZ(int z) {
+        this.z = z;
+        return this;
+    }
 }
