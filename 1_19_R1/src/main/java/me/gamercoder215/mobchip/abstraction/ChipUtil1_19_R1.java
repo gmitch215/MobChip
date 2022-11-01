@@ -538,7 +538,6 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
         net.minecraft.world.entity.Mob nms = toNMS(m);
-        String packageN = packageName.replace("{V}", "v1_19_R1");
 
         for (int i = 0; i < args.length; i++) {
             Object o = args[i];
