@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends TargetPathfinder implements Filtering<T>, Conditional<LivingEntity>, Repeated {
 
     private Class<T> filter;
-    private Predicate<? super LivingEntity> conditions;
+    private Predicate<LivingEntity> conditions;
     private int interval;
 
     /**
@@ -106,7 +106,7 @@ public class PathfinderNearestAttackableTarget<T extends LivingEntity> extends T
 
     @Override
     @NotNull
-    public Predicate<? super LivingEntity> getCondition() {
+    public Predicate<LivingEntity> getCondition() {
         return this.conditions;
     }
 

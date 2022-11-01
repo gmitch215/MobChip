@@ -15,7 +15,7 @@ public final class PathfinderUseItem extends Pathfinder implements Conditional<M
     
     private Sound finishSound;
     private ItemStack item;
-    private Predicate<? super Mob> requirements;
+    private Predicate<Mob> requirements;
 
     /**
      * Constructs a PathfinderUseItem with {@link Sound#ENTITY_PLAYER_BURP}.
@@ -85,7 +85,7 @@ public final class PathfinderUseItem extends Pathfinder implements Conditional<M
     
     @Override
     @NotNull
-    public Predicate<? super Mob> getCondition() {
+    public Predicate<Mob> getCondition() {
         return this.requirements;
     }
 
