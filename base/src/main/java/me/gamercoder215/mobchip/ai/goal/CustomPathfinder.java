@@ -54,14 +54,15 @@ public abstract class CustomPathfinder extends Pathfinder {
     public abstract boolean canStart();
 
     /**
-     * Called when {@link #canStart()} returns true.
+     * Called on the first tick this Pathfinder starts, when {@link #canStart()} returns true.
      * <br><br>
-     * Any actions that this Pathfinder will call should be in here. This method will run automatically.
+     * Any actions that this Pathfinder will call <strong>first</strong> should be in here. This method will run automatically.
      * <br><br>
      * Example:
      * <pre>
      * // public class LavaFloat extends CustomPathfinder {
-     * 
+     *
+     * // Beginning Movements
      * public void start() {
      *     // Get Entity Brain
      *     brain.getController().jump();
@@ -72,9 +73,9 @@ public abstract class CustomPathfinder extends Pathfinder {
     public abstract void start();
 
     /**
-     * Called when {@link #canStart()} returns false.
+     * Called in between {@link #start()} and {@link #stop()}.
      * <br><br>
-     * Any actions that this Pathfinder will call <strong>when it can't run</strong> should be in here. This method will run automatically.
+     * Any actions that this Pathfinder will call in between should be in here. This method will run automatically.
      * <br><br>
      * Example:
      * <pre>
