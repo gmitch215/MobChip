@@ -6,7 +6,6 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.HumanoidArm;
@@ -433,5 +432,25 @@ public final class EntityBody1_19_R1 implements EntityBody {
     public void sendTo(@NotNull Player p) {
         Packet<?> packet = nmsMob.getAddEntityPacket();
         ((CraftPlayer) p).getHandle().connection.send(packet);
+    }
+
+    @Override
+    public void resetFallDistance() {
+        nmsMob.resetFallDistance();
+    }
+
+    @Override
+    public boolean isInUnloadedChunk() {
+        return nmsMob.touchingUnloadedChunk();
+    }
+
+    @Override
+    public void naturalKnockback(double force, double xForce, double zForce) {
+        nmsMob.knockback(force, xForce, zForce);
+    }
+
+    @Override
+    public void eat(@NotNull ItemStack item) {
+        nmsMob.eat(ChipUtil1_19_R1.toNMS(m.getWorld()), ChipUtil1_19_R1.toNMS(item));
     }
 }

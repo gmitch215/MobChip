@@ -589,4 +589,30 @@ public interface EntityBody {
      * @throws UnsupportedOperationException if this Entity cannot be sent as a packet
      */
     void sendTo(@NotNull Player p) throws UnsupportedOperationException;
+
+    /**
+     * Resets the distance this Entity has fallen.
+     */
+    void resetFallDistance();
+
+    /**
+     * Fetches whether this Entity is currently inside an Unloaded Chunk.
+     * @return true if in unloaded chunk, else false
+     */
+    boolean isInUnloadedChunk();
+
+    /**
+     * Performs a natural knockback on this Entity.
+     * @param force Force of knockback to influence X and Z
+     * @param xForce X Direction Force
+     * @param zForce Z Direction Force
+     */
+    void naturalKnockback(double force, double xForce, double zForce);
+
+    /**
+     * Eats an Item.
+     * @param item Item to eat
+     */
+    void eat(@NotNull ItemStack item);
+
 }

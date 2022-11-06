@@ -48,6 +48,8 @@ import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 public class ChipUtil1_13_R2 implements ChipUtil {
     public static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_13_R2.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
+    public static net.minecraft.server.v1_13_R2.ItemStack toNMS(org.bukkit.inventory.ItemStack item) { return CraftItemStack.asNMSCopy(item); }
+
     @Override
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
         Mob m = p.getEntity();

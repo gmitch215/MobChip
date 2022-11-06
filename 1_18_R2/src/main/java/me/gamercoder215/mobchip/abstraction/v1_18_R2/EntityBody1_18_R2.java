@@ -434,4 +434,24 @@ public final class EntityBody1_18_R2 implements EntityBody {
         ((CraftPlayer) p).getHandle().connection.send(packet);
     }
 
+    @Override
+    public void resetFallDistance() {
+        nmsMob.resetFallDistance();
+    }
+
+    @Override
+    public boolean isInUnloadedChunk() {
+        return nmsMob.touchingUnloadedChunk();
+    }
+
+    @Override
+    public void naturalKnockback(double force, double xForce, double zForce) {
+        nmsMob.knockback(force, xForce, zForce);
+    }
+
+    @Override
+    public void eat(@NotNull ItemStack item) {
+        nmsMob.eat(ChipUtil1_18_R2.toNMS(m.getWorld()), ChipUtil1_18_R2.toNMS(item));
+    }
+
 }

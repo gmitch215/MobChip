@@ -6,7 +6,6 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -448,6 +447,28 @@ public final class EntityBody1_13_R2 implements EntityBody {
     public void sendTo(@NotNull Player p) {
         // doesn't exist
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resetFallDistance() {
+        nmsMob.fallDistance = 0.0F;
+    }
+
+    @Override
+    public boolean isInUnloadedChunk() {
+        // doesn't exist
+        return false;
+    }
+
+    @Override
+    public void naturalKnockback(double force, double xForce, double zForce) {
+        float forceF = Math.abs((float) force);
+        nmsMob.a(nmsMob, forceF, xForce, zForce);
+    }
+
+    @Override
+    public void eat(@NotNull ItemStack item) {
+        // doesn't exist
     }
 
 }
