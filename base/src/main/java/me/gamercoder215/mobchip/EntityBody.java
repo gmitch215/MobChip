@@ -582,4 +582,11 @@ public interface EntityBody {
      * @return true if entity would render, else false
      */
     boolean shouldRenderFromSqr(double dist);
+
+    /**
+     * Sends this Entity to the specified Player as a packet.
+     * @param p Player to send to
+     * @throws UnsupportedOperationException if this Entity cannot be sent as a packet
+     */
+    void sendTo(@NotNull Player p) throws UnsupportedOperationException;
 }
