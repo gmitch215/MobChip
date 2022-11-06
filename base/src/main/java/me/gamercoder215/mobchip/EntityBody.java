@@ -79,9 +79,29 @@ public interface EntityBody {
          * Converts this InteractionHand to an EquipmentSlot.
          * @return EquipmentSlot Variant
          */
+        @NotNull
         public EquipmentSlot toEquipmentSlot() {
             if (this == InteractionHand.MAIN_HAND) return EquipmentSlot.HAND;
             return EquipmentSlot.OFF_HAND;
+        }
+
+        /**
+         * Converts an EquipmentSlot to an InteractionHand.
+         * @param slot EquipmentSlot to convert
+         * @return InteractionHand Variant
+         */
+        @Nullable
+        public static InteractionHand fromEquipmentSlot(@Nullable EquipmentSlot slot) {
+            if (slot == null) return null;
+
+            switch (slot) {
+                case HAND:
+                    return MAIN_HAND;
+                case OFF_HAND:
+                    return OFF_HAND;
+                default:
+                    return null;
+            }
         }
 
     }
@@ -113,7 +133,6 @@ public interface EntityBody {
         ;
 
         InteractionResult() {}
-
     }
 
     /**
