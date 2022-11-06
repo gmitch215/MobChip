@@ -1051,4 +1051,24 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
     public EntityNBT getNBTEditor(Mob m) {
         return new EntityNBT1_13_R1(m);
     }
+
+    @Override
+    public void registerSensor(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
+        // doesn't exist
+    }
+
+    @Override
+    public boolean existsSensor(NamespacedKey key) {
+        return false;
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.Sensor<?> getSensor(NamespacedKey key) {
+        return null; // doesn't exist
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.EntitySenses getSenses(Mob m) {
+        return null; // doesn't exist
+    }
 }

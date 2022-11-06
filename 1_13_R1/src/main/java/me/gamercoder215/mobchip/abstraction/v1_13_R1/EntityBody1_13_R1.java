@@ -443,4 +443,10 @@ public final class EntityBody1_13_R1 implements EntityBody {
         return false;
     }
 
+    @Override
+    public void sendTo(@NotNull Player p) {
+        // doesn't exist
+        throw new UnsupportedOperationException();
+    }
+
 }

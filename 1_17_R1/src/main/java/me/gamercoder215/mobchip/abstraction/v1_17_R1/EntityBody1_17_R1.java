@@ -4,6 +4,7 @@ import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.entity.EntityInsentient;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.IEntitySelector;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -425,5 +427,11 @@ public final class EntityBody1_17_R1 implements EntityBody {
     @Override
     public boolean shouldRenderFromSqr(double dist) {
         return nmsMob.a(dist);
+    }
+
+    @Override
+    public void sendTo(@NotNull Player p) {
+        Packet<?> packet = nmsMob.getPacket();
+        ((CraftPlayer) p).getHandle().b.sendPacket(packet);
     }
 }

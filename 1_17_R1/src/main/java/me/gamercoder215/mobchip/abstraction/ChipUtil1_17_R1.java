@@ -20,6 +20,8 @@ import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
+import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
+import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
@@ -42,6 +44,7 @@ import net.minecraft.world.entity.ai.goal.target.*;
 import net.minecraft.world.entity.ai.gossip.ReputationType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryTarget;
+import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition;
 import net.minecraft.world.entity.ambient.EntityAmbient;
 import net.minecraft.world.entity.ambient.EntityBat;
@@ -83,11 +86,15 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -1436,6 +1443,67 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     @Override
     public EntityNBT getNBTEditor(Mob m) {
         return new EntityNBT1_17_R1(m);
+    }
+
+    public static net.minecraft.world.entity.ai.sensing.Sensor<?> toNMS(Sensor<?> s) {
+        if (s instanceof SensorDefault1_17_R1) return ((SensorDefault1_17_R1) s).getHandle();
+        return new Sensor1_17_R1(s);
+    }
+
+    public static SensorType<?> toNMSType(Sensor<?> s) {
+        try {
+            Constructor<SensorType> c = SensorType.class.getConstructor(Supplier.class);
+            c.setAccessible(true);
+
+            Supplier<net.minecraft.world.entity.ai.sensing.Sensor<?>> sup = () -> toNMS(s);
+
+            return (SensorType<?>) c.newInstance(sup);
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement st : e.getStackTrace()) Bukkit.getLogger().severe(st.toString());
+        }
+
+        return null;
+    }
+
+    public static Sensor<?> fromNMS(net.minecraft.world.entity.ai.sensing.Sensor<?> type) {
+        if (type instanceof Sensor1_17_R1) return ((Sensor1_17_R1) type).getSensor();
+        return new SensorDefault1_17_R1(type);
+    }
+
+    public static NamespacedKey fromNMS(MinecraftKey loc) {
+        return new NamespacedKey(loc.getNamespace(), loc.getKey());
+    }
+
+    public static Memory<?> fromNMS(MemoryModuleType<?> memory) {
+        return EntityMemory.getByKey(fromNMS(IRegistry.ar.getKey(memory)));
+    }
+
+    public static MemoryModuleType<?> getMemory(NamespacedKey key) {
+        return IRegistry.ar.get(new MinecraftKey(key.getNamespace(), key.getKey()));
+    }
+
+    @Override
+    public void registerSensor(Sensor<?> s) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        IRegistryWritable<SensorType<?>> writable = server.getCustomRegistry().b(IRegistry.G);
+        ResourceKey<SensorType<?>> nmsKey = ResourceKey.a(IRegistry.G, toNMS(s.getKey()));
+        writable.a(nmsKey, toNMSType(s), Lifecycle.stable());
+    }
+
+    @Override
+    public boolean existsSensor(NamespacedKey key) {
+        return IRegistry.as.c(new MinecraftKey(key.getNamespace(), key.getKey()));
+    }
+
+    @Override
+    public Sensor<?> getSensor(NamespacedKey key) {
+        return fromNMS(IRegistry.as.get(toNMS(key)).a());
+    }
+
+    @Override
+    public EntitySenses getSenses(Mob m) {
+        return new EntitySenses1_17_R1(m);
     }
 
 }

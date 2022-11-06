@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -441,6 +442,12 @@ public final class EntityBody1_13_R2 implements EntityBody {
     public boolean shouldRenderFromSqr(double dist) {
         // doesn't exist
         return false;
+    }
+
+    @Override
+    public void sendTo(@NotNull Player p) {
+        // doesn't exist
+        throw new UnsupportedOperationException();
     }
 
 }

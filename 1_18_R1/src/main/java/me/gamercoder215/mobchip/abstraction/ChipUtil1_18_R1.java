@@ -17,6 +17,8 @@ import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
+import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
+import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
@@ -41,6 +43,7 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.*;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
+import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.*;
@@ -100,10 +103,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -1438,5 +1438,66 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
     @Override
     public EntityNBT getNBTEditor(Mob m) {
         return new EntityNBT1_18_R1(m);
+    }
+
+    public static net.minecraft.world.entity.ai.sensing.Sensor<?> toNMS(Sensor<?> s) {
+        if (s instanceof SensorDefault1_18_R1) return ((SensorDefault1_18_R1) s).getHandle();
+        return new Sensor1_18_R1(s);
+    }
+
+    public static SensorType<?> toNMSType(Sensor<?> s) {
+        try {
+            Constructor<SensorType> c = SensorType.class.getConstructor(Supplier.class);
+            c.setAccessible(true);
+
+            Supplier<net.minecraft.world.entity.ai.sensing.Sensor<?>> sup = () -> toNMS(s);
+
+            return (SensorType<?>) c.newInstance(sup);
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement st : e.getStackTrace()) Bukkit.getLogger().severe(st.toString());
+        }
+
+        return null;
+    }
+
+    public static Sensor<?> fromNMS(net.minecraft.world.entity.ai.sensing.Sensor<?> type) {
+        if (type instanceof Sensor1_18_R1) return ((Sensor1_18_R1) type).getSensor();
+        return new SensorDefault1_18_R1(type);
+    }
+
+    public static NamespacedKey fromNMS(ResourceLocation loc) {
+        return new NamespacedKey(loc.getNamespace(), loc.getPath());
+    }
+
+    public static Memory<?> fromNMS(MemoryModuleType<?> memory) {
+        return EntityMemory.getByKey(fromNMS(Registry.MEMORY_MODULE_TYPE.getKey(memory)));
+    }
+
+    public static MemoryModuleType<?> getMemory(NamespacedKey key) {
+        return Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(key.getNamespace(), key.getKey()));
+    }
+
+    @Override
+    public void registerSensor(Sensor<?> s) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        WritableRegistry<SensorType<?>> writable = (WritableRegistry<SensorType<?>>) server.registryAccess().ownedRegistryOrThrow(Registry.SENSOR_TYPE_REGISTRY);
+        ResourceKey<SensorType<?>> nmsKey = ResourceKey.create(Registry.SENSOR_TYPE_REGISTRY, toNMS(s.getKey()));
+        writable.register(nmsKey, toNMSType(s), Lifecycle.stable());
+    }
+
+    @Override
+    public boolean existsSensor(NamespacedKey key) {
+        return Registry.SENSOR_TYPE.containsKey(new ResourceLocation(key.getNamespace(), key.getKey()));
+    }
+
+    @Override
+    public Sensor<?> getSensor(NamespacedKey key) {
+        return fromNMS(Registry.SENSOR_TYPE.get(toNMS(key)).create());
+    }
+
+    @Override
+    public EntitySenses getSenses(Mob m) {
+        return new EntitySenses1_18_R1(m);
     }
 }

@@ -8,6 +8,7 @@ import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import org.bukkit.Location;
@@ -240,5 +241,12 @@ public interface EntityBrain {
      */
     @NotNull
     EntityNBT getNBTEditor();
+
+    /**
+     * Fetches this Entity's Senses.
+     * @return Entity Senses
+     */
+    @NotNull
+    EntitySenses getSenses();
     
 }
