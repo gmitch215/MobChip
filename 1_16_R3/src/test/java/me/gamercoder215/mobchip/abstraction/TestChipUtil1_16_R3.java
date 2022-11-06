@@ -1,8 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
-import net.minecraft.server.v1_16_R3.EntityInsentient;
-import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.EnumDifficulty;
 import net.minecraft.server.v1_16_R3.ReputationType;
 import org.bukkit.Difficulty;

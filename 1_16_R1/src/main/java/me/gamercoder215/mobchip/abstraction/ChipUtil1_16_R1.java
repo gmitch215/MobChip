@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -1393,6 +1394,67 @@ public class ChipUtil1_16_R1 implements ChipUtil {
         return new EntityNBT1_16_R1(m);
     }
 
+    public static Sensor<?> toNMS(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
+        if (s instanceof SensorDefault1_16_R1) return ((SensorDefault1_16_R1) s).getHandle();
+        return new Sensor1_16_R1(s);
+    }
 
+    public static SensorType<?> toNMSType(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
+        try {
+            Constructor<SensorType> c = SensorType.class.getConstructor(Supplier.class);
+            c.setAccessible(true);
+
+            Supplier<Sensor<?>> sup = () -> toNMS(s);
+
+            return (SensorType<?>) c.newInstance(sup);
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement st : e.getStackTrace()) Bukkit.getLogger().severe(st.toString());
+        }
+
+        return null;
+    }
+
+    public static me.gamercoder215.mobchip.ai.sensing.Sensor<?> fromNMS(Sensor<?> type) {
+        if (type instanceof Sensor1_16_R1) return ((Sensor1_16_R1) type).getSensor();
+        return new SensorDefault1_16_R1(type);
+    }
+
+    public static NamespacedKey fromNMS(MinecraftKey loc) {
+        return new NamespacedKey(loc.getNamespace(), loc.getKey());
+    }
+
+    public static Memory<?> fromNMS(MemoryModuleType<?> memory) {
+        return EntityMemory.getByKey(fromNMS(IRegistry.MEMORY_MODULE_TYPE.getKey(memory)));
+    }
+
+    public static MemoryModuleType<?> getMemory(NamespacedKey key) {
+        return IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(key.getNamespace(), key.getKey()));
+    }
+
+    @Override
+    public void registerSensor(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        if (!server.f.a(IRegistry.X).isPresent()) return;
+        IRegistryWritable<SensorType<?>> writable = server.f.a(IRegistry.X).get();
+        ResourceKey<SensorType<?>> nmsKey = ResourceKey.a(IRegistry.X, toNMS(s.getKey()));
+        writable.a(nmsKey, toNMSType(s));
+    }
+
+    @Override
+    public boolean existsSensor(NamespacedKey key) {
+        return IRegistry.SENSOR_TYPE.e()
+                .anyMatch(s -> IRegistry.SENSOR_TYPE.getKey(s).equals(new MinecraftKey(key.getNamespace(), key.getKey())));
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.Sensor<?> getSensor(NamespacedKey key) {
+        return fromNMS(IRegistry.SENSOR_TYPE.get(toNMS(key)).a());
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.EntitySenses getSenses(Mob m) {
+        return new EntitySenses1_16_R1(m);
+    }
 
 }

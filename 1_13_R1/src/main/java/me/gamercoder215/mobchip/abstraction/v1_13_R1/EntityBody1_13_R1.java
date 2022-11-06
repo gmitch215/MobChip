@@ -443,4 +443,32 @@ public final class EntityBody1_13_R1 implements EntityBody {
         return false;
     }
 
+    @Override
+    public void sendTo(@NotNull Player p) {
+        // doesn't exist
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resetFallDistance() {
+        nmsMob.fallDistance = 0.0F;
+    }
+
+    @Override
+    public boolean isInUnloadedChunk() {
+        // doesn't exist
+        return false;
+    }
+
+    @Override
+    public void naturalKnockback(double force, double xForce, double zForce) {
+        float forceF = Math.abs((float) force);
+        nmsMob.a(nmsMob, forceF, xForce, zForce);
+    }
+
+    @Override
+    public void eat(@NotNull ItemStack item) {
+        // doesn't exist
+    }
+
 }

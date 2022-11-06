@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -458,6 +459,34 @@ public final class EntityBody1_16_R2 implements EntityBody {
     public boolean shouldRenderFromSqr(double dist) {
         // doesn't exist
         return false;
+    }
+
+    @Override
+    public void sendTo(@NotNull Player p) {
+        Packet<?> packet = nmsMob.P();
+        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
+    }
+
+    @Override
+    public void resetFallDistance() {
+        nmsMob.fallDistance = 0.0F;
+    }
+
+    @Override
+    public boolean isInUnloadedChunk() {
+        // doesn't exist
+        return false;
+    }
+
+    @Override
+    public void naturalKnockback(double force, double xForce, double zForce) {
+        float forceF = Math.abs((float) force);
+        nmsMob.a(forceF, xForce, zForce);
+    }
+
+    @Override
+    public void eat(@NotNull ItemStack item) {
+        nmsMob.a(ChipUtil1_16_R2.toNMS(m.getWorld()), ChipUtil1_16_R2.toNMS(item));
     }
 
 }

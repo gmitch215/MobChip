@@ -13,9 +13,11 @@ import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -44,6 +47,8 @@ import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ChipUtil1_13_R2 implements ChipUtil {
     public static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_13_R2.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
+
+    public static net.minecraft.server.v1_13_R2.ItemStack toNMS(org.bukkit.inventory.ItemStack item) { return CraftItemStack.asNMSCopy(item); }
 
     @Override
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
@@ -1052,6 +1057,26 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     @Override
     public EntityNBT getNBTEditor(Mob m) {
         return new EntityNBT1_13_R2(m);
+    }
+
+    @Override
+    public void registerSensor(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
+        // doesn't exist
+    }
+
+    @Override
+    public boolean existsSensor(NamespacedKey key) {
+        return false;
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.Sensor<?> getSensor(NamespacedKey key) {
+        return null; // doesn't exist
+    }
+
+    @Override
+    public me.gamercoder215.mobchip.ai.sensing.EntitySenses getSenses(Mob m) {
+        return null; // doesn't exist
     }
 
 }

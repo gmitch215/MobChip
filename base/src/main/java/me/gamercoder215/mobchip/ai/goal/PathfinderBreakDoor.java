@@ -18,7 +18,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	public static final int DEFAULT_DOOR_BREAK_TIME = 240;
 	
 	private int breakTime;
-	private Predicate<? super Difficulty> validDiffs;
+	private Predicate<Difficulty> validDiffs;
 	
 	/**
 	 * Constructs a PathfinderBreakDoor with the default  break time.
@@ -47,7 +47,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	 * @param validDiffs Predicate that determines if the Pathfinder should work on a given difficulty
 	 * @throws IllegalArgumentException if time is less than or equal to 0
 	 */
-	public PathfinderBreakDoor(@NotNull Mob m, int breakTime, Predicate<? super Difficulty> validDiffs) throws IllegalArgumentException {
+	public PathfinderBreakDoor(@NotNull Mob m, int breakTime, Predicate<Difficulty> validDiffs) throws IllegalArgumentException {
 		super(m);
 		if (breakTime <= 0) throw new IllegalArgumentException("Break Time must be greater than 0");
 
@@ -64,7 +64,7 @@ public final class PathfinderBreakDoor extends Pathfinder implements Conditional
 	}
 	
 	@Override
-	public @NotNull Predicate<? super Difficulty> getCondition() {
+	public @NotNull Predicate<Difficulty> getCondition() {
 		return this.validDiffs;
 	}
 	

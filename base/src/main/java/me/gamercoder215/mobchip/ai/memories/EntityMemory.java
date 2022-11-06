@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.memories;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -8,6 +9,13 @@ import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a Memory of an entity
@@ -319,6 +327,38 @@ public final class EntityMemory<T> implements Memory<T> {
     @Override
     public NamespacedKey getKey() {
         return NamespacedKey.minecraft(this.key);
+    }
+
+    /**
+     * Fetches an EntityMemory by its NamespacedKey.
+     * @param key NamespacedKey
+     * @return EntityMemory found, or null if not found
+     */
+    @Nullable
+    public static EntityMemory<?> getByKey(@NotNull NamespacedKey key) {
+        for (EntityMemory<?> mem : values()) if (mem.getKey().equals(key)) return mem;
+
+        return null;
+    }
+
+    /**
+     * Fetches all the EntityMemory values.
+     * @return EntityMemory values
+     */
+    @NotNull
+    public static EntityMemory<?>[] values() {
+        return Arrays.stream(EntityMemory.class.getDeclaredFields())
+                .filter(f -> EntityMemory.class.isAssignableFrom(f.getType()))
+                .filter(f -> Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()))
+                .map(f -> {
+                    f.setAccessible(true);
+                    try {
+                        return (EntityMemory<?>) f.get(null);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toArray(EntityMemory[]::new);
     }
 
 

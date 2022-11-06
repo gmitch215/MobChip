@@ -5,7 +5,6 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.entity.ai.gossip.ReputationType;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -47,7 +47,7 @@ improve the hassle of playing around with NMS and learning how to import and use
             
             <!-- Use master-SNAPSHOT for Experimental Features on master branch -->
             
-            <!-- Use something like 1.6.1-SNAPSHOT for a stable release -->
+            <!-- Use something like 1.7.0-SNAPSHOT for a stable release -->
         </dependency>
     </dependencies>
     
@@ -67,7 +67,7 @@ dependencies {
     implementation 'me.gamercoder215:mobchip-bukkit:[VERSION]'
     
     // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.6.1-SNAPSHOT" as version for a stable release
+    // Use something like "1.7.0-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
@@ -84,7 +84,7 @@ dependencies {
     implementation('me.gamercoder215:mobchip-bukkit:[VERSION]')
 
     // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.6.1-SNAPSHOT" as version for a stable release
+    // Use something like "1.7.0-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
@@ -209,20 +209,17 @@ public class MyPathfinder extends CustomPathfinder {
         return entity.getLocation().add(0, 2, 0).getBlock().getType() == Material.AIR;
     }
 
-    // Automatically called when canStart() returns true.
-    // In this case, We're using the EntityController (more on that below) to control the entity's movements.
-
+    // Automatically called on the first tick this Pathfinder is active, when canStart() returns true.
     @Override
     public void start() {
-        BukkitBrain.getBrain(entity).getController().jump().moveTo(entity.getLocation().add(3, 0, 3));
+        Bukkit.broadcastMessage("Started!");
     }
 
-    // Automatically called when canStart() returns false.
-    // We don't need to put down anything.
+    // Automatically called between every tick. In this case, we're going to make the entity jump and move.
 
     @Override
     public void tick() {
-        // do nothing
+        BukkitBrain.getBrain(entity).getController().jump().moveTo(entity.getLocation().add(3, 0, 3));
     }
 
     // There's also canInterrupt() and canContinueToUse() boolean methods you can override.

@@ -12,12 +12,15 @@ import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
+import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.bukkit.events.RestrictionSetEvent;
 import me.gamercoder215.mobchip.bukkit.events.memory.MemoryChangeEvent;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +51,45 @@ public class BukkitBrain implements EntityBrain {
 		if (m instanceof Villager) return new BukkitVillagerBrain((Villager) m);
 		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
 		return new BukkitBrain(m);
+	}
+
+	/**
+	 * Registers a Sensor.
+	 * @param sensor Sensor to Register
+	 * @throws IllegalArgumentException if sensor is already registered with this key
+	 */
+	public static void registerSensor(@NotNull Sensor<?> sensor) throws IllegalArgumentException {
+		if (isSensorRegistered(sensor.getKey())) throw new IllegalArgumentException("Sensor is already registered with key: " + sensor.getKey());
+		w.registerSensor(sensor);
+	}
+
+	/**
+	 * Checks whether this sensor is registered.
+	 * @param sensor Sensor to check
+	 * @return true if registered, false otherwise
+	 */
+	public static boolean isSensorRegistered(@NotNull Sensor<?> sensor) {
+		return isSensorRegistered(sensor.getKey());
+	}
+
+	/**
+	 * Checks whether a sensor is registered with this key.
+	 * @param key NamespacedKey of the Sensor
+	 * @return true if registered, false otherwise
+	 */
+	public static boolean isSensorRegistered(@NotNull NamespacedKey key) {
+		return w.existsSensor(key);
+	}
+
+	/**
+	 * Fetches the Sensor registered with this key.
+	 * @param key NamespacedKey of the Sensor
+	 * @return Sensor Registered, or null if not found
+	 */
+	@Nullable
+	public static Sensor<?> getRegisteredSensor(@NotNull NamespacedKey key) {
+		if (!isSensorRegistered(key)) return null;
+		return w.getSensor(key);
 	}
 
 	/**
@@ -166,6 +208,11 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public @NotNull EntityNBT getNBTEditor() {
 		return w.getNBTEditor(m);
+	}
+
+	@Override
+	public @NotNull EntitySenses getSenses() {
+		return w.getSenses(m);
 	}
 
 	/**

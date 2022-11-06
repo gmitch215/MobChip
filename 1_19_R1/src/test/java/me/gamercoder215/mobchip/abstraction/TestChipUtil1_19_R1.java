@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
-import net.minecraft.world.damagesource.DamageSource;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
