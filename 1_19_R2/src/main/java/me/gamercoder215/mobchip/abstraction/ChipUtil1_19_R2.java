@@ -27,6 +27,8 @@ import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -518,7 +520,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
         net.minecraft.world.entity.Mob m = toNMS(mob);
         GoalSelector s = target ? m.targetSelector : m.goalSelector;
 
-        s.removeAllGoals();
+        s.removeAllGoals(g -> true);
     }
 
     public static BehaviorResult.Status fromNMS(Behavior.Status status) {
@@ -574,15 +576,15 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public Attribute getDefaultAttribute(String s) {
-        return new Attribute1_19_R2((RangedAttribute) Registry.ATTRIBUTE.get(new ResourceLocation(s)));
+        return new Attribute1_19_R2((RangedAttribute) BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
     }
 
     public static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {
-        return Registry.ACTIVITY.get(new ResourceLocation(a.getKey().getKey()));
+        return BuiltInRegistries.ACTIVITY.get(new ResourceLocation(a.getKey().getKey()));
     }
 
     public static Activity fromNMS(net.minecraft.world.entity.schedule.Activity a) {
-        ResourceLocation key = Registry.ACTIVITY.getKey(a);
+        ResourceLocation key = BuiltInRegistries.ACTIVITY.getKey(a);
         if (key == null) return null;
         return Activity.getByKey(NamespacedKey.minecraft(key.getPath()));
     }
@@ -621,7 +623,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public Schedule getDefaultSchedule(String key) {
-        return fromNMS(Registry.SCHEDULE.get(new ResourceLocation(key)));
+        return fromNMS(BuiltInRegistries.SCHEDULE.get(new ResourceLocation(key)));
     }
 
     @Override
@@ -715,7 +717,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
             case VOID -> DamageSource.OUT_OF_WORLD;
             case WITHER -> DamageSource.WITHER;
-            case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
+            //case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
             case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
             case FREEZE -> DamageSource.FREEZE;
             case DRYOUT -> DamageSource.DRY_OUT;
@@ -794,7 +796,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
         if (nmsValue instanceof GlobalPos l) {
             BlockPos pos = l.pos();
-            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registryHolder.registryOrThrow(Registry.DIMENSION_REGISTRY).get(l.dimension()).getWorld();
+            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess().registryOrThrow(Registries.DIMENSION).get(l.dimension()).getWorld();
             if (w == null) w = Bukkit.getWorlds().get(0);
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
@@ -876,7 +878,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
         net.minecraft.world.entity.Mob nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(type).getPath();
         Object nmsValue = toNMS(key, value);
 
         nms.getBrain().setMemory(type, nmsValue);
@@ -891,7 +893,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
         net.minecraft.world.entity.Mob nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(type).getPath();
         Object nmsValue = toNMS(key, value);
 
         nms.getBrain().setMemoryWithExpiry(type, nmsValue, durationTicks);
@@ -901,7 +903,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     public <T> T getMemory(Mob mob, Memory<T> m) {
         net.minecraft.world.entity.Mob nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
-        String key = Registry.MEMORY_MODULE_TYPE.getKey(type).getPath();
+        String key = BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(type).getPath();
 
         return m.getBukkitClass().cast(fromNMS(mob, key, nms.getBrain().getMemory(type)));
     }
@@ -1344,7 +1346,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
     public static <T> void changeRegistryLock(Registry<T> r, boolean isLocked) {
         DedicatedServer srv = ((CraftServer) Bukkit.getServer()).getServer();
-        MappedRegistry<T> registry = (MappedRegistry<T>) srv.registryAccess().ownedRegistryOrThrow(r.key());
+        MappedRegistry<T> registry = (MappedRegistry<T>) srv.registryAccess().registryOrThrow(r.key());
         try {
             Field frozen = registry.getClass().getDeclaredField("ca");
             frozen.setAccessible(true);
@@ -1359,21 +1361,21 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     @Override
     public Attribute registerAttribute(NamespacedKey key, double defaultV, double min, double max, boolean client) {
         if (existsAttribute(key)) return null;
-        changeRegistryLock(Registry.ATTRIBUTE, false);
+        changeRegistryLock(BuiltInRegistries.ATTRIBUTE, false);
 
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> writable = (WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute>) server.registryAccess().ownedRegistryOrThrow(Registry.ATTRIBUTE_REGISTRY);
-        ResourceKey<net.minecraft.world.entity.ai.attributes.Attribute> nmsKey = ResourceKey.create(Registry.ATTRIBUTE_REGISTRY, toNMS(key));
+        WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> writable = (WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute>) server.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+        ResourceKey<net.minecraft.world.entity.ai.attributes.Attribute> nmsKey = ResourceKey.create(Registries.ATTRIBUTE, toNMS(key));
         Attribute1_19_R2 att = new Attribute1_19_R2(key, defaultV, min, max, client);
         writable.register(nmsKey, att, Lifecycle.stable());
 
-        changeRegistryLock(Registry.ATTRIBUTE, true);
+        changeRegistryLock(BuiltInRegistries.ATTRIBUTE, true);
         return att;
     }
 
     @Override
     public boolean existsAttribute(NamespacedKey key) {
-        return Registry.ATTRIBUTE.containsKey(toNMS(key));
+        return BuiltInRegistries.ATTRIBUTE.containsKey(toNMS(key));
     }
 
     public static ResourceLocation toNMS(NamespacedKey key) {
@@ -1382,19 +1384,19 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public Attribute getAttribute(NamespacedKey key) {
-        net.minecraft.world.entity.ai.attributes.Attribute a = Registry.ATTRIBUTE.get(toNMS(key));
+        net.minecraft.world.entity.ai.attributes.Attribute a = BuiltInRegistries.ATTRIBUTE.get(toNMS(key));
         if (!(a instanceof RangedAttribute)) return null;
         return new Attribute1_19_R2((RangedAttribute) a);
     }
 
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
-        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = Registry.ATTRIBUTE.get(toNMS(a.getKey()));
+        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = BuiltInRegistries.ATTRIBUTE.get(toNMS(a.getKey()));
         return new AttributeInstance1_19_R2(a, toNMS(m).getAttribute(nmsAttribute));
     }
 
     public static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
-        return net.minecraft.world.entity.ai.gossip.GossipType.byId(t.getKey().getKey());
+        return net.minecraft.world.entity.ai.gossip.GossipType.valueOf(t.getKey().getKey().toUpperCase());
     }
 
     public static GossipType fromNMS(net.minecraft.world.entity.ai.gossip.GossipType t) {
@@ -1473,23 +1475,23 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static MemoryModuleType<?> toNMS(Memory<?> mem) {
-        return Registry.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new ResourceLocation(mem.getKey().getKey()) : new ResourceLocation(mem.getKey().getNamespace(), mem.getKey().getKey()));
+        return BuiltInRegistries.MEMORY_MODULE_TYPE.get(mem instanceof EntityMemory<?> ? new ResourceLocation(mem.getKey().getKey()) : new ResourceLocation(mem.getKey().getNamespace(), mem.getKey().getKey()));
     }
 
     @Override
     public void registerMemory(Memory<?> m) {
-        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, false);
+        changeRegistryLock(BuiltInRegistries.MEMORY_MODULE_TYPE, false);
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WritableRegistry<MemoryModuleType<?>> writable = (WritableRegistry<MemoryModuleType<?>>) server.registryAccess().ownedRegistryOrThrow(Registry.MEMORY_MODULE_TYPE_REGISTRY);
-        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.create(Registry.MEMORY_MODULE_TYPE_REGISTRY, toNMS(m.getKey()));
+        WritableRegistry<MemoryModuleType<?>> writable = (WritableRegistry<MemoryModuleType<?>>) server.registryAccess().registryOrThrow(Registries.MEMORY_MODULE_TYPE);
+        ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.create(Registries.MEMORY_MODULE_TYPE, toNMS(m.getKey()));
         writable.register(nmsKey, toNMS(m), Lifecycle.stable());
-        changeRegistryLock(Registry.MEMORY_MODULE_TYPE, true);
+        changeRegistryLock(BuiltInRegistries.MEMORY_MODULE_TYPE, true);
     }
 
     @Override
     public boolean existsMemory(Memory<?> m) {
         if (m instanceof EntityMemory<?>) return true;
-        return Registry.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
+        return BuiltInRegistries.MEMORY_MODULE_TYPE.containsKey(new ResourceLocation(m.getKey().getNamespace(), m.getKey().getKey()));
     }
 
     @Override
@@ -1528,31 +1530,31 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static Memory<?> fromNMS(MemoryModuleType<?> memory) {
-        return EntityMemory.getByKey(fromNMS(Registry.MEMORY_MODULE_TYPE.getKey(memory)));
+        return EntityMemory.getByKey(fromNMS(BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(memory)));
     }
 
     public static MemoryModuleType<?> getMemory(NamespacedKey key) {
-        return Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(key.getNamespace(), key.getKey()));
+        return BuiltInRegistries.MEMORY_MODULE_TYPE.get(new ResourceLocation(key.getNamespace(), key.getKey()));
     }
 
     @Override
     public void registerSensor(Sensor<?> s) {
-        changeRegistryLock(Registry.SENSOR_TYPE, false);
+        changeRegistryLock(BuiltInRegistries.SENSOR_TYPE, false);
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WritableRegistry<SensorType<?>> writable = (WritableRegistry<SensorType<?>>) server.registryAccess().ownedRegistryOrThrow(Registry.SENSOR_TYPE_REGISTRY);
-        ResourceKey<SensorType<?>> nmsKey = ResourceKey.create(Registry.SENSOR_TYPE_REGISTRY, toNMS(s.getKey()));
+        WritableRegistry<SensorType<?>> writable = (WritableRegistry<SensorType<?>>) server.registryAccess().registryOrThrow(Registries.SENSOR_TYPE);
+        ResourceKey<SensorType<?>> nmsKey = ResourceKey.create(Registries.SENSOR_TYPE, toNMS(s.getKey()));
         writable.register(nmsKey, toNMSType(s), Lifecycle.stable());
-        changeRegistryLock(Registry.SENSOR_TYPE, true);
+        changeRegistryLock(BuiltInRegistries.SENSOR_TYPE, true);
     }
 
     @Override
     public boolean existsSensor(NamespacedKey key) {
-        return Registry.SENSOR_TYPE.containsKey(new ResourceLocation(key.getNamespace(), key.getKey()));
+        return BuiltInRegistries.SENSOR_TYPE.containsKey(new ResourceLocation(key.getNamespace(), key.getKey()));
     }
 
     @Override
     public Sensor<?> getSensor(NamespacedKey key) {
-        return fromNMS(Registry.SENSOR_TYPE.get(toNMS(key)).create());
+        return fromNMS(BuiltInRegistries.SENSOR_TYPE.get(toNMS(key)).create());
     }
 
     @Override
