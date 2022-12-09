@@ -28,7 +28,7 @@ public class TestChipUtil1_19_R2 {
 
         // Other
         for (Difficulty d : Difficulty.values()) Assertions.assertNotNull(ChipUtil1_19_R2.toNMS(d));
-        for (EntityDamageEvent.DamageCause c : EntityDamageEvent.DamageCause.values()) Assertions.assertNotNull(ChipUtil1_19_R2.toNMS(c));
+        for (EntityDamageEvent.DamageCause c : EntityDamageEvent.DamageCause.values()) Assertions.assertNotNull(ChipUtil1_19_R2.toNMS(c, null));
         for (GossipType t : GossipType.values()) Assertions.assertNotNull(ChipUtil1_19_R2.toNMS(t));
 
         Assertions.assertNotNull(ChipUtil1_19_R2.toNMS(m -> m.damage(2)));

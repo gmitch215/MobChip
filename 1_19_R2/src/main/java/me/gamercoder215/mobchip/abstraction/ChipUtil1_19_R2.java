@@ -115,7 +115,7 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
@@ -700,7 +700,14 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
         return new EntityBody1_19_R2(m);
     }
 
-    public static DamageSource toNMS(EntityDamageEvent.DamageCause c) {
+    public static DamageSource toNMS(EntityDamageEvent.DamageCause c, Entity en) {
+        if (en != null) {
+            net.minecraft.world.entity.Entity nmsEntity = toNMS(en);
+            
+            if (c == EntityDamageEvent.DamageCause.FALLING_BLOCK)
+              return DamageSource.fallingBlock(nmsEntity);
+        }
+
         return switch (c) {
             case FIRE -> DamageSource.IN_FIRE;
             case LIGHTNING -> DamageSource.LIGHTNING_BOLT;
@@ -717,13 +724,12 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
             case VOID -> DamageSource.OUT_OF_WORLD;
             case WITHER -> DamageSource.WITHER;
-            //case FALLING_BLOCK -> DamageSource.FALLING_BLOCK;
             case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
             case FREEZE -> DamageSource.FREEZE;
             case DRYOUT -> DamageSource.DRY_OUT;
             default -> DamageSource.GENERIC;
         };
-    }
+    }   
 
     public static ItemEntity toNMS(org.bukkit.entity.Item i) {
         return (ItemEntity) ((CraftItem) i).getHandle();
@@ -785,7 +791,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             for (LivingEntity l : ls) s.add(toNMS(l));
             nmsValue = s;
         }
-        else if (value instanceof EntityDamageEvent.DamageCause c) nmsValue = toNMS(c);
+        else if (value instanceof EntityDamageEvent.DamageCause c) nmsValue = toNMS(c, null);
         else nmsValue = value;
 
         return nmsValue;
@@ -1396,7 +1402,11 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
-        return net.minecraft.world.entity.ai.gossip.GossipType.valueOf(t.getKey().getKey().toUpperCase());
+        for (net.minecraft.world.entity.ai.gossip.GossipType nms : net.minecraft.world.entity.ai.gossip.GossipType.values()) {
+            if (nms.id.equalsIgnoreCase(t.getKey().getKey())) return nms;
+        }
+
+        throw new AssertionError("Missing GossipType: " + t.getKey() + "\"");
     }
 
     public static GossipType fromNMS(net.minecraft.world.entity.ai.gossip.GossipType t) {
@@ -1417,7 +1427,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
-        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
+        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause(), en.getAttacker()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
     }
 
     @Override

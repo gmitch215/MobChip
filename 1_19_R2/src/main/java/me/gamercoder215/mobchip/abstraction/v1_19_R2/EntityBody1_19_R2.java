@@ -333,7 +333,7 @@ public final class EntityBody1_19_R2 implements EntityBody {
 
     @Override
     public boolean isInvulnerableTo(EntityDamageEvent.@Nullable DamageCause cause) {
-        return nmsMob.isInvulnerableTo(ChipUtil1_19_R2.toNMS(cause));
+        return nmsMob.isInvulnerableTo(ChipUtil1_19_R2.toNMS(cause, m));
     }
 
     @Override
