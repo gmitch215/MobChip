@@ -175,9 +175,16 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>mobchip-1_19_R1</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mobchip-1_19_R2</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
