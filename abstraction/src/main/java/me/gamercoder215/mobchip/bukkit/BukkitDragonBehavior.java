@@ -26,18 +26,8 @@ public class BukkitDragonBehavior extends BukkitEntityBehavior implements Dragon
 
     @Override
     public @NotNull BehaviorResult naturalKnockback(@Nullable List<Entity> entities) {
-        BehaviorResult b = new BehaviorResult() {
-            @Override
-            public @NotNull Status getStatus() {
-                return Status.STOPPED;
-            }
-
-            @Override
-            public void stop() {
-            }
-        };
-        if (entities == null) return b;
+        if (entities == null) return BehaviorResult.STOPPED;
         wrapper.knockback(m, entities);
-        return b;
+        return BehaviorResult.STOPPED;
     }
 }

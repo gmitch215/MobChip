@@ -8,6 +8,18 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BehaviorResult {
 
     /**
+     * Represents a stopped BehaviorResult.
+     */
+    public static final BehaviorResult STOPPED = new BehaviorResult() {
+        @Override
+        public @NotNull Status getStatus() {
+            return Status.STOPPED;
+        }
+        @Override
+        public void stop() {}
+    };
+
+    /**
      * Constructs an Abstract Behavior Result.
      */
     protected BehaviorResult() {}
