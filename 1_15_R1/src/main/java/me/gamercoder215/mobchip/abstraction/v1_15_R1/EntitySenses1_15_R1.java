@@ -42,6 +42,11 @@ public final class EntitySenses1_15_R1 implements EntitySenses {
         }
     }
 
+    @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
     private void save() {
         try {
             Field sensorsF = BehaviorController.class.getDeclaredField("sensors");

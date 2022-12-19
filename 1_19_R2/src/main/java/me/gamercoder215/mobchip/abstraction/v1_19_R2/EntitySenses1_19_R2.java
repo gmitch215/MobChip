@@ -58,6 +58,11 @@ public final class EntitySenses1_19_R2 implements EntitySenses {
     }
 
     @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
+    @Override
     public @NotNull List<Sensor<?>> getSensors() {
         return sensorsHandle.values()
                 .stream()
