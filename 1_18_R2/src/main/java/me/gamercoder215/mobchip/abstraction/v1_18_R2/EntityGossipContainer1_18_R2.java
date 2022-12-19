@@ -14,9 +14,16 @@ import java.util.Arrays;
 
 public class EntityGossipContainer1_18_R2 implements EntityGossipContainer {
     private final GossipContainer handle;
+    private final Villager entity;
 
     public EntityGossipContainer1_18_R2(Villager v) {
+        this.entity = v;
         this.handle = ((CraftVillager) v).getHandle().getGossips();
+    }
+
+    @Override
+    public @NotNull Villager getEntity() {
+        return this.entity;
     }
 
     @Override

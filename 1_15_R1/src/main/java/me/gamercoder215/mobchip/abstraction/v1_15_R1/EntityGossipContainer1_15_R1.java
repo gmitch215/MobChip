@@ -22,9 +22,16 @@ import java.util.UUID;
 @SuppressWarnings("unchecked")
 public class EntityGossipContainer1_15_R1 implements EntityGossipContainer {
     private final Reputation handle;
+    private final Villager entity;
 
     public EntityGossipContainer1_15_R1(Villager v) {
+        this.entity = v;
         this.handle = ((CraftVillager) v).getHandle().eN();
+    }
+
+    @Override
+    public @NotNull Villager getEntity() {
+        return entity;
     }
 
     @Override

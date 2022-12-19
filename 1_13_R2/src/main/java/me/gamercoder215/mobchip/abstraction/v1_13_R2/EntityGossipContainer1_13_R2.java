@@ -9,8 +9,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class EntityGossipContainer1_13_R2 implements EntityGossipContainer {
 
+    private final Villager entity;
+
     public EntityGossipContainer1_13_R2(Villager v) {
+        this.entity = v;
         // doesn't exist
+    }
+
+    @Override
+    public @NotNull Villager getEntity() {
+        return entity;
     }
 
     @Override

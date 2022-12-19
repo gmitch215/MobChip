@@ -14,9 +14,16 @@ import java.util.Arrays;
 
 public class EntityGossipContainer1_17_R1 implements EntityGossipContainer {
     private final Reputation handle;
+    private final Villager entity;
 
     public EntityGossipContainer1_17_R1(Villager v) {
+        this.entity = v;
         this.handle = ((CraftVillager) v).getHandle().fT();
+    }
+
+    @Override
+    public @NotNull Villager getEntity() {
+        return entity;
     }
 
     @Override
