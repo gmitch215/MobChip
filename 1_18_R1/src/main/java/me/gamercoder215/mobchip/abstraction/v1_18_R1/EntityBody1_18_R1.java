@@ -7,6 +7,7 @@ import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,6 +34,13 @@ public final class EntityBody1_18_R1 implements EntityBody {
     public EntityBody1_18_R1(Mob m) {
         this.m = m;
         this.nmsMob = ChipUtil1_18_R1.toNMS(m);
+    }
+
+    private void update() {
+        ClientboundSetEntityDataPacket packet = new ClientboundSetEntityDataPacket(nmsMob.getId(), nmsMob.getEntityData(), true);
+
+        for (Player p : m.getWorld().getPlayers())
+            ((CraftPlayer) p).getHandle().connection.send(packet);
     }
 
     /**
@@ -400,6 +408,8 @@ public final class EntityBody1_18_R1 implements EntityBody {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }
+
+        update();
     }
 
     @Override

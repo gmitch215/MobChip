@@ -30,6 +30,13 @@ public final class EntityBody1_16_R2 implements EntityBody {
         this.nmsMob = ChipUtil1_16_R2.toNMS(m);
     }
 
+    private void update() {
+        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(nmsMob.getId(), nmsMob.getDataWatcher(), true);
+
+        for (Player p : m.getWorld().getPlayers())
+            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
+    }
+
     /**
      * Whether this Entity is Left Handed.
      *
@@ -431,6 +438,8 @@ public final class EntityBody1_16_R2 implements EntityBody {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }
+
+        update();
     }
 
     @Override

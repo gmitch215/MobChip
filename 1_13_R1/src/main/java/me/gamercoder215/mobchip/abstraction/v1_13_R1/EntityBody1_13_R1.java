@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R1.*;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -26,6 +27,13 @@ public final class EntityBody1_13_R1 implements EntityBody {
     public EntityBody1_13_R1(Mob m) {
         this.m = m;
         this.nmsMob = ChipUtil1_13_R1.toNMS(m);
+    }
+
+    private void update() {
+        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(nmsMob.getId(), nmsMob.getDataWatcher(), true);
+
+        for (Player p : m.getWorld().getPlayers())
+            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
     }
 
     /**
@@ -413,6 +421,8 @@ public final class EntityBody1_13_R1 implements EntityBody {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }
+
+        update();
     }
 
     @Override
