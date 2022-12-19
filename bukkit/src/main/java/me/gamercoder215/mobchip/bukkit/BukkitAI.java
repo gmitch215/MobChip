@@ -61,6 +61,11 @@ final class BukkitAI implements EntityAI {
 	}
 
 	@Override
+	public @NotNull Mob getEntity() {
+		return m;
+	}
+
+	@Override
 	public boolean contains(Pathfinder value) {
 		return wrapper.getGoals(m, target).stream().map(WrappedPathfinder::getPathfinder).collect(Collectors.toList()).contains(value);
 	}
