@@ -3,7 +3,7 @@
     <parent>
         <groupId>me.gamercoder215</groupId>
         <artifactId>mobchip-parent</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.7.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>mobchip-1_14_R1</artifactId>
