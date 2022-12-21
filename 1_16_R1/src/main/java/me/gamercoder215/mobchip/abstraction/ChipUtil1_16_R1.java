@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class ChipUtil1_16_R1 implements ChipUtil {
 
     public static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_16_R1.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
