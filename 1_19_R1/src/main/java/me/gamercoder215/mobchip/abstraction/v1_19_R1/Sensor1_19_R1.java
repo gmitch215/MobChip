@@ -1,12 +1,10 @@
 package me.gamercoder215.mobchip.abstraction.v1_19_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1;
+import me.gamercoder215.mobchip.abstraction.ChipUtil1_19_R1;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.Sensor;
-
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_19_R1;
 
 import java.util.Set;
 import java.util.stream.Collectors;
