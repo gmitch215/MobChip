@@ -6,10 +6,12 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -479,6 +481,30 @@ public final class EntityBody1_13_R2 implements EntityBody {
     @Override
     public void eat(@NotNull ItemStack item) {
         // doesn't exist
+    }  
+
+    @Override
+    public void setRotation(float yaw, float pitch) {
+        try {
+            if (m instanceof Slime) {
+                ControllerMove moveControl = nmsMob.getControllerMove();
+
+                Method setRotation = moveControl.getClass().getDeclaredMethod("a", float.class, boolean.class);
+                setRotation.setAccessible(true);
+                setRotation.invoke(moveControl, yaw, true);
+            } else {
+                float nYaw = Location.normalizeYaw(yaw);
+                float nPitch = Location.normalizePitch(pitch);
+                nmsMob.yaw = nYaw;
+                nmsMob.pitch = nPitch;
+                nmsMob.lastYaw = nYaw;
+                nmsMob.lastPitch = nPitch;
+                nmsMob.setHeadRotation(nYaw);
+            }
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }       
     }
 
 }

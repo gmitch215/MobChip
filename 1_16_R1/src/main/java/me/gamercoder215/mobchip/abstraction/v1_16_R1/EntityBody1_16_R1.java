@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -496,6 +497,22 @@ public final class EntityBody1_16_R1 implements EntityBody {
     @Override
     public void eat(@NotNull ItemStack item) {
         nmsMob.a(ChipUtil1_16_R1.toNMS(m.getWorld()), ChipUtil1_16_R1.toNMS(item));
+    }
+
+    @Override
+    public void setRotation(float yaw, float pitch) {
+        try {
+            if (m instanceof Slime) {
+                ControllerMove moveControl = nmsMob.getControllerMove();
+
+                Method setRotation = moveControl.getClass().getDeclaredMethod("a", float.class, boolean.class);
+                setRotation.setAccessible(true);
+                setRotation.invoke(moveControl, yaw, true);
+            } else m.setRotation(yaw, pitch);
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }       
     }
 
 }

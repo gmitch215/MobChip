@@ -634,4 +634,11 @@ public interface EntityBody {
      */
     void eat(@NotNull ItemStack item);
 
+    /**
+     * Sets the Entity's Rotation.
+     * @param yaw Yaw to set
+     * @param pitch Pitch to set
+     */
+    void setRotation(float yaw, float pitch);
+
 }
