@@ -1185,7 +1185,6 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
                 if (Goal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends Goal>) clazz.getSuperclass();
                 else break;
             }
-            Bukkit.getLogger().severe("Failed to find entity field for " + g.getClass().getName());
             return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
