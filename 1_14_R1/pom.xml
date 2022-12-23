@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>mobchip-1_14_R1</artifactId>
-    <name>MobChip-1.14</name>
+    <name>MobChip-1.14.4</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
