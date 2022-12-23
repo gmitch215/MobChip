@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.ai.memories;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -11,11 +10,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents a Memory of an entity

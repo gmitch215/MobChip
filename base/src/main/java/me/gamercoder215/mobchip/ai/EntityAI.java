@@ -2,6 +2,7 @@ package me.gamercoder215.mobchip.ai;
 
 import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +13,13 @@ import java.util.Set;
  * Represents Entity Pathfinder AI 
  */
 public interface EntityAI extends Set<WrappedPathfinder> {
+
+    /**
+     * Fetches the Entity this EntityAI belongs to.
+     * @return Entity
+     */
+    @NotNull
+    Mob getEntity();
 
     // Util
 

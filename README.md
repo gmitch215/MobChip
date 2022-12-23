@@ -14,7 +14,7 @@ improve the hassle of playing around with NMS and learning how to import and use
 
 - **Small**: MobChip is currently below 2MB, and we will try to optimize and keep it as small as possible.
 - **Simple**: MobChip has documentation, API usage, and other utilities to help ease the experience of working with Entity AI.
-- **Flexible**: With normal NMS, you're often limited with what fields you are able to pick, and obfuscated methods make knowing what to pick even harder. Even with the addition of Mojang Mappings, there's still a lot of things that both new and experienced developers don't know. MobChip uses Reflection to help 
+- **Flexible**: With normal NMS, you're often limited with what fields you are able to pick, and obfuscated methods make knowing what to pick even harder. Even with the addition of Mojang Mappings, there's still a lot of things that both new and experienced developers don't know. MobChip uses Reflection and Abstraction to help solve this issue, as well as providing an easy-to-read API and JavaDocs to access important fields and methods. 
 - **Transparent**: Instead of the getHandle() methods in previous versions, we have open wrappers that allow you to switch between MobChip and NMS for your MC Version. Depend on one of the wrapper modules according to your MC Version.
 
 ## Installation

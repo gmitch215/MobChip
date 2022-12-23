@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.ai.gossip;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Villager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,6 +9,13 @@ import org.jetbrains.annotations.Nullable;
  * Represents a Gossip Container Manager for a Villager
  */
 public interface EntityGossipContainer {
+
+    /**
+     * Fetches this Gossip Container's Villager.
+     * @return Villager
+     */
+    @NotNull
+    Villager getEntity();
 
     /**
      * Forcefully decays all the gossip types by their daily decay rate.

@@ -26,7 +26,7 @@ public class AttributeInstance1_14_R1 implements me.gamercoder215.mobchip.ai.att
 
     @Override
     public double getBaseValue() {
-        return handle.b();
+        return handle.getBaseValue();
     }
 
     @Override
@@ -37,19 +37,19 @@ public class AttributeInstance1_14_R1 implements me.gamercoder215.mobchip.ai.att
     @NotNull
     @Override
     public Collection<AttributeModifier> getModifiers() {
-        return handle.c().stream().map(CraftAttributeInstance::convert).collect(Collectors.toSet());
+        return handle.getModifiers().stream().map(CraftAttributeInstance::convert).collect(Collectors.toSet());
     }
 
     @Override
     public void addModifier(@NotNull AttributeModifier mod) {
         Preconditions.checkArgument(mod != null, "modifier");
-        handle.b(CraftAttributeInstance.convert(mod));
+        handle.addModifier(CraftAttributeInstance.convert(mod));
     }
 
     @Override
     public void removeModifier(@NotNull AttributeModifier mod) {
         Preconditions.checkArgument(mod != null, "modifier");
-        handle.c(CraftAttributeInstance.convert(mod));
+        handle.removeModifier(CraftAttributeInstance.convert(mod));
     }
 
     @Override

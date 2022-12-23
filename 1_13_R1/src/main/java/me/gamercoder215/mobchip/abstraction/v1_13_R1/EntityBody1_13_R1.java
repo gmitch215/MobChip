@@ -6,9 +6,11 @@ import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R1.*;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +28,13 @@ public final class EntityBody1_13_R1 implements EntityBody {
     public EntityBody1_13_R1(Mob m) {
         this.m = m;
         this.nmsMob = ChipUtil1_13_R1.toNMS(m);
+    }
+
+    private void update() {
+        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(nmsMob.getId(), nmsMob.getDataWatcher(), true);
+
+        for (Player p : m.getWorld().getPlayers())
+            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
     }
 
     /**
@@ -413,6 +422,8 @@ public final class EntityBody1_13_R1 implements EntityBody {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }
+
+        update();
     }
 
     @Override
@@ -469,6 +480,48 @@ public final class EntityBody1_13_R1 implements EntityBody {
     @Override
     public void eat(@NotNull ItemStack item) {
         // doesn't exist
+    }
+
+    public static float normalizeYaw(float yaw) {
+        float mYaw = yaw % 360.0f;
+        
+        if (mYaw >= 180.0f) mYaw -= 360.0f;
+        else if (mYaw < -180.0f) mYaw += 360.0f;
+        
+        return mYaw;
+    }
+
+    public static float normalizePitch(float pitch) {
+        float mPitch = pitch;
+
+        if (pitch > 90.0f) mPitch = 90.0f;
+        else if (pitch < -90.0f) mPitch = -90.0f;
+        
+        return mPitch;
+    }
+
+    @Override
+    public void setRotation(float yaw, float pitch) {
+        try {
+            if (m instanceof Slime) {
+                ControllerMove moveControl = nmsMob.getControllerMove();
+
+                Method setRotation = moveControl.getClass().getDeclaredMethod("a", float.class, boolean.class);
+                setRotation.setAccessible(true);
+                setRotation.invoke(moveControl, yaw, true);
+            } else {
+                float nYaw = normalizeYaw(yaw);
+                float nPitch = normalizePitch(pitch);
+                nmsMob.yaw = nYaw;
+                nmsMob.pitch = nPitch;
+                nmsMob.lastYaw = nYaw;
+                nmsMob.lastPitch = nPitch;
+                nmsMob.setHeadRotation(nYaw);
+            }
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }       
     }
 
 }

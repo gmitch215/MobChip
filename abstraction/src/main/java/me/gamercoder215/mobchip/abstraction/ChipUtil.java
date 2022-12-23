@@ -23,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -136,26 +135,11 @@ public interface ChipUtil {
     default void updateActivities(Creature c) {}
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {
-        return new BehaviorResult() {
-            @Override
-            public @NotNull Status getStatus() {
-                return Status.STOPPED;
-            }
-
-            @Override
-            public void stop() {}
-        };
+        return BehaviorResult.STOPPED;
     }
 
     default BehaviorResult setDisturbanceLocation(Creature c, Location loc) {
-        return new BehaviorResult() {
-            @Override
-            public @NotNull Status getStatus() {
-                return Status.STOPPED;
-            }
-            @Override
-            public void stop() {}
-        };
+        return BehaviorResult.STOPPED;
     }
 
     default void updateGoals(Map<Integer, Pathfinder> goals, Map<Integer, Boolean> target) {

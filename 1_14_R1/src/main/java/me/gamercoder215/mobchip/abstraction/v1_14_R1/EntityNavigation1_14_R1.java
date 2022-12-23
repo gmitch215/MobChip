@@ -76,7 +76,7 @@ public final class EntityNavigation1_14_R1 implements EntityNavigation {
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new NavigationPath1_14_R1(handle.a(finalPos.getX(), finalPos.getY(), finalPos.getZ()), m);
+        return new NavigationPath1_14_R1(handle.a(finalPos, range), m);
     }
 
     @Override

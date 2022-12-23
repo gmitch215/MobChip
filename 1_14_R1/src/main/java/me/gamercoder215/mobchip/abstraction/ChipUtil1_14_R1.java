@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
 public class ChipUtil1_14_R1 implements ChipUtil {
     public static org.bukkit.inventory.ItemStack fromNMS(net.minecraft.server.v1_14_R1.ItemStack item) { return CraftItemStack.asBukkitCopy(item); }
 
@@ -126,7 +126,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
             .put(Mule.class, EntityHorseMule.class)
             .put(SkeletonHorse.class, EntityHorseSkeleton.class)
             .put(Stray.class, EntitySkeletonStray.class)
-            .put(TraderLlama.class, EntityLLamaTrader.class)
+            .put(TraderLlama.class, EntityLlamaTrader.class)
             .put(WanderingTrader.class, EntityVillagerTrader.class)
             .put(WitherSkeleton.class, EntitySkeletonWither.class)
             .put(ZombieHorse.class, EntityHorseZombie.class)
@@ -482,16 +482,11 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     }
 
     public static <T extends EntityLiving> Behavior<T> toNMS(Consumer<Mob> en) {
-        return new Behavior<T>() {
+        return new Behavior<T>(Collections.emptyMap()) {
             @Override
             protected void d(WorldServer var0, T m, long var2) {
                 if (!(m instanceof EntityInsentient)) return;
                 en.accept(fromNMS((EntityInsentient) m));
-            }
-
-            @Override
-            protected Set<Pair<MemoryModuleType<?>, MemoryStatus>> a() {
-                return Collections.emptySet();
             }
         };
     }
@@ -617,9 +612,9 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
         if (nmsValue instanceof GlobalPos) {
             GlobalPos l = (GlobalPos) nmsValue;
-            BlockPosition pos = l.b();
+            BlockPosition pos = l.getBlockPosition();
 
-            org.bukkit.World w = Bukkit.getWorld(DimensionManager.a(l.a()).getKey());
+            org.bukkit.World w = Bukkit.getWorld(DimensionManager.a(l.getDimensionManager()).getKey());
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
         else if (nmsValue instanceof EntityHuman) {
@@ -759,7 +754,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         String key = IRegistry.MEMORY_MODULE_TYPE.getKey(type).getKey();
         Object nmsValue = toNMS(key, value);
 
-        nms.getBehaviorController().a(type, nmsValue);
+        nms.getBehaviorController().setMemory(type, nmsValue);
     }
 
     @Override
@@ -780,8 +775,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         MemoryModuleType type = toNMS(m);
         String key = IRegistry.MEMORY_MODULE_TYPE.getKey(type).getKey();
 
-        Optional<?> o = nms.getBehaviorController().c(type);
-        return o.map(value -> m.getBukkitClass().cast(fromNMS(mob, key, value))).orElse(null);
+        return m.getBukkitClass().cast(fromNMS(mob, key, nms.getBehaviorController().getMemory(type)));
     }
 
     @Override
@@ -795,14 +789,14 @@ public class ChipUtil1_14_R1 implements ChipUtil {
         EntityInsentient nms = toNMS(mob);
         MemoryModuleType type = toNMS(m);
 
-        return nms.getBehaviorController().a(type);
+        return nms.getBehaviorController().hasMemory(type);
     }
 
     @Override
     public void removeMemory(Mob mob, Memory<?> m) {
         EntityInsentient nms = toNMS(mob);
         MemoryModuleType<?> type = toNMS(m);
-        nms.getBehaviorController().b(type);
+        nms.getBehaviorController().removeMemory(type);
     }
 
     @Override
@@ -1049,13 +1043,18 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     }
 
     public static Mob getEntity(PathfinderGoal g) {
+        // For no discernible reason, the Mob field in PathfinderGoalDoorInteract
+        // is not final, unlike the mob fields in every other pathfinder.
+        // Since PathfinderGoalDoorInteract and subclasses each only have one mob field,
+        // we can simply ignore the "final" check in this case.
+        boolean ignoreNonFinal = g instanceof PathfinderGoalDoorInteract;
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
             while (clazz.getSuperclass() != null) {
                 for (Field f : clazz.getDeclaredFields()) {
                     f.setAccessible(true);
-                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && (ignoreNonFinal || Modifier.isFinal(f.getModifiers()))) {
                         return fromNMS((EntityInsentient) f.get(g));
                     }
                 }
@@ -1063,7 +1062,6 @@ public class ChipUtil1_14_R1 implements ChipUtil {
                 if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                 else break;
             }
-
             return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
@@ -1175,7 +1173,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
                 case "FollowParent": return new PathfinderFollowParent((Animals) m, getDouble(g, "c"));
                 case "HorseTrap": return new PathfinderSkeletonTrap((SkeletonHorse) m);
                 case "LeapAtTarget": return new PathfinderLeapAtTarget(m, getFloat(g, "c"));
-                case "JumpOnBlock": return new PathfinderCatOnBlock((Cat) m, getDouble(g, "g"));
+                case "JumpOnBlock": return new PathfinderCatOnBlock((Cat) m, getDouble(g, "b"));
                 case "LlamaFollow": return new PathfinderLlamaFollowCaravan((Llama) m, getDouble(g, "b"));
                 case "LookAtPlayer": return new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "d", Class.class), LivingEntity.class), getFloat(g, "c"), getFloat(g, "g"));
                 case "LookAtTradingPlayer": return new PathfinderLookAtTradingPlayer((AbstractVillager) m);
@@ -1186,7 +1184,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
                 case "Raid": return new PathfinderMoveToRaid((Raider) m);
                 case "MoveTowardsRestriction": return new PathfinderMoveTowardsRestriction((Creature) m, getDouble(g, "e"));
                 case "MoveTowardsTarget": return new PathfinderMoveTowardsTarget((Creature) m, getDouble(g, "f"), getFloat(g, "g"));
-                case "OcelotAttack": return new PathfinderOcelotAttack((Ocelot) m);
+                case "OcelotAttack": return new PathfinderOcelotAttack(m);
                 case "OfferFlower": return new PathfinderOfferFlower((IronGolem) m);
                 case "Panic": return new PathfinderPanic((Creature) m, getDouble(g, "b"));
                 case "Perch": return new PathfinderRideShoulder((Parrot) m);
@@ -1252,7 +1250,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     }
 
     public static GossipType fromNMS(ReputationType t) {
-        return GossipType.getByKey(NamespacedKey.minecraft(t.g));
+        return GossipType.getByKey(NamespacedKey.minecraft(t.f));
     }
 
     @Override
@@ -1372,7 +1370,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
             Supplier<Sensor<?>> sup = () -> toNMS(s);
 
-            return (SensorType<?>) c.newInstance(sup);
+            return c.newInstance(sup);
         } catch (ReflectiveOperationException e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement st : e.getStackTrace()) Bukkit.getLogger().severe(st.toString());
@@ -1387,7 +1385,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     }
 
     public static NamespacedKey fromNMS(MinecraftKey loc) {
-        return new NamespacedKey(loc.b(), loc.getKey());
+        return new NamespacedKey(loc.getNamespace(), loc.getKey());
     }
 
     public static Memory<?> fromNMS(MemoryModuleType<?> memory) {

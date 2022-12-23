@@ -1,8 +1,8 @@
 package me.gamercoder215.mobchip.ai.sensing;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -10,6 +10,13 @@ import java.util.List;
  * Represents a mob's senses and groups of {@link Sensor}s.
  */
 public interface EntitySenses {
+
+    /**
+     * Fetches the Entity this EntitySenses belongs to.
+     * @return Mob
+     */
+    @NotNull
+    Mob getEntity();
 
     /**
      * Fetches a list of all sensors that this mob has enabled.

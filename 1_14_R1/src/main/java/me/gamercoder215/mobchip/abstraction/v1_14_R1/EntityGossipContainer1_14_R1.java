@@ -24,8 +24,11 @@ import java.util.UUID;
 @SuppressWarnings({"deprecation", "unchecked"})
 public class EntityGossipContainer1_14_R1 implements EntityGossipContainer {
     private Reputation handle;
+    private final Villager entity;
 
     public EntityGossipContainer1_14_R1(Villager v) {
+        this.entity = v;
+
         try {
             Field containerF = EntityVillager.class.getDeclaredField("bM");
             containerF.setAccessible(true);
@@ -35,6 +38,11 @@ public class EntityGossipContainer1_14_R1 implements EntityGossipContainer {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
         }
+    }
+
+    @Override
+    public @NotNull Villager getEntity() {
+        return entity;
     }
 
     @Override

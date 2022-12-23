@@ -45,6 +45,11 @@ public final class EntitySenses1_19_R1 implements EntitySenses {
         }
     }
 
+    @Override
+    public @NotNull Mob getEntity() {
+        return m;
+    }
+
     private void save() {
         try {
             Field sensorsF = Brain.class.getDeclaredField("e");

@@ -7,15 +7,18 @@ import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,13 @@ public final class EntityBody1_19_R1 implements EntityBody {
     public EntityBody1_19_R1(Mob m) {
         this.m = m;
         this.nmsMob = ChipUtil1_19_R1.toNMS(m);
+    }
+
+    private void update() {
+        ClientboundSetEntityDataPacket packet = new ClientboundSetEntityDataPacket(nmsMob.getId(), nmsMob.getEntityData(), true);
+
+        for (Player p : m.getWorld().getPlayers())
+            ((CraftPlayer) p).getHandle().connection.send(packet);
     }
 
     /**
@@ -400,6 +410,8 @@ public final class EntityBody1_19_R1 implements EntityBody {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }
+
+        update();
     }
 
     @Override
@@ -452,5 +464,21 @@ public final class EntityBody1_19_R1 implements EntityBody {
     @Override
     public void eat(@NotNull ItemStack item) {
         nmsMob.eat(ChipUtil1_19_R1.toNMS(m.getWorld()), ChipUtil1_19_R1.toNMS(item));
+    }
+
+    @Override
+    public void setRotation(float yaw, float pitch) {
+        try {
+            if (m instanceof Slime) {
+                MoveControl moveControl = nmsMob.getMoveControl();
+
+                Method setRotation = moveControl.getClass().getDeclaredMethod("a", float.class, boolean.class);
+                setRotation.setAccessible(true);
+                setRotation.invoke(moveControl, yaw, true);
+            } else m.setRotation(yaw, pitch);
+        } catch (ReflectiveOperationException e) {
+            Bukkit.getLogger().severe(e.getMessage());
+            for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+        }       
     }
 }
