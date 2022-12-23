@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_13_R1.*;
@@ -600,12 +601,27 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         return ((CraftEntity) en).getHandle();
     }
 
+    // For no discernible reason, the Mob field in these pathfinders
+    // is not final, unlike the mob fields in every other pathfinder.
+    // Since these classes each only have one mob field,
+    // we can simply ignore the "final" check in this case.
+
+    private static final List<Class<? extends PathfinderGoal>> NON_FINAL_ENTITY_FIELDS = ImmutableList.of(
+            PathfinderGoalAvoidTarget.class,
+            PathfinderGoalLookAtPlayer.class,
+            PathfinderGoalMeleeAttack.class,
+            PathfinderGoalDoorInteract.class
+    );
+
     public static Mob getEntity(PathfinderGoal g) {
-        // For no discernible reason, the Mob field in PathfinderGoalDoorInteract
-        // is not final, unlike the mob fields in every other pathfinder.
-        // Since PathfinderGoalDoorInteract and subclasses each only have one mob field,
-        // we can simply ignore the "final" check in this case.
-        boolean ignoreNonFinal = g instanceof PathfinderGoalDoorInteract;
+        boolean ignoreNonFinal = false;
+        for (Class<? extends PathfinderGoal> c : NON_FINAL_ENTITY_FIELDS) {
+            if (c.isAssignableFrom(g.getClass())) {
+                ignoreNonFinal = true;
+                break;
+            }
+        }
+
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
