@@ -1131,13 +1131,18 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     public static Sound fromNMS(SoundEffect s) { return CraftSound.getBukkit(s); }
 
     public static Mob getEntity(PathfinderGoal g) {
+        // For no discernible reason, the Mob field in PathfinderGoalDoorInteract
+        // is not final, unlike the mob fields in every other pathfinder.
+        // Since PathfinderGoalDoorInteract and subclasses each only have one mob field,
+        // we can simply ignore the "final" check in this case.
+        boolean ignoreNonFinal = g instanceof PathfinderGoalDoorInteract;
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
             while (clazz.getSuperclass() != null) {
                 for (Field f : clazz.getDeclaredFields()) {
                     f.setAccessible(true);
-                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && (ignoreNonFinal || Modifier.isFinal(f.getModifiers()))) {
                         return fromNMS((EntityInsentient) f.get(g));
                     }
                 }
@@ -1145,7 +1150,6 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                 else break;
             }
-
             return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
@@ -1260,7 +1264,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 case "FollowParent" -> new PathfinderFollowParent((Animals) m, getDouble(g, "f"));
                 case "HorseTrap" -> new PathfinderSkeletonTrap((SkeletonHorse) m);
                 case "LeapAtTarget" -> new PathfinderLeapAtTarget(m, getFloat(g, "c"));
-                case "JumpOnBlock" -> new PathfinderCatOnBlock((Cat) m, getDouble(g, "g"));
+                case "JumpOnBlock" -> new PathfinderCatOnBlock((Cat) m, getDouble(g, "b"));
                 case "LlamaFollow" -> new PathfinderLlamaFollowCaravan((Llama) m, getDouble(g, "b"));
                 case "LookAtPlayer" -> new PathfinderLookAtEntity<>(m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "d"), getFloat(g, "e"), getBoolean(g, "i"));
                 case "LookAtTradingPlayer" -> new PathfinderLookAtTradingPlayer((AbstractVillager) m);
@@ -1271,7 +1275,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
                 case "Raid" -> new PathfinderMoveToRaid((Raider) m);
                 case "MoveTowardsRestriction" -> new PathfinderMoveTowardsRestriction((Creature) m, getDouble(g, "e"));
                 case "MoveTowardsTarget" -> new PathfinderMoveTowardsTarget((Creature) m, getDouble(g, "f"), getFloat(g, "g"));
-                case "OcelotAttack" -> new PathfinderOcelotAttack((Ocelot) m);
+                case "OcelotAttack" -> new PathfinderOcelotAttack(m);
                 case "OfferFlower" -> new PathfinderOfferFlower((IronGolem) m);
                 case "Panic" -> new PathfinderPanic((Creature) m, getDouble(g, "c"));
                 case "Perch" -> new PathfinderRideShoulder((Parrot) m);

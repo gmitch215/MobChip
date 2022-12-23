@@ -761,13 +761,18 @@ public class ChipUtil1_13_R2 implements ChipUtil {
     }
 
     public static Mob getEntity(PathfinderGoal g) {
+        // For no discernible reason, the Mob field in PathfinderGoalDoorInteract
+        // is not final, unlike the mob fields in every other pathfinder.
+        // Since PathfinderGoalDoorInteract and subclasses each only have one mob field,
+        // we can simply ignore the "final" check in this case.
+        boolean ignoreNonFinal = g instanceof PathfinderGoalDoorInteract;
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
             while (clazz.getSuperclass() != null) {
                 for (Field f : clazz.getDeclaredFields()) {
                     f.setAccessible(true);
-                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && (ignoreNonFinal || Modifier.isFinal(f.getModifiers()))) {
                         return fromNMS((EntityInsentient) f.get(g));
                     }
                 }
@@ -775,7 +780,6 @@ public class ChipUtil1_13_R2 implements ChipUtil {
                 if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                 else break;
             }
-
             return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
@@ -879,7 +883,7 @@ public class ChipUtil1_13_R2 implements ChipUtil {
                 case "GotoTarget": return new PathfinderMoveToBlock((Creature) m, l -> fromNMS(getObject(g, "d", BlockPosition.class), m.getWorld()).equals(l), getDouble(g, "a"), getInt(g, "i"), getInt(g, "j"));
                 case "MoveTowardsRestriction": return new PathfinderMoveTowardsRestriction((Creature) m, getDouble(g, "e"));
                 case "MoveTowardsTarget": return new PathfinderMoveTowardsTarget((Creature) m, getDouble(g, "f"), getFloat(g, "g"));
-                case "OcelotAttack": return new PathfinderOcelotAttack((Ocelot) m);
+                case "OcelotAttack": return new PathfinderOcelotAttack(m);
                 case "OfferFlower": return new PathfinderOfferFlower((IronGolem) m);
                 case "Panic": return new PathfinderPanic((Creature) m, getDouble(g, "b"));
                 case "Perch": return new PathfinderRideShoulder((Parrot) m);

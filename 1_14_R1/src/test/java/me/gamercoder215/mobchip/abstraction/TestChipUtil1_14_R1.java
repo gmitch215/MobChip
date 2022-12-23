@@ -40,10 +40,7 @@ public class TestChipUtil1_14_R1 {
     public void testBukkitConversion() {
         // Other
         for (EnumDifficulty d : EnumDifficulty.values()) Assertions.assertNotNull(ChipUtil1_14_R1.fromNMS(d));
-        for (ReputationType t : ReputationType.values()) {
-            if (t == ReputationType.GOLEM) continue; // Only exists in 1.14
-            Assertions.assertNotNull(ChipUtil1_14_R1.fromNMS(t));
-        }
+        for (ReputationType t : ReputationType.values())Assertions.assertNotNull(ChipUtil1_14_R1.fromNMS(t));
     }
-    
+
 }

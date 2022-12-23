@@ -24,7 +24,7 @@ public final class BehaviorResult1_14_R1 extends BehaviorResult {
 
     @Override
     public @NotNull Status getStatus() {
-        return ChipUtil1_14_R1.fromNMS(b.b());
+        return ChipUtil1_14_R1.fromNMS(b.a());
     }
 
     @Override
