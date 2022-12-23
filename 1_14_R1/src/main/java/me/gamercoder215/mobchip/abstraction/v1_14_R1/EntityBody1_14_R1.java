@@ -60,7 +60,7 @@ public final class EntityBody1_14_R1 implements EntityBody {
 
     @Override
     public boolean canBreatheUnderwater() {
-        return nmsMob.cB();
+        return nmsMob.cC();
     }
 
     @Override
@@ -139,7 +139,7 @@ public final class EntityBody1_14_R1 implements EntityBody {
 
     @Override
     public boolean canRideUnderwater() {
-        return nmsMob.be();
+        return nmsMob.bf();
     }
 
     @Override
@@ -342,7 +342,7 @@ public final class EntityBody1_14_R1 implements EntityBody {
 
     @Override
     public boolean isImmuneToExplosions() {
-        return nmsMob.bR();
+        return nmsMob.bS();
     }
 
     @Override
@@ -368,7 +368,7 @@ public final class EntityBody1_14_R1 implements EntityBody {
 
     @Override
     public int getMaxFallDistance() {
-        return nmsMob.bu();
+        return nmsMob.bv();
     }
 
     @Override
@@ -511,7 +511,7 @@ public final class EntityBody1_14_R1 implements EntityBody {
         } catch (ReflectiveOperationException e) {
             Bukkit.getLogger().severe(e.getMessage());
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
-        }       
+        }
     }
 
 }

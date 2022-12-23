@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_13_R1.*;
@@ -600,14 +601,34 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         return ((CraftEntity) en).getHandle();
     }
 
+    // For no discernible reason, the Mob field in these pathfinders
+    // is not final, unlike the mob fields in every other pathfinder.
+    // Since these classes each only have one mob field,
+    // we can simply ignore the "final" check in this case.
+
+    private static final List<Class<? extends PathfinderGoal>> NON_FINAL_ENTITY_FIELDS = ImmutableList.of(
+            PathfinderGoalAvoidTarget.class,
+            PathfinderGoalLookAtPlayer.class,
+            PathfinderGoalMeleeAttack.class,
+            PathfinderGoalDoorInteract.class
+    );
+
     public static Mob getEntity(PathfinderGoal g) {
+        boolean ignoreNonFinal = false;
+        for (Class<? extends PathfinderGoal> c : NON_FINAL_ENTITY_FIELDS) {
+            if (c.isAssignableFrom(g.getClass())) {
+                ignoreNonFinal = true;
+                break;
+            }
+        }
+
         try {
             Class<? extends PathfinderGoal> clazz = g.getClass();
 
             while (clazz.getSuperclass() != null) {
                 for (Field f : clazz.getDeclaredFields()) {
                     f.setAccessible(true);
-                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && Modifier.isFinal(f.getModifiers())) {
+                    if (EntityInsentient.class.isAssignableFrom(f.getType()) && (ignoreNonFinal || Modifier.isFinal(f.getModifiers()))) {
                         return fromNMS((EntityInsentient) f.get(g));
                     }
                 }
@@ -615,7 +636,6 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
                 if (PathfinderGoal.class.isAssignableFrom(clazz.getSuperclass())) clazz = (Class<? extends PathfinderGoal>) clazz.getSuperclass();
                 else break;
             }
-
             return null;
         } catch (Exception e) {
             Bukkit.getLogger().severe(e.getMessage());
@@ -864,7 +884,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
                 case "GotoTarget": return new PathfinderMoveToBlock((Creature) m, l -> fromNMS(getObject(g, "d", BlockPosition.class), m.getWorld()).equals(l), getDouble(g, "a"), getInt(g, "i"), getInt(g, "j"));
                 case "MoveTowardsRestriction": return new PathfinderMoveTowardsRestriction((Creature) m, getDouble(g, "e"));
                 case "MoveTowardsTarget": return new PathfinderMoveTowardsTarget((Creature) m, getDouble(g, "f"), getFloat(g, "g"));
-                case "OcelotAttack": return new PathfinderOcelotAttack((Ocelot) m);
+                case "OcelotAttack": return new PathfinderOcelotAttack(m);
                 case "OfferFlower": return new PathfinderOfferFlower((IronGolem) m);
                 case "Panic": return new PathfinderPanic((Creature) m, getDouble(g, "b"));
                 case "Perch": return new PathfinderRideShoulder((Parrot) m);

@@ -1,6 +1,6 @@
 package me.gamercoder215.mobchip.ai.goal;
 
-import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,7 +12,7 @@ public final class PathfinderOcelotAttack extends Pathfinder {
      * Constructs a PathfinderOcelotAttack.
      * @param m Ocelot to use
      */
-    public PathfinderOcelotAttack(@NotNull Ocelot m) {
+    public PathfinderOcelotAttack(@NotNull Mob m) {
         super(m);
     }
 

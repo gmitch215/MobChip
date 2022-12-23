@@ -26,12 +26,12 @@ public final class EntityScheduleManager1_14_R1 implements EntityScheduleManager
 
     @Override
     public @Nullable me.gamercoder215.mobchip.ai.schedule.Schedule getCurrentSchedule() {
-        return ChipUtil1_14_R1.fromNMS(nmsMob.getBehaviorController().b());
+        return ChipUtil1_14_R1.fromNMS(nmsMob.getBehaviorController().getSchedule());
     }
 
     @Override
     public void setSchedule(@NotNull me.gamercoder215.mobchip.ai.schedule.Schedule s) {
-        nmsMob.getBehaviorController().a(ChipUtil1_14_R1.toNMS(s));
+        nmsMob.getBehaviorController().setSchedule(ChipUtil1_14_R1.toNMS(s));
     }
 
     @Override
