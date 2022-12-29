@@ -171,8 +171,15 @@ public class ChipUtil1_16_R3 implements ChipUtil {
 
         switch (name) {
             case "AvoidTarget": {
-                PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
-                return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
+                PathfinderAvoidEntity p = (PathfinderAvoidEntity) b;
+                Predicate<LivingEntity> avoidP = p.getAvoidPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidPredicate().test(en);
+                Predicate<LivingEntity> avoidingP = p.getAvoidingPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidingPredicate().test(en);
+
+                return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), en -> avoidP.test(fromNMS(en)), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier(), en -> avoidingP.test(fromNMS(en)));
             }
             case "ArrowAttack": {
                 PathfinderRangedAttack p = (PathfinderRangedAttack) b;
@@ -1159,7 +1166,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
             name = name.replace("PathfinderGoal", "");
 
             switch (name) {
-                case "AvoidTarget": return new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"));
+                case "AvoidTarget": return new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"), en -> getObject(g, "g", Predicate.class).test(toNMS(en)), en -> getObject(g, "h", Predicate.class).test(toNMS(en)));
                 case "ArrowAttack": return new PathfinderRangedAttack(m, getDouble(g, "e"), getFloat(g, "i"), getInt(g, "g"), getInt(g, "h"));
                 case "Beg": return new PathfinderBeg((Wolf) m, getFloat(g, "d"));
                 case "BowShoot": return new PathfinderRangedBowAttack(m, getDouble(g, "b"), (float) Math.sqrt(getFloat(g, "d")), getInt(g, "c"));
