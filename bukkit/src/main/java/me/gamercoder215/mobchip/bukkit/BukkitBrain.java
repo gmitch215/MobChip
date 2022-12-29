@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BukkitBrain implements EntityBrain {
 
-	private static final String BUKKIT_PACKAGE = "me.gamercoder215.mobchip.bukkit.";
+	private static final String BUKKIT_PACKAGE = BukkitBrain.class.getPackage().getName() + ".";
 	final Mob m;
 
 	BukkitBrain(@NotNull Mob m) {
