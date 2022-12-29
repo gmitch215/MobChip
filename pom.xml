@@ -3,7 +3,7 @@
 
 	<groupId>me.gamercoder215</groupId>
 	<artifactId>mobchip-parent</artifactId>
-	<version>1.7.1-SNAPSHOT</version>
+	<version>1.7.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>MobChip-Parent</name>
@@ -25,7 +25,7 @@
 
 	<developers>
 		<developer>
-			<name>GamerCoder215</name>
+			<name>GamerCoder</name>
 			<roles>
 				<role>Owner</role>
 			</roles>
