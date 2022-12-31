@@ -562,6 +562,8 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
 
                 return ((Function) o).apply(obj);
             };
+
+            if (o instanceof Sound) args[i] = toNMS((Sound) o);
         }
 
         try {
