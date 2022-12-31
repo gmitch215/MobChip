@@ -649,8 +649,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             }
             return null;
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -761,8 +760,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return null;
@@ -807,8 +805,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
 
             return m.invoke(g, args);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -1005,9 +1002,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             healthF.setAccessible(true);
             health = healthF.getFloat(en);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
@@ -1029,9 +1024,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             m.setAccessible(true);
             m.invoke(nmsMob, list.stream().map(ChipUtil1_13_R1::toNMS).collect(Collectors.toList()));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 

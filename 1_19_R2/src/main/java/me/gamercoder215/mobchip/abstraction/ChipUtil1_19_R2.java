@@ -572,8 +572,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             Behavior<? super net.minecraft.world.entity.LivingEntity> b = (Behavior<? super net.minecraft.world.entity.LivingEntity>) c.newInstance(args);
             return new BehaviorResult1_19_R2(b, nms);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -686,9 +685,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             m.setAccessible(true);
             m.invoke(nmsMob, list.stream().map(ChipUtil1_19_R2::toNMS).collect(Collectors.toList()));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 
@@ -1153,8 +1150,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return null;
@@ -1194,8 +1190,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             }
             return null;
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -1207,8 +1202,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
             return m.invoke(g, args);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -1373,9 +1367,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             frozen.setAccessible(true);
             frozen.set(registry, isLocked);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 
