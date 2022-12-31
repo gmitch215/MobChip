@@ -180,9 +180,7 @@ public class BukkitBrain implements EntityBrain {
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException ignored) {}
 		catch (Exception e) {
-			Bukkit.getLogger().severe(e.getClass().getSimpleName());
-			Bukkit.getLogger().severe(e.getMessage());
-			for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+			ChipUtil.printStackTrace(e);
 		}
 
 		if (m instanceof Villager) return new BukkitVillagerBehavior((Villager) m);

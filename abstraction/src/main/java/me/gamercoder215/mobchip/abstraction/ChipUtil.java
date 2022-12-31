@@ -147,9 +147,8 @@ public interface ChipUtil {
             for (Map.Entry<Integer, Pathfinder> e : goals.entrySet())
                 addPathfinder(e.getValue(), e.getKey(), target.get(e.getKey()));
         } catch (ClassCastException e) {
-            Bukkit.getLogger().severe("[MobChip] Invalid Projectile Source: " + e.getMessage());
-            for (StackTraceElement s : e.getStackTrace())
-                Bukkit.getLogger().severe("[MobChip] " + s.toString());
+            Bukkit.getLogger().severe("[MobChip] Invalid Projectile Source");
+            printStackTrace(e);
         }
     }
 
@@ -184,4 +183,12 @@ public interface ChipUtil {
         }
     }
 
+    static void printStackTrace(Throwable e) {
+        Bukkit.getLogger().severe(e.getClass().getName() + ": " + e.getMessage());
+        for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe("    " + s.toString());
+        if (e.getCause() != null) {
+            Bukkit.getLogger().severe("Caused by:");
+            printStackTrace(e.getCause());
+        }
+    }
 }

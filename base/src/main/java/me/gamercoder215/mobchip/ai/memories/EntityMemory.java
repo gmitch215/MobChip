@@ -18,7 +18,7 @@ import java.util.Arrays;
  * @param <T> Type of Memory
  */
 public final class EntityMemory<T> implements Memory<T> {
-	
+
 	/**
 	 * Whether this Entity is not admiring another entity.
 	 */
@@ -204,6 +204,7 @@ public final class EntityMemory<T> implements Memory<T> {
      * This entity's Ram Cooldown (Typically for Ravagers).
      */
     public static final EntityMemory<Integer> RAM_COOLDOWN = new EntityMemory<>(Integer.class, "ram_cooldown_ticks");
+    public static final EntityMemory<Boolean> IS_PANICKING = new EntityMemory<>(Boolean.class, "is_panicking");
     /**
      * The Entity that this Entity is angry at.
      */
@@ -305,7 +306,7 @@ public final class EntityMemory<T> implements Memory<T> {
         this.bukkit = bukkit;
         this.key = key;
     }
-    
+
     /**
      * Get the Bukkit Class of this EntityMemory.
      * @return Bukkit Class
@@ -358,5 +359,5 @@ public final class EntityMemory<T> implements Memory<T> {
     }
 
 
-    
+
 }
