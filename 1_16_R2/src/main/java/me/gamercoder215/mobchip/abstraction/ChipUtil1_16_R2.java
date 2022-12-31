@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Lifecycle;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.abstraction.v1_16_R2.*;
+import me.gamercoder215.mobchip.abstraction.v1_16_R2.recreation.AnimalPanic1_16_R2;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
@@ -39,12 +40,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -398,6 +399,10 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         return (LivingEntity) l.getBukkitEntity();
     }
 
+    private static final Map<String, BiFunction<EntityInsentient, Object[], BehaviorResult>> ALTERNATE_BEHAVIOR_PATTERNS = ImmutableMap.<String, BiFunction<EntityInsentient, Object[], BehaviorResult>>builder()
+            .put("AnimalPanic", (m, args) -> new BehaviorResult1_16_R2(new AnimalPanic1_16_R2((float) args[0]), m))
+            .build();
+
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, Object... args) {
         return runBehavior(m, behaviorName, Behavior.class.getPackage().getName(), args);
@@ -405,6 +410,9 @@ public class ChipUtil1_16_R2 implements ChipUtil {
 
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
+        if (ALTERNATE_BEHAVIOR_PATTERNS.containsKey(behaviorName))
+            return ALTERNATE_BEHAVIOR_PATTERNS.get(behaviorName).apply(toNMS(m), args);
+
         EntityInsentient nms = toNMS(m);
         String packageN = packageName.replace("{V}", "v1_16_R2");
 
