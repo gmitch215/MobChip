@@ -237,8 +237,7 @@ public abstract class Boss<T extends Mob> {
                                 Bukkit.getLogger().severe(e.getCause().getMessage());
                                 for (StackTraceElement s : e.getCause().getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             } catch (Exception e) {
-                                Bukkit.getLogger().severe(e.getClass().getSimpleName());
-                                Bukkit.getLogger().severe(e.getMessage());
+                                                    Bukkit.getLogger().severe(e.getMessage());
                                 for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             }
                         }

@@ -1,10 +1,10 @@
 package me.gamercoder215.mobchip.abstraction.v1_19_R2;
 
+import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.abstraction.ChipUtil1_19_R2;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import net.minecraft.world.damagesource.CombatTracker;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,9 +43,7 @@ public class EntityCombatTracker1_19_R2 implements EntityCombatTracker {
             f.setAccessible(true);
             ((List<net.minecraft.world.damagesource.CombatEntry>) f.get(handle)).stream().map(en -> ChipUtil1_19_R2.fromNMS(m, en)).forEach(entries::add);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
         return entries;
     }
@@ -61,9 +59,7 @@ public class EntityCombatTracker1_19_R2 implements EntityCombatTracker {
             Method m = List.class.getMethod("add", Object.class);
             m.invoke(entries, ChipUtil1_19_R2.toNMS(entry));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 
