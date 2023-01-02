@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.memories;
 
+import me.gamercoder215.mobchip.util.PositionPath;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -14,7 +15,8 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 /**
- * Represents a Memory of an entity
+ * Represents a Memory of an entity.
+ * @see MemoryStatus
  * @param <T> Type of Memory
  */
 public final class EntityMemory<T> implements Memory<T> {
@@ -183,7 +185,7 @@ public final class EntityMemory<T> implements Memory<T> {
     /**
      * The cooldown, in ticks, of this Mob's tempting.
      */
-    public static final EntityMemory<Integer> TEMPING_COOLDOWN = new EntityMemory<>(Integer.class, "temptation_cooldown_ticks");
+    public static final EntityMemory<Integer> TEMPTING_COOLDOWN = new EntityMemory<>(Integer.class, "temptation_cooldown_ticks");
     /**
      * Whether this Mob is being tempted.
      */
@@ -297,6 +299,22 @@ public final class EntityMemory<T> implements Memory<T> {
      * This Mob's Liked Noteblock Position.
      */
     public static final EntityMemory<Location> LIKED_NOTEBLOCK = new EntityMemory<>(Location.class, "liked_noteblock");
+    /**
+     * The item pickup cooldown for this Mob.
+     */
+    public static final EntityMemory<Integer> TICKS_ITEM_PICKUP_COOLDOWN = new EntityMemory<>(Integer.class, "item_pickup_cooldown_ticks");
+    /**
+     * This Mob's nearest visible wanted Item, as an entity.
+     */
+    public static final EntityMemory<Item> NEAREST_VISIBLE_WANTED_ITEM = new EntityMemory<>(Item.class, "nearest_visible_wanted_item");
+    /**
+     * This Mob's current path.
+     */
+    public static final EntityMemory<PositionPath> PATH = new EntityMemory<>(PositionPath.class, "path");
+    /**
+     * This Mob (Warden)'s current disturbance location, symbolizing a potential future attack.
+     */
+    public static final EntityMemory<Location> DISTURBANCE_LOCATION = new EntityMemory<>(Location.class, "disturbance_location");
 
     private final Class<T> bukkit;
 
