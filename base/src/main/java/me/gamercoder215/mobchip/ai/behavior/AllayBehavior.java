@@ -11,6 +11,7 @@ public interface AllayBehavior extends CreatureBehavior, Updatable {
 
     /**
      * Makes this Allay listen to a Note Block.
+     * <p>This behavior does not require any memories.</p>
      * @param loc Location of the Note Block
      * @return Result of Behavior
      */

@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
 import me.gamercoder215.mobchip.ai.SpeedModifier;
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -10,6 +11,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager harvest Farmland.
+     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#WALKING_TARGET} to be absent, and {@link EntityMemory#SECONDARY_JOB_SITE} to be present.</p>
      * @return Result of Behavior
      */
     @NotNull
@@ -17,6 +19,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager show trades to a Player.
+     * <p>This behavior requires {@link EntityMemory#INTERACTION_TARGET} to be present.</p>
      * @param minDuration Minimum Duration, in ticks, of showing
      * @param maxDuration Maximum Duration, in ticks, of showing
      * @return Result of Behavior
@@ -26,6 +29,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Village show trades to a Player.
+     * <p>This behavior requires {@link EntityMemory#INTERACTION_TARGET} to be present.</p>
      * @param duration How long to show trades, in ticks
      * @return Result of Behavior
      */
@@ -36,12 +40,20 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Resets this Villager's profession.
+     * <p>This method removes {@link EntityMemory#JOB_SITE} for you.</p>
      * @return Result of Behavior
      */
     @NotNull BehaviorResult resetProfession();
 
     /**
      * Makes this Villager gift the hero of the Raid.
+     * <p>This behavior requires the follow memories to be registered:</p>
+     * <ul>
+     *     <li>{@link EntityMemory#WALKING_TARGET}</li>
+     *     <li>{@link EntityMemory#LOOKING_TARGET}</li>
+     *     <li>{@link EntityMemory#INTERACTION_TARGET}</li>
+     * </ul>
+     * <p>This behavior also requires {@link EntityMemory#NEAREST_VISIBLE_PLAYER} to be present.</p>
      * @param duration Duration, in ticks, of gifting
      * @return Result of Behavior
      */
@@ -50,6 +62,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager celebrate that they survived the Raid.
+     * <p>This behavior does not require any memories.</p>
      * @param minDuration Minimum Duration, in ticks, of celebrating
      * @param maxDuration Maximum Duration, in ticks, of celebrating
      * @return Result of Behavior
@@ -59,6 +72,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager celebrate that they survived the Raid.
+     * <p>This behavior does not require any memories.</p>
      * @param duration Duration, in ticks, of celebrating
      * @return Result of Behavior
      */
@@ -67,6 +81,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager find a potential Job Site.
+     * <p>This behavior requires {@link EntityMemory#JOB_SITE} to be present.</p>
      * @param speedMod Speed Modifier while looking
      * @return Result of Behavior
      */
@@ -75,6 +90,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager find a potential Job Site with the default Speed Modifier.
+     * <p>This behavior requires {@link EntityMemory#JOB_SITE} to be present.</p>
      * @return Result of Behavior
      */
     default BehaviorResult findJobSite() {
@@ -83,6 +99,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager find the nearest Village.
+     * <p>This method removes {@link EntityMemory#WALKING_TARGET} for you.</p>
      * @param minDistance Minimum Distance from Village
      * @param speedMod Speed Modifier while looking
      * @return Result of Behavior
@@ -92,6 +109,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager find the nearest Village, with no speed modifier.
+     * <p>This method removes {@link EntityMemory#WALKING_TARGET} for you.</p>
      * @param minDistance Minimum Distance from Village
      * @return Result of Behavior
      */
@@ -100,6 +118,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager work at its Job Site.
+     * <p>This behavior requires {@link EntityMemory#JOB_SITE} to be present and {@link EntityMemory#LOOKING_TARGET} to be registered.</p>
      * @return Result of Behavior
      */
     @NotNull
@@ -107,6 +126,7 @@ public interface VillagerBehavior extends CreatureBehavior {
 
     /**
      * Makes this Villager use bonemeal.
+     * <p>This method removes {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#WALKING_TARGET} for you.</p>
      * @return Result of Behavior
      */
     @NotNull
