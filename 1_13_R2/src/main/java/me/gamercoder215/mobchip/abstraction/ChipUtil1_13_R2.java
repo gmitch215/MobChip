@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatLocation;
@@ -507,6 +508,15 @@ public class ChipUtil1_13_R2 implements ChipUtil {
         }
     }
 
+    @Override
+    public me.gamercoder215.mobchip.ai.memories.MemoryStatus getMemoryStatus(Mob mob, Memory<?> m) {
+        return MemoryStatus.REGISTERED; // doesn't exist
+    }
+
+    @Override
+    public void setMemory(Mob mob, String memoryKey, Object value) {
+        // memories don't exist
+    }
 
     @Override
     public <T> void setMemory(Mob mob, Memory<T> m, T value) {

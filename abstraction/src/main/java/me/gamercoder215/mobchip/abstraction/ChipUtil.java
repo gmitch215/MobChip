@@ -12,6 +12,7 @@ import me.gamercoder215.mobchip.ai.goal.Pathfinder;
 import me.gamercoder215.mobchip.ai.goal.WrappedPathfinder;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
@@ -78,6 +79,8 @@ public interface ChipUtil {
 
     <T> void setMemory(Mob mob, Memory<T> m, T value);
 
+    void setMemory(Mob mob, String memoryKey, Object value);
+
     <T> void setMemory(Mob mob, Memory<T> m, T value, long durationTicks);
 
     <T> T getMemory(Mob mob, Memory<T> m);
@@ -132,6 +135,8 @@ public interface ChipUtil {
 
     EntitySenses getSenses(Mob m);
 
+    MemoryStatus getMemoryStatus(Mob mob, Memory<?> m);
+
     default void updateActivities(Creature c) {}
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {
@@ -159,7 +164,7 @@ public interface ChipUtil {
      * @return Classes of objects
      */
     static Class<?>[] getArgTypes(Object... args) {
-        Class<?> types[] = new Class<?>[args.length];
+        Class<?>[] types = new Class<?>[args.length];
         for (int i = 0; i < args.length; i++) {
             try {
                 types[i] = (Class<?>) args[i].getClass().getDeclaredField("TYPE").get(null);

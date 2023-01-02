@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
@@ -842,6 +843,25 @@ public final class ChipUtil1_18_R2 implements ChipUtil {
         };
     }
 
+    @Override
+    public MemoryStatus getMemoryStatus(Mob mob, Memory<?> m) {
+        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        MemoryModuleType<?> nmsM = toNMS(m);
+
+        if (nms.getBrain().checkMemory(nmsM, net.minecraft.world.entity.ai.memory.MemoryStatus.VALUE_PRESENT)) return MemoryStatus.PRESENT;
+        if (nms.getBrain().checkMemory(nmsM, net.minecraft.world.entity.ai.memory.MemoryStatus.VALUE_ABSENT)) return MemoryStatus.ABSENT;
+
+        return MemoryStatus.REGISTERED;
+    }
+
+    @Override
+    public void setMemory(Mob mob, String memoryKey, Object value) {
+        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        MemoryModuleType type = Registry.MEMORY_MODULE_TYPE.get(new ResourceLocation(memoryKey));
+        Object nmsValue = toNMS(memoryKey, value);
+
+        nms.getBrain().setMemory(type, nmsValue);
+    }
 
     @Override
     public <T> void setMemory(Mob mob, Memory<T> m, T value) {

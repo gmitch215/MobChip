@@ -17,6 +17,7 @@ import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatLocation;
@@ -772,6 +773,25 @@ public class ChipUtil1_16_R1 implements ChipUtil {
         }
     }
 
+    @Override
+    public me.gamercoder215.mobchip.ai.memories.MemoryStatus getMemoryStatus(Mob mob, Memory<?> m) {
+        EntityInsentient nms = toNMS(mob);
+        MemoryModuleType<?> nmsM = toNMS(m);
+
+        if (nms.getBehaviorController().a(nmsM, net.minecraft.server.v1_16_R1.MemoryStatus.VALUE_PRESENT)) return me.gamercoder215.mobchip.ai.memories.MemoryStatus.PRESENT;
+        if (nms.getBehaviorController().a(nmsM, net.minecraft.server.v1_16_R1.MemoryStatus.VALUE_ABSENT)) return me.gamercoder215.mobchip.ai.memories.MemoryStatus.ABSENT;
+
+        return MemoryStatus.REGISTERED;
+    }
+
+    @Override
+    public void setMemory(Mob mob, String memoryKey, Object value) {
+        EntityInsentient nms = toNMS(mob);
+        MemoryModuleType type = IRegistry.MEMORY_MODULE_TYPE.get(new MinecraftKey(memoryKey));
+        Object nmsValue = toNMS(memoryKey, value);
+
+        nms.getBehaviorController().setMemory(type, nmsValue);
+    }
 
     @Override
     public <T> void setMemory(Mob mob, Memory<T> m, T value) {
