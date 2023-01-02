@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
@@ -282,6 +283,11 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public void removeMemory(@NotNull Memory<?> memory) {
 		w.removeMemory(m, memory);
+	}
+
+	@Override
+	public MemoryStatus getMemoryStatus(@NotNull Memory<?> memory) {
+		return w.getMemoryStatus(m, memory);
 	}
 
 	/**
