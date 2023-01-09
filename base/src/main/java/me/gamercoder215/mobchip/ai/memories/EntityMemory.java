@@ -206,6 +206,9 @@ public final class EntityMemory<T> implements Memory<T> {
      * This entity's Ram Cooldown (Typically for Ravagers).
      */
     public static final EntityMemory<Integer> RAM_COOLDOWN = new EntityMemory<>(Integer.class, "ram_cooldown_ticks");
+    /**
+     * Whether this Entity is currently panicking.
+     */
     public static final EntityMemory<Boolean> IS_PANICKING = new EntityMemory<>(Boolean.class, "is_panicking");
     /**
      * The Entity that this Entity is angry at.

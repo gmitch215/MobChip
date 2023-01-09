@@ -19,7 +19,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob back up if it is too close.
-     * <p>This behavior requires {@link EntityMemory#WALKING_TARGET} to be absent, {@link EntityMemory#LOOKING_TARGET} to be registered, and {@link EntityMemory#ATTACK_TARGET} & {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#WALKING_TARGET} to be absent, {@link EntityMemory#LOOKING_TARGET} to be registered, and {@link EntityMemory#ATTACK_TARGET} with {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
      * @param minDistance Minimum Distance to back up
      * @param speedModifier Speed Modifier while backing up
      * @return Result of Behavior
@@ -29,7 +29,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob back up if it is too close, with no speed modifier.
-     * <p>This behavior requires {@link EntityMemory#WALKING_TARGET} to be absent, {@link EntityMemory#LOOKING_TARGET} to be registered, and {@link EntityMemory#ATTACK_TARGET} & {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#WALKING_TARGET} to be absent, {@link EntityMemory#LOOKING_TARGET} to be registered, and {@link EntityMemory#ATTACK_TARGET} with {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
      * @param minDistance Minimum Distance to back up
      * @return Result of Behavior
      */
@@ -70,7 +70,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Entity move to its wanted item, with {@code requireTarget} set to true.
-     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#TICKS_ITEM_PICKUP_COOLDOWN} to be registered, and {@link EntityMemory#NEAREST_VISIBLE_WANTED_ITEM} & {@link EntityMemory#WALKING_TARGET} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#TICKS_ITEM_PICKUP_COOLDOWN} to be registered, and {@link EntityMemory#NEAREST_VISIBLE_WANTED_ITEM} with {@link EntityMemory#WALKING_TARGET} to be present.</p>
      * @param minDist Minimum Distance from Item
      * @param speedMod Speed Modifier while moving
      * @return Result of Behavior
@@ -81,7 +81,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Entity move to its wanted item, with no speed modifier.
-     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#TICKS_ITEM_PICKUP_COOLDOWN} to be registered, and {@link EntityMemory#NEAREST_VISIBLE_WANTED_ITEM} & {@link EntityMemory#WALKING_TARGET} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} and {@link EntityMemory#TICKS_ITEM_PICKUP_COOLDOWN} to be registered, and {@link EntityMemory#NEAREST_VISIBLE_WANTED_ITEM} with {@link EntityMemory#WALKING_TARGET} to be present.</p>
      * @param minDist Minimum Distance from Item
      * @return Result of Behavior
      */
@@ -108,7 +108,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob perform a Melee Attack.
-     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} to be registered, {@link EntityMemory#ATTACK_COOLING_DOWN} to be absent, and {@link EntityMemory#ATTACK_TARGET} & {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} to be registered, {@link EntityMemory#ATTACK_COOLING_DOWN} to be absent, and {@link EntityMemory#ATTACK_TARGET} with {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
      * @param cooldown Cooldown, in ticks, before the next attack
      * @return Result of Behavior
      */
@@ -116,7 +116,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob perform a Melee Attack, with a cooldown of 3 seconds (60 ticks).
-     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} to be registered, {@link EntityMemory#ATTACK_COOLING_DOWN} to be absent, and {@link EntityMemory#ATTACK_TARGET} & {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
+     * <p>This behavior requires {@link EntityMemory#LOOKING_TARGET} to be registered, {@link EntityMemory#ATTACK_COOLING_DOWN} to be absent, and {@link EntityMemory#ATTACK_TARGET} with {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present.</p>
      * @return Result of Behavior
      */
     default @NotNull BehaviorResult meleeAttack() {
@@ -146,7 +146,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob interact with the nearest door.
-     * <p>This behavior requires {@link EntityMemory#PATH} to be present, and {@link EntityMemory#DOORS_TO_CLOSE} & {@link EntityMemory#NEAREST_LIVING_ENTITIES} to be registered.</p>
+     * <p>This behavior requires {@link EntityMemory#PATH} to be present, and {@link EntityMemory#DOORS_TO_CLOSE} with {@link EntityMemory#NEAREST_LIVING_ENTITIES} to be registered.</p>
      * @return Result of Behavior
      */
     @NotNull BehaviorResult interactWithDoor();
@@ -160,7 +160,7 @@ public interface EntityBehavior {
 
     /**
      * Makes this Mob socialize at the Village's Bell.
-     * <p>This behavior requires {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present, {@link EntityMemory#INTERACTION_TARGET} to be absent, and {@link EntityMemory#WALKING_TARGET} & {@link EntityMemory#LOOKING_TARGET} to be registered.</p>
+     * <p>This behavior requires {@link EntityMemory#NEAREST_VISIBLE_LIVING_ENTITIES} to be present, {@link EntityMemory#INTERACTION_TARGET} to be absent, and {@link EntityMemory#WALKING_TARGET} with {@link EntityMemory#LOOKING_TARGET} to be registered.</p>
      * @return Result of Behavior
      */
     @NotNull BehaviorResult socializeAtBell();
