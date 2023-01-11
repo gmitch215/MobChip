@@ -15,6 +15,7 @@ import me.gamercoder215.mobchip.ai.goal.*;
 import me.gamercoder215.mobchip.ai.goal.target.*;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.combat.CombatLocation;
@@ -39,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
@@ -187,8 +189,18 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
 
         switch (name) {
             case "AvoidTarget": {
-                PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
-                return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
+                PathfinderAvoidEntity p = (PathfinderAvoidEntity) b;
+                Predicate<LivingEntity> avoidP = p.getAvoidPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidPredicate().test(en);
+                Predicate<LivingEntity> avoidingP = p.getAvoidingPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidingPredicate().test(en);
+
+                return new PathfinderGoalAvoidTarget<>((EntityCreature) m, toNMS(p.getFilter()),
+                        en -> { if (en instanceof EntityLiving) return avoidP.test(fromNMS((EntityLiving) en)); return false; },
+                        p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier(),
+                        en -> { if (en instanceof EntityLiving) return avoidingP.test(fromNMS((EntityLiving) en)); return false; });
             }
             case "ArrowAttack": {
                 PathfinderRangedAttack p = (PathfinderRangedAttack) b;
@@ -523,6 +535,15 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
         } catch (IndexOutOfBoundsException ignored) {}
     }
 
+    @Override
+    public me.gamercoder215.mobchip.ai.memories.MemoryStatus getMemoryStatus(Mob mob, Memory<?> m) {
+        return MemoryStatus.REGISTERED; // doesn't exist
+    }
+
+    @Override
+    public void setMemory(Mob mob, String memoryKey, Object value) {
+        // memories don't exist
+    }
 
     @Override
     public <T> void setMemory(Mob mob, Memory<T> m, T value) {
@@ -638,8 +659,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             }
             return null;
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -750,8 +770,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return null;
@@ -796,8 +815,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
 
             return m.invoke(g, args);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -859,7 +877,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             name = name.replace("PathfinderGoal", "");
 
             switch (name) {
-                case "AvoidTarget": return new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "i", Class.class), LivingEntity.class), getFloat(g, "f"), getDouble(g, "d"), getDouble(g, "e"));
+                case "AvoidTarget": return new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "i", Class.class), LivingEntity.class), getFloat(g, "f"), getDouble(g, "d"), getDouble(g, "e"), en -> getObject(g, "j", Predicate.class).test(toNMS(en)), en -> getObject(g, "k", Predicate.class).test(toNMS(en)));
                 case "ArrowAttack": return new PathfinderRangedAttack(m, getDouble(g, "e"), getFloat(g, "i"), getInt(g, "g"), getInt(g, "h"));
                 case "Beg": return new PathfinderBeg((Wolf) m, getFloat(g, "d"));
                 case "BreakDoor": return new PathfinderBreakDoor(m);
@@ -994,9 +1012,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             healthF.setAccessible(true);
             health = healthF.getFloat(en);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
@@ -1018,9 +1034,7 @@ public final class ChipUtil1_13_R1 implements ChipUtil {
             m.setAccessible(true);
             m.invoke(nmsMob, list.stream().map(ChipUtil1_13_R1::toNMS).collect(Collectors.toList()));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 

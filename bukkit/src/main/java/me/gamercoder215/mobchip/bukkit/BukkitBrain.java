@@ -10,6 +10,7 @@ import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BukkitBrain implements EntityBrain {
 
-	private static final String BUKKIT_PACKAGE = "me.gamercoder215.mobchip.bukkit.";
+	private static final String BUKKIT_PACKAGE = BukkitBrain.class.getPackage().getName() + ".";
 	final Mob m;
 
 	BukkitBrain(@NotNull Mob m) {
@@ -180,9 +181,7 @@ public class BukkitBrain implements EntityBrain {
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException ignored) {}
 		catch (Exception e) {
-			Bukkit.getLogger().severe(e.getClass().getSimpleName());
-			Bukkit.getLogger().severe(e.getMessage());
-			for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+			ChipUtil.printStackTrace(e);
 		}
 
 		if (m instanceof Villager) return new BukkitVillagerBehavior((Villager) m);
@@ -284,6 +283,11 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public void removeMemory(@NotNull Memory<?> memory) {
 		w.removeMemory(m, memory);
+	}
+
+	@Override
+	public MemoryStatus getMemoryStatus(@NotNull Memory<?> memory) {
+		return w.getMemoryStatus(m, memory);
 	}
 
 	/**

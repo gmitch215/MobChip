@@ -5,15 +5,17 @@ import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class BehaviorResult1_19_R2 extends BehaviorResult {
-    private final Behavior<? super LivingEntity> b;
-    private final net.minecraft.world.entity.Mob mob;
+    private final BehaviorControl b;
+    private final LivingEntity mob;
     private final ServerLevel l;
 
-    public BehaviorResult1_19_R2(Behavior<? super LivingEntity> b, net.minecraft.world.entity.Mob mob) {
+    public <T extends LivingEntity> BehaviorResult1_19_R2(BehaviorControl<T> b, T mob) {
         this.b = b;
         this.mob = mob;
         this.l = ChipUtil1_19_R2.toNMS(Bukkit.getWorld(mob.level.getWorld().getUID()));

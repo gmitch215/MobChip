@@ -16,6 +16,6 @@ class BukkitAxolotlBehavior extends BukkitUpdatableCreatureBehavior implements A
 
     @Override
     public @NotNull BehaviorResult playDead() {
-        return run("PlayDead");
+        return wrapper.runBehavior(m, "PlayDead", "net.minecraft.world.entity.animal.axolotl");
     }
 }
