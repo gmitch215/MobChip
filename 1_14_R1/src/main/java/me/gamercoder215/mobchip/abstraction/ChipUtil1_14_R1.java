@@ -409,6 +409,9 @@ public class ChipUtil1_14_R1 implements ChipUtil {
 
     @Override
     public BehaviorResult runBehavior(Mob m, String behaviorName, String packageName, Object... args) {
+        if (ALTERNATE_BEHAVIOR_PATTERNS.containsKey(behaviorName))
+            return ALTERNATE_BEHAVIOR_PATTERNS.get(behaviorName).apply(toNMS(m), args);
+        
         EntityInsentient nms = toNMS(m);
         String packageN = packageName.replace("{V}", "v1_14_R1");
 

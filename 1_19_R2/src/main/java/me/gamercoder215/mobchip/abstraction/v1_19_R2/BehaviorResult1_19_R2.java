@@ -4,7 +4,6 @@ import me.gamercoder215.mobchip.abstraction.ChipUtil1_19_R2;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;

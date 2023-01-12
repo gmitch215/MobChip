@@ -4,7 +4,6 @@ import me.gamercoder215.mobchip.abstraction.ChipUtil1_16_R3;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import net.minecraft.server.v1_16_R3.Behavior;
 import net.minecraft.server.v1_16_R3.EntityInsentient;
-import net.minecraft.server.v1_16_R3.EntityLiving;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;

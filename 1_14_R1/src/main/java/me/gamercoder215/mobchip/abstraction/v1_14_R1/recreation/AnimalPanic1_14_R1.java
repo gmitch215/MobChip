@@ -167,7 +167,6 @@ public class AnimalPanic1_14_R1 extends Behavior<EntityCreature> {
         int var4 = var1 + var2 + var3;
         int var5 = pos.getX();
         int var6 = pos.getY();
-        int var7 = pos.getZ();
 
         int posInt = (int) pos.asLong();
 
