@@ -17,7 +17,7 @@ class BukkitFrogBehavior extends BukkitUpdatableCreatureBehavior implements Frog
 
     @Override
     public @NotNull BehaviorResult shootTongue(Sound tongueSound, Sound eatSound) {
-        return run("ShootTongue");
+        return wrapper.runBehavior(m, "ShootTongue", "net.minecraft.world.entity.animal.frog", tongueSound, eatSound);
     }
 
     @Override

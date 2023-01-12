@@ -1,11 +1,11 @@
 package me.gamercoder215.mobchip.abstraction.v1_15_R1;
 
+import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.abstraction.ChipUtil1_15_R1;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import net.minecraft.server.v1_15_R1.Reputation;
 import net.minecraft.server.v1_15_R1.ReputationType;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Villager;
@@ -58,9 +58,7 @@ public class EntityGossipContainer1_15_R1 implements EntityGossipContainer {
             data.remove(en.getUniqueId());
             map.set(handle, data);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 
@@ -84,9 +82,7 @@ public class EntityGossipContainer1_15_R1 implements EntityGossipContainer {
             }
             map.set(handle, data);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 }

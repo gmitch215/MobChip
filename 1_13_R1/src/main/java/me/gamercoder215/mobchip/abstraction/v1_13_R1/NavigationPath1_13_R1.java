@@ -1,10 +1,10 @@
 package me.gamercoder215.mobchip.abstraction.v1_13_R1;
 
+import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_13_R1.PathEntity;
 import net.minecraft.server.v1_13_R1.PathPoint;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,8 +42,7 @@ public final class NavigationPath1_13_R1 implements NavigationPath {
             PathPoint n = pathPoints[handle.e()];
             new EntityController1_13_R1(m).moveTo(n.a, n.b, n.c);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 

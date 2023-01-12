@@ -16,6 +16,7 @@ import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
@@ -27,9 +28,9 @@ import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -43,6 +44,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.*;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -287,8 +289,15 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
         return switch (name) {
             case "AvoidTarget" -> {
-                PathfinderAvoidEntity<?> p = (PathfinderAvoidEntity<?>) b;
-                yield new AvoidEntityGoal<>((PathfinderMob) m, toNMS(p.getFilter()), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier());
+                PathfinderAvoidEntity p = (PathfinderAvoidEntity) b;
+                Predicate<LivingEntity> avoidP = p.getAvoidPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidPredicate().test(en);
+                Predicate<LivingEntity> avoidingP = p.getAvoidingPredicate() == null ?
+                        en -> true :
+                        en -> p.getAvoidingPredicate().test(en);
+
+                yield new AvoidEntityGoal<>((PathfinderMob) m, toNMS(p.getFilter()), en -> avoidP.test(fromNMS(en)), p.getMaxDistance(), p.getSpeedModifier(), p.getSprintModifier(), en -> avoidingP.test(fromNMS(en)));
             }
             case "ArrowAttack" -> {
                 PathfinderRangedAttack p = (PathfinderRangedAttack) b;
@@ -557,16 +566,27 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
                 return ((Function) o).apply(obj);
             };
+
+            if (o instanceof Sound) args[i] = toNMS((Sound) o);
+            if (o instanceof Item) args[i] = toNMS((Item) o);
         }
 
         try {
             Class<?> bClass = Class.forName(packageName + "." + behaviorName);
-            Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
-            Behavior<? super net.minecraft.world.entity.LivingEntity> b = (Behavior<? super net.minecraft.world.entity.LivingEntity>) c.newInstance(args);
-            return new BehaviorResult1_19_R2(b, nms);
+            if (Behavior.class.isAssignableFrom(bClass)) {
+                Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
+                Behavior<? super net.minecraft.world.entity.LivingEntity> b = (Behavior<? super net.minecraft.world.entity.LivingEntity>) c.newInstance(args);
+                return new BehaviorResult1_19_R2(b, nms);
+            } else {
+                Method create = bClass.getDeclaredMethod("a", ChipUtil.getArgTypes(args));
+                create.setAccessible(true);
+                BehaviorControl<? super net.minecraft.world.entity.LivingEntity> control = (BehaviorControl<? super net.minecraft.world.entity.LivingEntity>) create.invoke(null, args);
+                return new BehaviorResult1_19_R2(control, nms);
+            }
+
+
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -679,9 +699,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             m.setAccessible(true);
             m.invoke(nmsMob, list.stream().map(ChipUtil1_19_R2::toNMS).collect(Collectors.toList()));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 
@@ -743,8 +761,10 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
         final Object nmsValue;
 
         if (value instanceof Location l) {
-            if (key.equals("nearest_bed") || key.equals("celebrate_location") || key.equals("nearest_repellent")) nmsValue = new BlockPos(l.getX(), l.getY(), l.getZ());
-            else nmsValue = GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ()));
+            nmsValue = switch (key) {
+                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location" -> new BlockPos(l.getX(), l.getY(), l.getZ());
+                default -> GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ()));
+            };
         }
         else if (value instanceof Location[] ls) {
             List<GlobalPos> p = new ArrayList<>();
@@ -874,6 +894,25 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
         };
     }
 
+    @Override
+    public MemoryStatus getMemoryStatus(Mob mob, Memory<?> m) {
+        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        MemoryModuleType<?> nmsM = toNMS(m);
+
+        if (nms.getBrain().checkMemory(nmsM, net.minecraft.world.entity.ai.memory.MemoryStatus.VALUE_PRESENT)) return MemoryStatus.PRESENT;
+        if (nms.getBrain().checkMemory(nmsM, net.minecraft.world.entity.ai.memory.MemoryStatus.VALUE_ABSENT)) return MemoryStatus.ABSENT;
+
+        return MemoryStatus.REGISTERED;
+    }
+
+    @Override
+    public void setMemory(Mob mob, String memoryKey, Object value) {
+        net.minecraft.world.entity.Mob nms = toNMS(mob);
+        MemoryModuleType type = BuiltInRegistries.MEMORY_MODULE_TYPE.get(new ResourceLocation(memoryKey));
+        Object nmsValue = toNMS(memoryKey, value);
+
+        nms.getBrain().setMemory(type, nmsValue);
+    }
 
     @Override
     public <T> void setMemory(Mob mob, Memory<T> m, T value) {
@@ -1146,8 +1185,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
 
         return null;
@@ -1187,8 +1225,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             }
             return null;
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -1200,8 +1237,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
 
             return m.invoke(g, args);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
             return null;
         }
     }
@@ -1284,7 +1320,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             name = name.replace("PathfinderGoal", "");
 
             return switch (name) {
-                case "AvoidTarget" -> new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"));
+                case "AvoidTarget" -> new PathfinderAvoidEntity<>((Creature) m, fromNMS(getObject(g, "f", Class.class), LivingEntity.class), getFloat(g, "c"), getDouble(g, "i"), getDouble(g, "j"), en -> getObject(g, "g", Predicate.class).test(toNMS(en)), en -> getObject(g, "h", Predicate.class).test(toNMS(en)));
                 case "ArrowAttack" -> new PathfinderRangedAttack(m, getDouble(g, "e"), getFloat(g, "i"), getInt(g, "g"), getInt(g, "h"));
                 case "Beg" -> new PathfinderBeg((Wolf) m, getFloat(g, "d"));
                 case "BowShoot" -> new PathfinderRangedBowAttack(m, getDouble(g, "b"), (float) Math.sqrt(getFloat(g, "d")), getInt(g, "c"));
@@ -1366,9 +1402,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
             frozen.setAccessible(true);
             frozen.set(registry, isLocked);
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getClass().getSimpleName());
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
+            ChipUtil.printStackTrace(e);
         }
     }
 

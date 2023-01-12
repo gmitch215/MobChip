@@ -5,6 +5,9 @@ import me.gamercoder215.mobchip.ai.goal.target.Filtering;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 /**
  * Represents a Pathfinder to avoid a LivingEntity
@@ -16,6 +19,9 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	private float maxDistance;
 	private double sprintModifier;
 	private Class<T> filter;
+
+	private Predicate<T> avoidPredicate;
+	private Predicate<T> avoidingPredicate;
 
 	/**
 	 * Constructs a PathfinderAvoidEntity with a max distance of 5 and using the default speed modifiers.
@@ -40,20 +46,53 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	}
 
 	/**
+	 * Constructs a PathfinderAvoidEntity without any avoiding predicates.
+	 * @param m Creature to use
+	 * @param filter Filter of entity to avoid
+	 * @param dist Maximum Distance away to stop fleeing
+	 * @param sprintMod Sprinting away modifier
+	 * @param walkMod Walking away modifier
+	 * @throws IllegalArgumentException if filter is null
+	 */
+	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double sprintMod, double walkMod) throws IllegalArgumentException {
+		this(m, filter, dist, sprintMod, walkMod, null);
+	}
+
+	/**
+	 * Constructs a PathfinderAvoidEntity with only an avoid predicate.
+	 * @param m Creature to use
+	 * @param filter Filter of entity to avoid
+	 * @param dist Maximum Distance away to stop fleeing
+	 * @param sprintMod Sprinting away modifier
+	 * @param walkMod Walking away modifier
+	 * @param avoidPredicate Predicate to check when determining the entity to avoid
+	 * @throws IllegalArgumentException if filter is null
+	 */
+	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double sprintMod, double walkMod, @Nullable Predicate<T> avoidPredicate) throws IllegalArgumentException {
+		this(m, filter, dist, sprintMod, walkMod, avoidPredicate, null);
+	}
+
+
+	/**
 	 * Constructs a PathfinderAvoidEntity.
 	 * @param m Creature to use
 	 * @param filter Filter of entity to avoid
 	 * @param dist Maximum Distance away to stop fleeing
 	 * @param walkMod Walking away modifier
 	 * @param sprintMod Sprinting away modifier
+	 * @param avoidPredicate Predicate to check when determining the entity to avoid
+	 * @param avoidingPredicate Predicate to check when determining if the entity should continue avoiding
 	 * @throws IllegalArgumentException if filter is null
 	 */
-	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) throws IllegalArgumentException {
+	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod, @Nullable Predicate<T> avoidPredicate, @Nullable Predicate<T> avoidingPredicate) throws IllegalArgumentException {
 		super(m);
+
 		this.filter = filter;
 		this.speedModifier = walkMod;
 		this.maxDistance = dist;
 		this.sprintModifier = sprintMod;
+		this.avoidPredicate = avoidPredicate;
+		this.avoidingPredicate = avoidingPredicate;
 	}
 	
 	/**
@@ -91,6 +130,40 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	 */
 	public void setSprintModifier(double mod) {
 		this.sprintModifier = mod;
+	}
+
+	/**
+	 * Gets the current avoid predicate.
+	 * @return Avoid Predicate used to determine the entity to avoid
+	 */
+	@Nullable
+	public Predicate<T> getAvoidPredicate() {
+		return avoidPredicate;
+	}
+
+	/**
+	 * Sets the current avoid predicate.
+	 * @param avoidPredicate Avoiding Predicate used to determine the entity to avoid
+	 */
+	public void setAvoidPredicate(@Nullable Predicate<T> avoidPredicate) {
+		this.avoidPredicate = avoidPredicate;
+	}
+
+	/**
+	 * Gets the current avoiding predicate.
+	 * @return Avoiding Predicate used to determine if the entity should continue avoiding
+	 */
+	@Nullable
+	public Predicate<T> getAvoidingPredicate() {
+		return avoidingPredicate;
+	}
+
+	/**
+	 * Sets the current avoiding predicate.
+	 * @param avoidingPredicate Avoiding Predicate used to determine if the entity should continue avoiding
+	 */
+	public void setAvoidingPredicate(@Nullable Predicate<T> avoidingPredicate) {
+		this.avoidingPredicate = avoidingPredicate;
 	}
 
 	@Override

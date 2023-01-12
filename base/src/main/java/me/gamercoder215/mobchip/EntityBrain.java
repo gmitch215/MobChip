@@ -6,6 +6,7 @@ import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
 import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.Memory;
+import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
@@ -149,6 +150,13 @@ public interface EntityBrain {
      * @param memory Memory to remove
      */
     void removeMemory(@NotNull Memory<?> memory);
+
+    /**
+     * Fetches the status of a Memory.
+     * @param memory Memory to fetch
+     * @return Memory Status inside the brain.
+     */
+    MemoryStatus getMemoryStatus(@NotNull Memory<?> memory);
 
     /**
      * Whether this Brain contains all of these memories.

@@ -13,6 +13,7 @@ public interface DragonBehavior extends EntityBehavior {
 
     /**
      * Makes this Ender Dragon perform a natural knockback with its wings when Entities get too close.
+     * <p>This behavior does not require any memories.</p>
      * @param entities List of Entities to knock back
      * @return Result of Behavior
      */
