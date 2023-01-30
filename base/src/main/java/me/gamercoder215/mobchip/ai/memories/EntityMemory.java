@@ -287,14 +287,6 @@ public final class EntityMemory<T> implements Memory<T> {
      */
     public static final EntityMemory<Player> LIKED_PLAYER = new EntityMemory<>(Player.class, "liked_player");
     /**
-     * Whether this Warden is sniffing.
-     */
-    public static final EntityMemory<Boolean> IS_SNIFFING = new EntityMemory<>(Boolean.class, "is_sniffing");
-    /**
-     * Whether this Warden is emerging.
-     */
-    public static final EntityMemory<Boolean> IS_EMERGING = new EntityMemory<>(Boolean.class, "is_emerging");
-    /**
      * This Warden's Roaring Target.
      */
     public static final EntityMemory<LivingEntity> ROAR_TARGET = new EntityMemory<>(LivingEntity.class, "roar_target");
@@ -318,6 +310,62 @@ public final class EntityMemory<T> implements Memory<T> {
      * This Mob (Warden)'s current disturbance location, symbolizing a potential future attack.
      */
     public static final EntityMemory<Location> DISTURBANCE_LOCATION = new EntityMemory<>(Location.class, "disturbance_location");
+
+    /**
+     * <p>Whether this Warden is sniffing.</p>
+     * <p>An expiry value of {@code 0} means it is not sniffing, and any other value is how many ticks left it has to completely sniff.</p>
+     */
+    public static final EntityMemory<Unit> IS_SNIFFING = new EntityMemory<>(Unit.class, "is_sniffing");
+    /**
+     * <p>Whether this Warden is emerging.</p>
+     * <p>An expiry value of {@code 0} means it is not emerging, and any other value is how many ticks left it has to completely emerge.</p>
+     */
+    public static final EntityMemory<Unit> IS_EMERGING = new EntityMemory<>(Unit.class, "is_emerging");
+
+    /**
+     * Represents the delay for the next roar sound.
+     */
+    public static final EntityMemory<Unit> ROAR_SOUND_DELAY = new EntityMemory<>(Unit.class, "roar_sound_delay");
+
+    /**
+     * Represents the cooldown until this Warden can dig again.
+     */
+    public static final EntityMemory<Unit> DIG_COOLDOWN = new EntityMemory<>(Unit.class, "dig_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can roar again.
+     */
+    public static final EntityMemory<Unit> ROAR_SOUND_COOLDOWN = new EntityMemory<>(Unit.class, "roar_sound_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can sniff again.
+     */
+    public static final EntityMemory<Unit> SNIFF_COOLDOWN = new EntityMemory<>(Unit.class, "sniff_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can locate another disturbance.
+     */
+    public static final EntityMemory<Unit> TOUCH_COOLDOWN = new EntityMemory<>(Unit.class, "touch_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can receive another vibration.
+     */
+    public static final EntityMemory<Unit> VIBRATION_COOLDOWN = new EntityMemory<>(Unit.class, "vibration_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can perform its sonic boom attack.
+     */
+    public static final EntityMemory<Unit> SONIC_BOOM_COOLDOWN = new EntityMemory<>(Unit.class, "sonic_boom_cooldown");
+
+    /**
+     * Represents the cooldown until this Warden can play its sonic boom sound.
+     */
+    public static final EntityMemory<Unit> SONIC_BOOM_SOUND_COOLDOWN = new EntityMemory<>(Unit.class, "sonic_boom_sound_cooldown");
+
+    /**
+     * Represents the delay for when this Warden can play its sonic boom sound.
+     */
+    public static final EntityMemory<Unit> SONIC_BOOM_SOUND_DELAY = new EntityMemory<>(Unit.class, "sonic_boom_sound_delay");
 
     private final Class<T> bukkit;
 

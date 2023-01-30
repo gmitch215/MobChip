@@ -615,6 +615,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
             EntityDamageEvent.DamageCause c = (EntityDamageEvent.DamageCause) value;
             nmsValue = toNMS(c);
         }
+        else if (value instanceof me.gamercoder215.mobchip.ai.memories.Unit) nmsValue = Unit.INSTANCE;
         else nmsValue = value;
 
         return nmsValue;
@@ -685,6 +686,7 @@ public class ChipUtil1_14_R1 implements ChipUtil {
             DamageSource c = (DamageSource) value;
             value = fromNMS(c);
         }
+        else if (value instanceof Unit) value = me.gamercoder215.mobchip.ai.memories.Unit.INSTANCE;
         else value = nmsValue;
 
         return value;

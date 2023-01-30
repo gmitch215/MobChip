@@ -17,6 +17,7 @@ import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
+import me.gamercoder215.mobchip.ai.memories.Unit;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
@@ -761,6 +762,7 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
             nmsValue = s;
         }
         else if (value instanceof EntityDamageEvent.DamageCause c) nmsValue = toNMS(c);
+        else if (value instanceof Unit u) nmsValue = net.minecraft.util.Unit.INSTANCE;
         else nmsValue = value;
 
         return nmsValue;
@@ -813,6 +815,7 @@ public final class ChipUtil1_18_R1 implements ChipUtil {
             }
         }
         else if (value instanceof DamageSource c) value = fromNMS(c);
+        else if (value instanceof net.minecraft.util.Unit u) value = Unit.INSTANCE;
         else value = nmsValue;
 
         return value;
