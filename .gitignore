@@ -7,9 +7,8 @@
 build.sh
 .idea/
 
-bukkit/target
-*/target
-/target
+**/target/
+target/
 
 logs/*.log
-*/logs/*.log
+**/logs/*.log
