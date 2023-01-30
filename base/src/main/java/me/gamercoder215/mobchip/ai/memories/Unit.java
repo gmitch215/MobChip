@@ -14,7 +14,6 @@ import me.gamercoder215.mobchip.EntityBrain;
  *       brain.setMemory(EntityMemory.IS_SNIFFING, Unit.INSTANCE, 500); // Sniffing for 500 ticks
  *   }
  * }</pre>
- * </p>
  *
  * @see EntityBrain#getExpiration(Memory)
  */
