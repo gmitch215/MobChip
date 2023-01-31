@@ -38,7 +38,7 @@ jobs:
           java-version: '16'
           cache: 'maven'
       - name: Build Project
-        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,1_13_R1,1_13_R2,1_14_R1,1_15_R1,1_16_R1,1_16_R2,1_16_R3,1_17_R1,bukkit"
+        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,nms/1_13_R1,nms/1_13_R2,nms/1_14_R1,nms/1_15_R1,nms/1_16_R1,nms/1_16_R2,nms/1_16_R3,nms/1_17_R1,bukkit"
 
   build-8_11:
     needs: setup
@@ -58,7 +58,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: 'maven'
       - name: Build Project
-        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,1_13_R1,1_13_R2,1_14_R1,1_15_R1,1_16_R1,1_16_R2,1_16_R3,bukkit"
+        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,nms/1_13_R1,nms/1_13_R2,nms/1_14_R1,nms/1_15_R1,nms/1_16_R1,nms/1_16_R2,nms/1_16_R3,bukkit"
 
 
   build:
