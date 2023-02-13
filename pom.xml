@@ -3,7 +3,7 @@
 
 	<groupId>me.gamercoder215</groupId>
 	<artifactId>mobchip-parent</artifactId>
-	<version>1.7.2-SNAPSHOT</version>
+	<version>1.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>MobChip-Parent</name>
@@ -65,23 +65,18 @@
 		<module>bukkit</module>
 		<module>abstraction</module>
 
-		<module>1_13_R1</module>
-		<module>1_13_R2</module>
-
-		<module>1_14_R1</module>
-		<module>1_15_R1</module>
-
-		<module>1_16_R1</module>
-		<module>1_16_R2</module>
-		<module>1_16_R3</module>
-
-		<module>1_17_R1</module>
-
-		<module>1_18_R1</module>
-		<module>1_18_R2</module>
-
-		<module>1_19_R1</module>
-		<module>1_19_R2</module>
+		<module>nms/1_13_R1</module>
+		<module>nms/1_13_R2</module>
+		<module>nms/1_14_R1</module>
+		<module>nms/1_15_R1</module>
+		<module>nms/1_16_R1</module>
+		<module>nms/1_16_R2</module>
+		<module>nms/1_16_R3</module>
+		<module>nms/1_17_R1</module>
+		<module>nms/1_18_R1</module>
+		<module>nms/1_18_R2</module>
+		<module>nms/1_19_R1</module>
+		<module>nms/1_19_R2</module>
 	</modules>
 
 	<repositories>
@@ -118,7 +113,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.0.0</version>
+			<version>5.1.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -138,7 +133,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.name}-b${buildNumber}</finalName>
+		<finalName>${project.name}-${project.version}</finalName>
 		<defaultGoal>clean install</defaultGoal>
 		<plugins>
 			<plugin>
@@ -150,22 +145,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M8</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<shortRevisionLength>6</shortRevisionLength>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>

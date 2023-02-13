@@ -7,6 +7,7 @@ import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
+import me.gamercoder215.mobchip.ai.memories.Unit;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
@@ -132,7 +133,8 @@ public interface EntityBrain {
     <T> T getMemory(@NotNull Memory<T> memory);
 
     /**
-     * Get the expiration date of this Memory.
+     * <p>Get the expiration date of this Memory.</p>
+     * <p>For memories with a {@link Unit} type, this value should be read instead of using {@link #getMemory(Memory)}.</p>
      * @param memory Memory to fetch
      * @return Found expiration date, or 0 if no expiration or not found
      */

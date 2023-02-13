@@ -137,6 +137,8 @@ public interface ChipUtil {
 
     MemoryStatus getMemoryStatus(Mob mob, Memory<?> m);
 
+    EnderCrystal getNearestCrystal(EnderDragon d);
+
     default void updateActivities(Creature c) {}
 
     default BehaviorResult hearNoteblock(Creature c, Location loc) {

@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.bukkit;
 
+import me.gamercoder215.mobchip.DragonBrain;
 import me.gamercoder215.mobchip.EntityBody;
 import me.gamercoder215.mobchip.EntityBrain;
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
@@ -50,8 +51,18 @@ public class BukkitBrain implements EntityBrain {
 	public static EntityBrain getBrain(@Nullable Mob m) {
 		if (m == null) return null;
 		if (m instanceof Villager) return new BukkitVillagerBrain((Villager) m);
-		if (m instanceof EnderDragon) return new BukkitDragonBrain((EnderDragon) m);
 		return new BukkitBrain(m);
+	}
+
+	/**
+	 * Gets the DragonBrain of this EnderDragon.
+	 * @param d EnderDragon to get
+	 * @return DragonBrain
+	 */
+	@Nullable
+	public static DragonBrain getBrain(@Nullable EnderDragon d) {
+		if (d == null) return null;
+		return new BukkitDragonBrain(d);
 	}
 
 	/**
