@@ -1588,4 +1588,11 @@ public final class ChipUtil1_19_R1 implements ChipUtil {
         return new EntitySenses1_19_R1(m);
     }
 
+    @Override
+    public EnderCrystal getNearestCrystal(EnderDragon d) {
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
+        if (nms.nearestCrystal == null) return null;
+        return (EnderCrystal) nms.nearestCrystal.getBukkitEntity();
+    }
+
 }

@@ -1444,4 +1444,11 @@ public class ChipUtil1_14_R1 implements ChipUtil {
     public me.gamercoder215.mobchip.ai.sensing.EntitySenses getSenses(Mob m) {
         return new EntitySenses1_14_R1(m);
     }
+
+    @Override
+    public EnderCrystal getNearestCrystal(EnderDragon d) {
+        EntityEnderDragon nms = toNMS(d);
+        if (nms.currentEnderCrystal == null) return null;
+        return (EnderCrystal) nms.currentEnderCrystal.getBukkitEntity();
+    }
 }

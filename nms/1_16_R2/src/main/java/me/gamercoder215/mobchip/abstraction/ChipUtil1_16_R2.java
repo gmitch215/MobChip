@@ -1483,4 +1483,11 @@ public class ChipUtil1_16_R2 implements ChipUtil {
         return new EntitySenses1_16_R2(m);
     }
 
+    @Override
+    public EnderCrystal getNearestCrystal(EnderDragon d) {
+        EntityEnderDragon nms = toNMS(d);
+        if (nms.currentEnderCrystal == null) return null;
+        return (EnderCrystal) nms.currentEnderCrystal.getBukkitEntity();
+    }
+
 }
