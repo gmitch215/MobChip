@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip;
 
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
+import org.bukkit.entity.Villager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,5 +15,8 @@ public interface VillagerBrain extends EntityBrain {
      */
     @NotNull
     EntityGossipContainer getGossipContainer();
+
+    @Override
+    Villager getEntity();
 
 }
