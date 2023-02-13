@@ -466,6 +466,10 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
                 PathfinderResetAnger p = (PathfinderResetAnger) b;
                 yield new ResetUniversalAngerTargetGoal<>((net.minecraft.world.entity.Mob & NeutralMob) m, p.isAlertingOthers());
             }
+            case "RandomStandGoal" -> {
+                PathfinderRandomStand p = (PathfinderRandomStand) b;
+                yield new RandomStandGoal((net.minecraft.world.entity.animal.horse.AbstractHorse) m);
+            }
 
             // Target
 
@@ -1360,6 +1364,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
                 case "Panic" -> new PathfinderPanic((Creature) m, getDouble(g, "c"));
                 case "Perch" -> new PathfinderRideShoulder((Parrot) m);
                 case "RandomLookaround" -> new PathfinderRandomLook(m);
+                case "RandomStandGoal" -> new PathfinderRandomStand((AbstractHorse) m);
                 case "RandomStroll" -> new PathfinderRandomStroll((Creature) m, getDouble(g, "f"), getInt(g, "g"));
                 case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
                 case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
@@ -1615,6 +1620,13 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     @Override
     public EntitySenses getSenses(Mob m) {
         return new EntitySenses1_19_R2(m);
+    }
+
+    @Override
+    public EnderCrystal getNearestCrystal(EnderDragon d) {
+        net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
+        if (nms.nearestCrystal == null) return null;
+        return (EnderCrystal) nms.nearestCrystal.getBukkitEntity();
     }
 
 }
