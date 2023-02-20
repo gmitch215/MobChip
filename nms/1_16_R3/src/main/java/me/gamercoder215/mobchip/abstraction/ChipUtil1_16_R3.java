@@ -43,7 +43,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -1282,10 +1285,35 @@ public class ChipUtil1_16_R3 implements ChipUtil {
         return new Attribute1_16_R3((AttributeRanged) a);
     }
 
+    @NotNull
+    private AttributeInstance1_16_R3 getOrCreateInstance(Mob m, Attribute a) {
+        EntityInsentient nms = toNMS(m);
+        AttributeMapBase map = nms.getAttributeMap();
+        AttributeBase nmsA = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
+
+        AttributeModifiable handle = toNMS(m).getAttributeInstance(nmsA);
+        if (handle != null) return new AttributeInstance1_16_R3(a, handle);
+
+        try {
+            Field attributesF = AttributeMapBase.class.getDeclaredField("b");
+            attributesF.setAccessible(true);
+            Map<AttributeBase, AttributeModifiable> attributes = (Map<AttributeBase, AttributeModifiable>) attributesF.get(map);
+
+            handle = new AttributeModifiable(nmsA, ignored -> {});
+            attributes.put(nmsA, handle);
+
+            return new AttributeInstance1_16_R3(a, handle);
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
+
+        throw new RuntimeException("Failed to create AttributeInstance");
+    }
+
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
-        return new AttributeInstance1_16_R3(a, toNMS(m).getAttributeInstance(nmsAttribute));
+        return getOrCreateInstance(m, a);
     }
 
     public static ReputationType toNMS(GossipType t) {

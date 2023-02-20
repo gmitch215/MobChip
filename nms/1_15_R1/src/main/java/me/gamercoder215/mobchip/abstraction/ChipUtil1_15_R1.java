@@ -1265,15 +1265,41 @@ public class ChipUtil1_15_R1 implements ChipUtil {
     }
 
     public static final Map<NamespacedKey, Attribute> CUSTOM_ATTRIBUTE_MAP = new HashMap<>();
+    
     @Override
     public Attribute getAttribute(NamespacedKey key) {
         return CUSTOM_ATTRIBUTE_MAP.get(key);
     }
 
+    @NotNull
+    private AttributeInstance1_15_R1 getOrCreateInstance(Mob m, Attribute a) {
+        EntityInsentient nms = toNMS(m);
+        AttributeMapBase map = nms.getAttributeMap();
+        AttributeBase nmsA = (AttributeBase) CUSTOM_ATTRIBUTE_MAP.get(a.getKey()); 
+
+        net.minecraft.server.v1_15_R1.AttributeInstance handle = toNMS(m).getAttributeInstance(nmsA);
+        if (handle != null) return new AttributeInstance1_15_R1(a, handle);
+
+        try {
+            Field attributesF = AttributeMapBase.class.getDeclaredField("b");
+            attributesF.setAccessible(true);
+            Map<AttributeBase, net.minecraft.server.v1_15_R1.AttributeInstance> attributes = (Map<AttributeBase, net.minecraft.server.v1_15_R1.AttributeInstance>) attributesF.get(map);
+
+            handle = new AttributeModifiable(map, nmsA);
+            attributes.put(nmsA, handle);
+
+            return new AttributeInstance1_15_R1(a, handle);
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
+
+        throw new RuntimeException("Failed to create AttributeInstance");
+    }
+
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = (AttributeBase) CUSTOM_ATTRIBUTE_MAP.get(a.getKey());
-        return new AttributeInstance1_15_R1(a, toNMS(m).getAttributeInstance(nmsAttribute));
+        return getOrCreateInstance(m, a);
     }
 
     public static ReputationType toNMS(GossipType t) {
