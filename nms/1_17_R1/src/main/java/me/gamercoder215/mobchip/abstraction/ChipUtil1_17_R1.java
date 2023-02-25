@@ -1417,7 +1417,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     public static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
-        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.i() == null ? null : fromNMS(en.i()));
+        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.j(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.i() == null ? null : fromNMS(en.i()));
     }
 
     public static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {

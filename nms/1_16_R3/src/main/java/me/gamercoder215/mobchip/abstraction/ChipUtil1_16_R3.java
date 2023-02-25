@@ -1349,7 +1349,7 @@ public class ChipUtil1_16_R3 implements ChipUtil {
             ChipUtil.printStackTrace(e);
         }
 
-        return new CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
+        return new CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.j(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
     }
 
     public static net.minecraft.server.v1_16_R3.CombatEntry toNMS(me.gamercoder215.mobchip.combat.CombatEntry en) {
