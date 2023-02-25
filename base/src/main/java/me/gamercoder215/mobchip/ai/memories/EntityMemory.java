@@ -291,7 +291,7 @@ public final class EntityMemory<T> implements Memory<T> {
      */
     public static final EntityMemory<LivingEntity> ROAR_TARGET = new EntityMemory<>(LivingEntity.class, "roar_target");
     /**
-     * This Mob's Liked Noteblock Position.
+     * This Allay's Liked Noteblock Position.
      */
     public static final EntityMemory<Location> LIKED_NOTEBLOCK = new EntityMemory<>(Location.class, "liked_noteblock");
     /**
@@ -366,6 +366,16 @@ public final class EntityMemory<T> implements Memory<T> {
      * Represents the delay for when this Warden can play its sonic boom sound.
      */
     public static final EntityMemory<Unit> SONIC_BOOM_SOUND_DELAY = new EntityMemory<>(Unit.class, "sonic_boom_sound_delay");
+
+    /**
+     * Represents the cooldown until this Allay likes a different noteblock.
+     */
+    public static final EntityMemory<Integer> LIKED_NOTEBLOCK_COOLDOWN_TICKS = new EntityMemory<>(Integer.class, "liked_noteblock_cooldown_ticks");
+
+    /**
+     * Represents the cooldown until this Allay can pick up another item.
+     */
+    public static final EntityMemory<Integer> ITEM_PICKUP_COOLDOWN_TICKS = new EntityMemory<>(Integer.class, "item_pickup_cooldown_ticks");
 
     private final Class<T> bukkit;
 
