@@ -3,7 +3,6 @@ package me.gamercoder215.mobchip;
 import me.gamercoder215.mobchip.ai.enderdragon.CustomPhase;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import org.bukkit.entity.EnderCrystal;
-import org.bukkit.entity.EnderDragon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

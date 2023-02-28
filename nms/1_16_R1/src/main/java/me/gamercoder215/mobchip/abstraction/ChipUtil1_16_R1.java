@@ -1306,10 +1306,35 @@ public class ChipUtil1_16_R1 implements ChipUtil {
         return new Attribute1_16_R1((AttributeRanged) a);
     }
 
+    @NotNull
+    private AttributeInstance1_16_R1 getOrCreateInstance(Mob m, Attribute a) {
+        EntityInsentient nms = toNMS(m);
+        AttributeMapBase map = nms.getAttributeMap();
+        AttributeBase nmsA = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
+
+        AttributeModifiable handle = toNMS(m).getAttributeInstance(nmsA);
+        if (handle != null) return new AttributeInstance1_16_R1(a, handle);
+
+        try {
+            Field attributesF = AttributeMapBase.class.getDeclaredField("b");
+            attributesF.setAccessible(true);
+            Map<AttributeBase, AttributeModifiable> attributes = (Map<AttributeBase, AttributeModifiable>) attributesF.get(map);
+
+            handle = new AttributeModifiable(nmsA, ignored -> {});
+            attributes.put(nmsA, handle);
+
+            return new AttributeInstance1_16_R1(a, handle);
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
+
+        throw new RuntimeException("Failed to create AttributeInstance");
+    }
+
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = IRegistry.ATTRIBUTE.get(toNMS(a.getKey()));
-        return new AttributeInstance1_16_R1(a, toNMS(m).getAttributeInstance(nmsAttribute));
+        return getOrCreateInstance(m, a);
     }
 
     public static ReputationType toNMS(GossipType t) {
@@ -1345,7 +1370,7 @@ public class ChipUtil1_16_R1 implements ChipUtil {
             ChipUtil.printStackTrace(e);
         }
 
-        return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
+        return new me.gamercoder215.mobchip.combat.CombatEntry(m, fromNMS(en.a()), time, health, en.c(), en.j(),  en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.a().getEntity() == null ? null : fromNMS(en.a().getEntity()));
     }
 
     public static net.minecraft.server.v1_16_R1.CombatEntry toNMS(me.gamercoder215.mobchip.combat.CombatEntry en) {

@@ -43,6 +43,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
@@ -1445,10 +1446,35 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
         return new Attribute1_19_R2((RangedAttribute) a);
     }
 
+    @NotNull
+    private AttributeInstance1_19_R2 getOrCreateInstance(Mob m, Attribute a) {
+        net.minecraft.world.entity.Mob nms = toNMS(m);
+        AttributeMap map = nms.getAttributes();
+        net.minecraft.world.entity.ai.attributes.Attribute nmsA = BuiltInRegistries.ATTRIBUTE.get(toNMS(a.getKey()));
+
+        net.minecraft.world.entity.ai.attributes.AttributeInstance handle = toNMS(m).getAttribute(nmsA);
+        if (handle != null) return new AttributeInstance1_19_R2(a, handle);
+
+        try {
+            Field attributesF = AttributeMap.class.getDeclaredField("b");
+            attributesF.setAccessible(true);
+            Map<net.minecraft.world.entity.ai.attributes.Attribute, net.minecraft.world.entity.ai.attributes.AttributeInstance> attributes = (Map<net.minecraft.world.entity.ai.attributes.Attribute, net.minecraft.world.entity.ai.attributes.AttributeInstance>) attributesF.get(map);
+
+            handle = new net.minecraft.world.entity.ai.attributes.AttributeInstance(nmsA, ignored -> {});
+            attributes.put(nmsA, handle);
+
+            return new AttributeInstance1_19_R2(a, handle);
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
+
+        throw new RuntimeException("Failed to create AttributeInstance");
+    }
+
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = BuiltInRegistries.ATTRIBUTE.get(toNMS(a.getKey()));
-        return new AttributeInstance1_19_R2(a, toNMS(m).getAttribute(nmsAttribute));
+        return getOrCreateInstance(m, a);
     }
 
     public static net.minecraft.world.entity.ai.gossip.GossipType toNMS(GossipType t) {
@@ -1473,7 +1499,7 @@ public final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
-        return new CombatEntry(m, fromNMS(en.getSource()), en.getTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.getLocation())), en.getFallDistance(), en.getAttacker() == null ? null : fromNMS(en.getAttacker()));
+        return new CombatEntry(m, fromNMS(en.getSource()), en.getTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getFallDistance(), en.getLocation() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.getLocation())), en.getAttacker() == null ? null : fromNMS(en.getAttacker()));
     }
 
     public static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
