@@ -19,6 +19,24 @@ body:
     validations:
       required: true
 
+  - type: input
+    attributes:
+      label: MobChip Version
+      description: What version of MobChip are you using?
+      placeholder: |
+        Ex: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Server Version
+      description: What version of the server and MC are you using?
+      placeholder: |
+        Ex: "Paper 1.19.2"
+    validations:
+      required: true
+
   - type: textarea
     attributes:
       label: Description

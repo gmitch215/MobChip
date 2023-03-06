@@ -39,6 +39,8 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
+import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
+import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
 import net.minecraft.world.entity.ai.attributes.AttributeRanged;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.goal.*;
@@ -1366,10 +1368,35 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
         return new Attribute1_17_R1((AttributeRanged) a);
     }
 
+    @NotNull
+    private AttributeInstance1_17_R1 getOrCreateInstance(Mob m, Attribute a) {
+        EntityInsentient nms = toNMS(m);
+        AttributeMapBase map = nms.getAttributeMap();
+        AttributeBase nmsA = IRegistry.al.get(toNMS(a.getKey()));
+
+        AttributeModifiable handle = toNMS(m).getAttributeInstance(nmsA);
+        if (handle != null) return new AttributeInstance1_17_R1(a, handle);
+
+        try {
+            Field attributesF = AttributeMapBase.class.getDeclaredField("b");
+            attributesF.setAccessible(true);
+            Map<AttributeBase, AttributeModifiable> attributes = (Map<AttributeBase, AttributeModifiable>) attributesF.get(map);
+
+            handle = new AttributeModifiable(nmsA, ignored -> {});
+            attributes.put(nmsA, handle);
+
+            return new AttributeInstance1_17_R1(a, handle);
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
+
+        throw new RuntimeException("Failed to create AttributeInstance");
+    }
+
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
         AttributeBase nmsAttribute = IRegistry.al.get(toNMS(a.getKey()));
-        return new AttributeInstance1_17_R1(a, toNMS(m).getAttributeInstance(nmsAttribute));
+        return getOrCreateInstance(m, a);
     }
 
     public static ReputationType toNMS(GossipType t) {
@@ -1390,7 +1417,7 @@ public final class ChipUtil1_17_R1 implements ChipUtil {
     }
 
     public static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
-        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.j(), en.i() == null ? null : fromNMS(en.i()));
+        return new CombatEntry(m, fromNMS(en.a()), en.b(), en.d(), en.c(), en.j(), en.g() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.g())), en.i() == null ? null : fromNMS(en.i()));
     }
 
     public static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
