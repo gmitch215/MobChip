@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_13_R1;
 
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_13_R1;
 import me.gamercoder215.mobchip.nbt.NBTSection;
 import net.minecraft.server.v1_13_R1.*;
 import org.bukkit.*;
@@ -24,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unchecked", "deprecation"})
-public class NBTSection1_13_R1 implements NBTSection {
+class NBTSection1_13_R1 implements NBTSection {
 
     private final NBTTagCompound tag;
     private final Runnable saveFunc;

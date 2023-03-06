@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
 import com.google.common.collect.ImmutableList;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import net.minecraft.core.IRegistry;
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public final class EntitySenses1_17_R1 implements EntitySenses {
+final class EntitySenses1_17_R1 implements EntitySenses {
 
     private final Mob m;
     private final EntityInsentient nmsMob;

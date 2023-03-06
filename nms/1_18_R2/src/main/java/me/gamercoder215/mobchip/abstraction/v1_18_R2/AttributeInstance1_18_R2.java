@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class AttributeInstance1_18_R2 implements AttributeInstance {
+final class AttributeInstance1_18_R2 implements AttributeInstance {
 
     private final net.minecraft.world.entity.ai.attributes.AttributeInstance handle;
     private final Attribute a;

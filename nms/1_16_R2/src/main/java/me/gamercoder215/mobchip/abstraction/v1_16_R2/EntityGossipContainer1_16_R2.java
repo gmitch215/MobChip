@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_16_R2;
 
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_16_R2;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import net.minecraft.server.v1_16_R2.Reputation;
@@ -20,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unchecked")
-public class EntityGossipContainer1_16_R2 implements EntityGossipContainer {
+final class EntityGossipContainer1_16_R2 implements EntityGossipContainer {
     private final Reputation handle;
     private final Villager entity;
 

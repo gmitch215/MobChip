@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class EntityScheduleManager1_13_R1 implements EntityScheduleManager {
+final class EntityScheduleManager1_13_R1 implements EntityScheduleManager {
 
     public EntityScheduleManager1_13_R1(Mob m) {
         // doesn't exist

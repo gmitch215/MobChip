@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -9,7 +8,7 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class Sensor1_17_R1 extends Sensor<EntityLiving> {
+final class Sensor1_17_R1 extends Sensor<EntityLiving> {
 
     private final me.gamercoder215.mobchip.ai.sensing.Sensor<?> s;
 

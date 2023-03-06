@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class AttributeInstance1_15_R1 implements me.gamercoder215.mobchip.ai.attribute.AttributeInstance {
+final class AttributeInstance1_15_R1 implements me.gamercoder215.mobchip.ai.attribute.AttributeInstance {
 
     private final net.minecraft.server.v1_15_R1.AttributeInstance handle;
     private final Attribute a;

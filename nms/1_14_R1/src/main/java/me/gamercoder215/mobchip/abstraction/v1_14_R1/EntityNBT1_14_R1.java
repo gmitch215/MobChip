@@ -1,13 +1,12 @@
 package me.gamercoder215.mobchip.abstraction.v1_14_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.server.v1_14_R1.EntityInsentient;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
-public final class EntityNBT1_14_R1 extends NBTSection1_14_R1 implements EntityNBT {
+final class EntityNBT1_14_R1 extends NBTSection1_14_R1 implements EntityNBT {
 
     private final Mob mob;
     private final EntityInsentient handle;

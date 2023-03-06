@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
-public class Attribute1_16_R2 extends AttributeRanged implements Attribute {
+final class Attribute1_16_R2 extends AttributeRanged implements Attribute {
 
     private final NamespacedKey key;
     private final double defaultV;

@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_13_R1;
 
 import com.google.common.base.Preconditions;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_13_R1;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class AttributeInstance1_13_R1 implements me.gamercoder215.mobchip.ai.attribute.AttributeInstance {
+final class AttributeInstance1_13_R1 implements me.gamercoder215.mobchip.ai.attribute.AttributeInstance {
 
     private final net.minecraft.server.v1_13_R1.AttributeInstance handle;
     private final Attribute a;
