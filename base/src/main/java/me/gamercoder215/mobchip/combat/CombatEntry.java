@@ -196,6 +196,10 @@ public final class CombatEntry {
 
     // Builder
 
+    /**
+     * Creates a new Builder for a {@link CombatEntry}.
+     * @return Builder Class
+     */
     public static Builder builder() {
         return new Builder();
     }
