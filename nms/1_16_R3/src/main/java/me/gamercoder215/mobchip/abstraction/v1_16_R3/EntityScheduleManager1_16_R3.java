@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_16_R3;
 
 import com.google.common.collect.ImmutableList;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_16_R3;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import net.minecraft.server.v1_16_R3.EntityInsentient;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class EntityScheduleManager1_16_R3 implements EntityScheduleManager {
+final class EntityScheduleManager1_16_R3 implements EntityScheduleManager {
 
     private final EntityInsentient nmsMob;
     private final Mob m;

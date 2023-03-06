@@ -7,7 +7,7 @@ import org.bukkit.entity.Villager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class EntityGossipContainer1_13_R2 implements EntityGossipContainer {
+final class EntityGossipContainer1_13_R2 implements EntityGossipContainer {
 
     private final Villager entity;
 

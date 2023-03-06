@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
 import com.google.common.collect.ImmutableList;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
@@ -14,7 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public final class EntityScheduleManager1_17_R1 implements EntityScheduleManager {
+final class EntityScheduleManager1_17_R1 implements EntityScheduleManager {
 
     private final EntityInsentient nmsMob;
  

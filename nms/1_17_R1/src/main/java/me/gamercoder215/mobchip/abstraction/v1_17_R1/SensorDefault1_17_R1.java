@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import net.minecraft.core.IRegistry;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class SensorDefault1_17_R1 implements Sensor<LivingEntity> {
+final class SensorDefault1_17_R1 implements Sensor<LivingEntity> {
 
     private final net.minecraft.world.entity.ai.sensing.Sensor<?> handle;
 

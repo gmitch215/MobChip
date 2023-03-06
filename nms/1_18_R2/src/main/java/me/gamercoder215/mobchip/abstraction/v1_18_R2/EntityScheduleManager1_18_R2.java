@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_18_R2;
 
 import com.google.common.collect.ImmutableList;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_18_R2;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import me.gamercoder215.mobchip.ai.schedule.Schedule;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
-public final class EntityScheduleManager1_18_R2 implements EntityScheduleManager {
+final class EntityScheduleManager1_18_R2 implements EntityScheduleManager {
 
     private final net.minecraft.world.entity.Mob nmsMob;
 

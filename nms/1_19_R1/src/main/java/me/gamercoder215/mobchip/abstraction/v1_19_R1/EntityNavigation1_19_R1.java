@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_19_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_19_R1;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class EntityNavigation1_19_R1 implements EntityNavigation {
+final class EntityNavigation1_19_R1 implements EntityNavigation {
 
     private final PathNavigation handle;
 

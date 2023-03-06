@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.behavior.BehaviorResult;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityInsentient;
@@ -9,7 +8,7 @@ import net.minecraft.world.entity.ai.behavior.Behavior;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
-public final class BehaviorResult1_17_R1 extends BehaviorResult {
+final class BehaviorResult1_17_R1 extends BehaviorResult {
     private final Behavior<? super EntityLiving> b;
     private final EntityInsentient mob;
     private final WorldServer l;

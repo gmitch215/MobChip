@@ -183,7 +183,7 @@ public interface ChipUtil {
 
     static ChipUtil getWrapper() {
         try {
-            String pkg = ChipUtil.class.getPackage().getName();
+            String pkg = ChipUtil.class.getPackage().getName() + ".v" + getServerVersion();
             return (ChipUtil)Class.forName(pkg + ".ChipUtil" + getServerVersion()).getConstructor().newInstance();
         } catch (Exception e) {
             throw new IllegalStateException("Invalid Version: " + getServerVersion());

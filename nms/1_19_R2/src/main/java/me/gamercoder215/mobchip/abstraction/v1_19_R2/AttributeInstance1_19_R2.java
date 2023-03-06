@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.craftbukkit.v1_19_R2.attribute.CraftAttributeInstance.convert;
 
-public class AttributeInstance1_19_R2 implements AttributeInstance {
+final class AttributeInstance1_19_R2 implements AttributeInstance {
 
     private final net.minecraft.world.entity.ai.attributes.AttributeInstance handle;
     private final Attribute a;

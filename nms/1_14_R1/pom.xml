@@ -3,7 +3,7 @@
     <parent>
         <groupId>me.gamercoder215</groupId>
         <artifactId>mobchip-parent</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <version>1.8.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -23,7 +23,7 @@
                         <link>https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/</link>
                     </links>
                     <excludes>
-                        <exclude>me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1</exclude>
+                        <exclude>me.gamercoder215.mobchip.abstraction.v1_14_R1.ChipUtil1_14_R1</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -35,7 +35,7 @@
                         </goals>
                         <configuration>
                             <dependencySourceExcludes>
-                                <dependencySourceExclude>me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1</dependencySourceExclude>
+                                <dependencySourceExclude>me.gamercoder215.mobchip.abstraction.v1_14_R1.ChipUtil1_14_R1</dependencySourceExclude>
                             </dependencySourceExcludes>
                         </configuration>
                     </execution>

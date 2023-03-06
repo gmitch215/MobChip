@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class AttributeInstance1_16_R2 implements AttributeInstance {
+final class AttributeInstance1_16_R2 implements AttributeInstance {
 
     private final AttributeModifiable handle;
     private final Attribute a;

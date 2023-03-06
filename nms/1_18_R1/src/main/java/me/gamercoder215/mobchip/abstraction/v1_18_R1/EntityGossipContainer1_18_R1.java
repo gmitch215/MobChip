@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_18_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_18_R1;
 import me.gamercoder215.mobchip.ai.gossip.EntityGossipContainer;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
 import net.minecraft.world.entity.ai.gossip.GossipContainer;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class EntityGossipContainer1_18_R1 implements EntityGossipContainer {
+final class EntityGossipContainer1_18_R1 implements EntityGossipContainer {
     private final GossipContainer handle;
     private final Villager entity;
 

@@ -2,7 +2,6 @@ package me.gamercoder215.mobchip.abstraction.v1_15_R1;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_15_R1;
 import me.gamercoder215.mobchip.ai.schedule.Activity;
 import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
 import net.minecraft.server.v1_15_R1.EntityInsentient;
@@ -13,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class EntityScheduleManager1_15_R1 implements EntityScheduleManager {
+final class EntityScheduleManager1_15_R1 implements EntityScheduleManager {
 
     private final EntityInsentient nmsMob;
     private final Mob m;

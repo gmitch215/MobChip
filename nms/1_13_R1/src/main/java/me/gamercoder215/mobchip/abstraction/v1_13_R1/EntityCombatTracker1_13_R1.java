@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_13_R1;
 
 import me.gamercoder215.mobchip.abstraction.ChipUtil;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_13_R1;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import net.minecraft.server.v1_13_R1.CombatTracker;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class EntityCombatTracker1_13_R1 implements EntityCombatTracker {
+final class EntityCombatTracker1_13_R1 implements EntityCombatTracker {
 
     private final CombatTracker handle;
     private final Mob m;

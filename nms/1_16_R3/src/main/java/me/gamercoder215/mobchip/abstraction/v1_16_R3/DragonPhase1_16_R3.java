@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_16_R3;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_16_R3;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import net.minecraft.server.v1_16_R3.IDragonController;
 import org.bukkit.Location;
@@ -8,7 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EnderDragon;
 import org.jetbrains.annotations.NotNull;
 
-public final class DragonPhase1_16_R3 implements DragonPhase {
+final class DragonPhase1_16_R3 implements DragonPhase {
 
     private final EnderDragon dragon;
     private final IDragonController handle;

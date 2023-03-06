@@ -3,7 +3,7 @@ package me.gamercoder215.mobchip.abstraction.v1_18_R1;
 import me.gamercoder215.mobchip.ai.goal.CustomPathfinder;
 import net.minecraft.world.entity.ai.goal.Goal;
 
-public class CustomGoal1_18_R1 extends Goal {
+final class CustomGoal1_18_R1 extends Goal {
 
     private final CustomPathfinder p;
 

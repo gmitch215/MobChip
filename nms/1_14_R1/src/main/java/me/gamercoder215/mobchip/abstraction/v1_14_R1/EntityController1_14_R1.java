@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_14_R1;
 
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_14_R1;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.controller.NaturalMoveType;
 import net.minecraft.server.v1_14_R1.*;
@@ -8,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.util.Vector;
 
-public final class EntityController1_14_R1 implements EntityController {
+final class EntityController1_14_R1 implements EntityController {
 
     private final ControllerJump jumpC;
     private final ControllerMove moveC;

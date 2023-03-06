@@ -7,7 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
-public class Attribute1_18_R2 extends RangedAttribute implements Attribute {
+final class Attribute1_18_R2 extends RangedAttribute implements Attribute {
 
     private final NamespacedKey key;
     private final double defaultV;

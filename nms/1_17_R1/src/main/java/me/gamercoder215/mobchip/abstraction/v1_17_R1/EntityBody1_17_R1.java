@@ -1,7 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_17_R1;
 
 import me.gamercoder215.mobchip.EntityBody;
-import me.gamercoder215.mobchip.abstraction.ChipUtil1_17_R1;
 import me.gamercoder215.mobchip.ai.animation.EntityAnimation;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.network.protocol.Packet;
@@ -31,7 +30,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class EntityBody1_17_R1 implements EntityBody {
+final class EntityBody1_17_R1 implements EntityBody {
     private final EntityInsentient nmsMob;
     private final Mob m;
 

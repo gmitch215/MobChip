@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public final class NavigationPath1_16_R2 implements NavigationPath {
+final class NavigationPath1_16_R2 implements NavigationPath {
     private String name;
     private final Mob m;
     private final PathEntity handle;
