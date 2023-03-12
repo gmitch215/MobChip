@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 
+import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -182,11 +183,15 @@ public interface ChipUtil {
     }
 
     static ChipUtil getWrapper() {
+        String pkg = ChipUtil.class.getPackage().getName() + ".v" + getServerVersion();
         try {
-            String pkg = ChipUtil.class.getPackage().getName() + ".v" + getServerVersion();
-            return (ChipUtil)Class.forName(pkg + ".ChipUtil" + getServerVersion()).getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException("Invalid Version: " + getServerVersion());
+            Constructor<? extends ChipUtil> constr = Class.forName(pkg + ".ChipUtil" + getServerVersion())
+                    .asSubclass(ChipUtil.class)
+                    .getDeclaredConstructor();
+            constr.setAccessible(true);
+            return constr.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Invalid Version: " + getServerVersion() + " (Could not load " + pkg + ".ChipUtil" + getServerVersion() + ")", e);
         }
     }
 
