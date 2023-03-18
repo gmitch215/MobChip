@@ -77,6 +77,7 @@
 		<module>nms/1_18_R2</module>
 		<module>nms/1_19_R1</module>
 		<module>nms/1_19_R2</module>
+		<module>nms/1_19_R3</module>
 	</modules>
 
 	<repositories>
