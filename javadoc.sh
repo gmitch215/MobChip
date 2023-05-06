@@ -28,6 +28,7 @@ done
 cp -Rfv ./docs/* ./
 rm -rf ./docs
 
+echo "mobchip.gamercoder215.me" > CNAME
 echo "[MobChip JavaDoc Builder] Committing..."
 
 git add .
