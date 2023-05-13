@@ -641,4 +641,40 @@ public interface EntityBody {
      */
     void setRotation(float yaw, float pitch);
 
+    /**
+     * Fetches the number of ticks the mob turns red for after being hit, or 0 when not recently hit.
+     * @return Hurt Time
+     */
+    int getHurtTime();
+
+    /**
+     * Sets the number of ticks the mob turns red for after being hit.
+     * @param hurtTime Hurt Time to set
+     */
+    void setHurtTime(int hurtTime);
+
+    /**
+     * Fetches the total amount of ticks this mob has been hurt for.
+     * @return Hurt Duration
+     */
+    int getHurtDuration();
+
+    /**
+     * Sets the total amount of ticks this mob has been hurt for.
+     * @param hurtDuration Hurt Duration to set
+     */
+    void setHurtDuration(int hurtDuration);
+
+    /**
+     * Fetches the total amount of ticks this mob has been dead for, or 0 if not dead.
+     * @return Death Time
+     */
+    int getDeathTime();
+
+    /**
+     * Sets the total amount of ticks this mob has been dead for.
+     * @param deathTime Death Time to set
+     */
+    void setDeathTime(int deathTime);
+
 }

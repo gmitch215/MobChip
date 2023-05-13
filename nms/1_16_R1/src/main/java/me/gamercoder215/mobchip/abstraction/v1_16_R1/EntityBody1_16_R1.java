@@ -514,4 +514,34 @@ final class EntityBody1_16_R1 implements EntityBody {
         }       
     }
 
+    @Override
+    public int getHurtTime() {
+        return nmsMob.hurtTicks;
+    }
+
+    @Override
+    public void setHurtTime(int hurtTime) {
+        nmsMob.hurtTicks = hurtTime;
+    }
+
+    @Override
+    public int getHurtDuration() {
+        return nmsMob.hurtDuration;
+    }
+
+    @Override
+    public void setHurtDuration(int hurtDuration) {
+        nmsMob.hurtDuration = hurtDuration;
+    }
+
+    @Override
+    public int getDeathTime() {
+        return nmsMob.deathTicks;
+    }
+
+    @Override
+    public void setDeathTime(int deathTime) {
+        nmsMob.deathTicks = deathTime;
+    }
+
 }
