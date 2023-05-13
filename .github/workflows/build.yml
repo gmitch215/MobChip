@@ -42,8 +42,8 @@ jobs:
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
-          distribution: ${{ matrix.java-vendor }}
-          java-version: 'temurin'
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
           cache: 'gradle'
       - name: Change Permissions
         run: chmod +x ./gradlew
