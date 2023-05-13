@@ -1,13 +1,15 @@
 package me.gamercoder215.mobchip.abstraction.v1_19_R1;
 
-import me.gamercoder215.mobchip.abstraction.v1_19_R1.ChipUtil1_19_R1;
 import me.gamercoder215.mobchip.ai.gossip.GossipType;
+import net.minecraft.world.entity.ai.goal.Goal;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 public class TestChipUtil1_19_R1 {
 
@@ -41,6 +43,21 @@ public class TestChipUtil1_19_R1 {
         // Other
         for (net.minecraft.world.Difficulty d : net.minecraft.world.Difficulty.values()) Assertions.assertNotNull(ChipUtil1_19_R1.fromNMS(d));
         for (net.minecraft.world.entity.ai.gossip.GossipType t : net.minecraft.world.entity.ai.gossip.GossipType.values()) Assertions.assertNotNull(ChipUtil1_19_R1.fromNMS(t));
+    }
+
+    @Test
+    @DisplayName("Test ChipUtil1_19_R1#getFlags")
+    public void testGetFlags() {
+        OptimizedSmallEnumSet1_19_R1<Goal.Flag> set = new OptimizedSmallEnumSet1_19_R1<>(Goal.Flag.class);
+        set.addUnchecked(Goal.Flag.MOVE);
+        set.addUnchecked(Goal.Flag.LOOK);
+
+        Assertions.assertTrue(set.hasElement(Goal.Flag.MOVE));
+        Assertions.assertTrue(set.hasElement(Goal.Flag.LOOK));
+
+        Set<Goal.Flag> flags = ChipUtil1_19_R1.getFlags(set.getBackingSet());
+        Assertions.assertTrue(flags.contains(Goal.Flag.MOVE));
+        Assertions.assertTrue(flags.contains(Goal.Flag.LOOK));
     }
     
 }
