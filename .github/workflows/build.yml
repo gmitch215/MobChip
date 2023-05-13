@@ -12,117 +12,90 @@ jobs:
 
   setup:
     runs-on: ubuntu-latest
-    name: Maven Setup
+    name: Gradle Setup
     steps:
       - uses: actions/checkout@v3
+      - uses: gradle/wrapper-validation-action@v1
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'maven'
+          cache: 'gradle'
+      - name: Change Permissions
+        run: chmod +x ./gradlew
       - name: Setup Project
-        run: mvn clean install dependency:tree -DskipTests
-
-  build-16:
-    needs: setup
-    runs-on: ubuntu-latest
-    name: Build Java 16
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '16'
-          cache: 'maven'
-      - name: Build Project
-        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,nms/1_13_R1,nms/1_13_R2,nms/1_14_R1,nms/1_15_R1,nms/1_16_R1,nms/1_16_R2,nms/1_16_R3,nms/1_17_R1,bukkit"
-
-  build-8_11:
-    needs: setup
-    strategy:
-      matrix:
-        java-version: [8, 11]
-
-    runs-on: ubuntu-latest
-    name: Build Java ${{ matrix.java-version }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
-          cache: 'maven'
-      - name: Build Project
-        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true -pl "base,abstraction,nms/1_13_R1,nms/1_13_R2,nms/1_14_R1,nms/1_15_R1,nms/1_16_R1,nms/1_16_R2,nms/1_16_R3,bukkit"
-
+        run: ./gradlew project tasks :mobchip-bukkit:dependencies
 
   build:
+    runs-on: ubuntu-latest
     needs: setup
+    timeout-minutes: 10
+
     strategy:
       matrix:
-        java-version: [17, 18]
+        java-version: [17, 18, 19]
 
-    runs-on: ubuntu-latest
     name: Build Java ${{ matrix.java-version }}
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
-          cache: 'maven'
-      - name: Build Project
-        run: mvn clean package -Dmaven.javadoc.skip=true
+          distribution: ${{ matrix.java-vendor }}
+          java-version: 'temurin'
+          cache: 'gradle'
+      - name: Change Permissions
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew clean assemble publishToMavenLocal
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: setup
+
     name: Test Project
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
           java-version: '17'
-          cache: 'maven'
-      - name: Test Project
-        run: mvn test
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Change Permissions
+        run: chmod +x ./gradlew
+      - name: Gradle Test
+        run: ./gradlew test
 
   deploy:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: build
     name: Deploy JavaDocs
     if: ${{ github.event_name != 'pull_request' && github.ref_name == 'master' }}
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'maven'
-
-      - name: Build Project
-        run: mvn install -DskipTests
-
+          cache: 'gradle'
+      - name: Change Permissions
+        run: chmod +x ./gradlew
       - name: Build JavaDocs
+        run: ./gradlew clean allJavadoc
+      - name: Deploy JavaDoc
         run: bash javadoc.sh ${GITHUB_SHA::7}
 
   analyze:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: build
     if: github.event_name != 'pull_request'
-    name: Analyze Project
+    timeout-minutes: 10
 
+    name: Analyze Project
     steps:
       - uses: actions/checkout@v3
         with:
@@ -132,18 +105,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'maven'
-
+          cache: 'gradle'
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
+      - name: Change Permissions
+        run: chmod +x ./gradlew
       - name: Build and Analyze
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=GamerCoder215_MobChip
+        run: ./gradlew clean assemble sonar --info
