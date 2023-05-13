@@ -79,6 +79,6 @@ final class EntityCombatTracker1_18_R1 implements EntityCombatTracker {
 
     @Override
     public boolean hasLastDamageCancelled() {
-        return ChipUtil1_18_R1.toNMS(m).forceExplosionKnockback;
+        return ChipUtil1_18_R1.toNMS(m).lastDamageCancelled;
     }
 }
