@@ -12,7 +12,7 @@ mkdir ./docs
 
 echo "[MobChip JavaDoc Builder] Injecting..."
 
-cp -R bukkit/target/apidocs/* docs/
+cp -R build/docs/javadoc/* docs/
 
 git checkout gh-pages
 

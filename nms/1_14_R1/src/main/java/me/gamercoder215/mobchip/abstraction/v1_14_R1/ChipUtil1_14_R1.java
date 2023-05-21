@@ -60,10 +60,11 @@ final class ChipUtil1_14_R1 implements ChipUtil {
         PathfinderGoalSelector s = target ? mob.targetSelector : mob.goalSelector;
 
         PathfinderGoal g = custom(p);
+        Set<PathfinderGoal.Type> nms = ChipUtil1_14_R1.getFlags(g);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
-            EnumSet<PathfinderGoal.Type> nmsFlags = g.i() == null ? EnumSet.allOf(PathfinderGoal.Type.class) : EnumSet.copyOf(g.i());
+            EnumSet<PathfinderGoal.Type> nmsFlags = nms == null ? EnumSet.allOf(PathfinderGoal.Type.class) : EnumSet.copyOf(nms);
             nmsFlags.add(toNMS(f));
             g.a(nmsFlags);
         }
@@ -1113,6 +1114,46 @@ final class ChipUtil1_14_R1 implements ChipUtil {
         }
     }
 
+    public static Set<PathfinderGoal.Type> getFlags(long backingSet) {
+        Set<PathfinderGoal.Type> flags = new HashSet<>();
+
+        for (PathfinderGoal.Type flag : PathfinderGoal.Type.values())
+            if ((backingSet & 1L << flag.ordinal()) != 0L) flags.add(flag);
+
+        return flags;
+    }
+
+    /**
+     * Paper removes the default Goal#getFlags method for performance reasons, causing NoSuchMethodErrors.
+     */
+    public static Set<PathfinderGoal.Type> getFlags(PathfinderGoal g) {
+        try {
+            Method getFlags = PathfinderGoal.class.getDeclaredMethod("getFlags");
+            getFlags.setAccessible(true);
+
+            Object optimizedSmallEnumSet = getFlags.invoke(g);
+            Method backingSetM = optimizedSmallEnumSet.getClass().getDeclaredMethod("getBackingSet");
+            backingSetM.setAccessible(true);
+
+            long backingSet = (long) backingSetM.invoke(optimizedSmallEnumSet);
+            return getFlags(backingSet);
+        } catch (NoSuchMethodException ignored) {
+            try {
+                Method obfGetFlags = PathfinderGoal.class.getDeclaredMethod("i");
+                obfGetFlags.setAccessible(true);
+                return (Set<PathfinderGoal.Type>) obfGetFlags.invoke(g);
+            } catch (NoSuchMethodException e) {
+                throw new AssertionError("Could not find flags", e);
+            } catch (ReflectiveOperationException e) {
+                ChipUtil.printStackTrace(e);
+                return null;
+            }
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+            return null;
+        }
+    }
+
     public static PathfinderGoal custom(CustomPathfinder p) {
         CustomGoal1_14_R1 g = new CustomGoal1_14_R1(p);
         EnumSet<PathfinderGoal.Type> flags = EnumSet.noneOf(PathfinderGoal.Type.class);
@@ -1125,9 +1166,11 @@ final class ChipUtil1_14_R1 implements ChipUtil {
         return new CustomPathfinder(getEntity(g)) {
             @Override
             public @NotNull PathfinderFlag[] getFlags() {
-                PathfinderFlag[] flags = new PathfinderFlag[g.i().size()];
+                Set<PathfinderGoal.Type> nms = ChipUtil1_14_R1.getFlags(g);
+
+                PathfinderFlag[] flags = new PathfinderFlag[nms.size()];
                 int i = 0;
-                for (PathfinderGoal.Type f : g.i()) {
+                for (PathfinderGoal.Type f : nms) {
                     flags[i] = fromNMS(f);
                     i++;
                 }

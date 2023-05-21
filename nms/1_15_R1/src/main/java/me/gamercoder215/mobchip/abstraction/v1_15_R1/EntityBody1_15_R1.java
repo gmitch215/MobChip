@@ -503,4 +503,64 @@ final class EntityBody1_15_R1 implements EntityBody {
         }       
     }
 
+    @Override
+    public int getHurtTime() {
+        return nmsMob.hurtTicks;
+    }
+
+    @Override
+    public void setHurtTime(int hurtTime) {
+        nmsMob.hurtTicks = hurtTime;
+    }
+
+    @Override
+    public int getHurtDuration() {
+        return nmsMob.hurtDuration;
+    }
+
+    @Override
+    public void setHurtDuration(int hurtDuration) {
+        nmsMob.hurtDuration = hurtDuration;
+    }
+
+    @Override
+    public int getDeathTime() {
+        return nmsMob.deathTicks;
+    }
+
+    @Override
+    public void setDeathTime(int deathTime) {
+        nmsMob.deathTicks = deathTime;
+    }
+
+    @Override
+    public float getForwardSpeed() {
+        return nmsMob.bb;
+    }
+
+    @Override
+    public void setForwardSpeed(float speed) {
+        nmsMob.r(speed);
+    }
+
+    @Override
+    public float getSidewaysSpeed() {
+        return nmsMob.aZ;
+    }
+
+    @Override
+    public void setSidewaysSpeed(float speed) {
+        nmsMob.t(speed);
+    }
+
+    @Override
+    public float getUpwardSpeed() {
+        return nmsMob.ba;
+    }
+
+    @Override
+    public void setUpwardSpeed(float speed) {
+        nmsMob.s(speed);
+    }
+
 }

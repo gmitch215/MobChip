@@ -41,7 +41,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.NeutralMob;
@@ -132,10 +131,11 @@ final class ChipUtil1_19_R3 implements ChipUtil {
         net.minecraft.world.entity.Mob mob = toNMS(m);
         GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
         Goal g = custom(p);
+        Set<Goal.Flag> nms = ChipUtil1_19_R3.getFlags(g);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
-            EnumSet<Goal.Flag> nmsFlags = g.getFlags() == null ? EnumSet.allOf(Goal.Flag.class) : EnumSet.copyOf(g.getFlags());
+            EnumSet<Goal.Flag> nmsFlags = nms == null ? EnumSet.allOf(Goal.Flag.class) : EnumSet.copyOf(nms);
             nmsFlags.add(toNMS(f));
             g.setFlags(nmsFlags);
         }
@@ -755,7 +755,7 @@ final class ChipUtil1_19_R3 implements ChipUtil {
             case LIGHTNING -> fromType(DamageTypes.LIGHTNING_BOLT);
             case FIRE_TICK -> fromType(DamageTypes.ON_FIRE);
             case SUFFOCATION -> fromType(DamageTypes.IN_WALL);
-            case LAVA -> fromType(DamageTypes.HOT_FLOOR);
+            case LAVA -> fromType(DamageTypes.LAVA);
             case HOT_FLOOR -> fromType(DamageTypes.HOT_FLOOR);
             case CRAMMING -> fromType(DamageTypes.CRAMMING);
             case DROWNING -> fromType(DamageTypes.DROWN);
@@ -1273,6 +1273,47 @@ final class ChipUtil1_19_R3 implements ChipUtil {
         }
     }
 
+    public static Set<Goal.Flag> getFlags(long backingSet) {
+        Set<Goal.Flag> flags = new HashSet<>();
+
+        for (Goal.Flag flag : Goal.Flag.values())
+            if ((backingSet & 1L << flag.ordinal()) != 0L) flags.add(flag);
+
+        return flags;
+    }
+
+
+    /**
+     * Paper removes the default Goal#getFlags method for performance reasons, causing NoSuchMethodErrors.
+     */
+    public static Set<Goal.Flag> getFlags(Goal g) {
+        try {
+            Method getFlags = Goal.class.getDeclaredMethod("getFlags");
+            getFlags.setAccessible(true);
+
+            Object optimizedSmallEnumSet = getFlags.invoke(g);
+            Method backingSetM = optimizedSmallEnumSet.getClass().getDeclaredMethod("getBackingSet");
+            backingSetM.setAccessible(true);
+
+            long backingSet = (long) backingSetM.invoke(optimizedSmallEnumSet);
+            return getFlags(backingSet);
+        } catch (NoSuchMethodException ignored) {
+            try {
+                Method obfGetFlags = Goal.class.getDeclaredMethod("j");
+                obfGetFlags.setAccessible(true);
+                return (Set<Goal.Flag>) obfGetFlags.invoke(g);
+            } catch (NoSuchMethodException e) {
+                throw new AssertionError("Could not find flags", e);
+            } catch (ReflectiveOperationException e) {
+                ChipUtil.printStackTrace(e);
+                return null;
+            }
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+            return null;
+        }
+    }
+
     public static Goal custom(CustomPathfinder p) {
         CustomGoal1_19_R3 g = new CustomGoal1_19_R3(p);
         EnumSet<Goal.Flag> set = EnumSet.noneOf(Goal.Flag.class);
@@ -1289,9 +1330,11 @@ final class ChipUtil1_19_R3 implements ChipUtil {
         return new CustomPathfinder(getEntity(g)) {
             @Override
             public @NotNull PathfinderFlag[] getFlags() {
-                PathfinderFlag[] flags = new PathfinderFlag[g.getFlags().size()];
+                Set<Goal.Flag> nms = ChipUtil1_19_R3.getFlags(g);
+
+                PathfinderFlag[] flags = new PathfinderFlag[nms.size()];
                 int i = 0;
-                for (Goal.Flag f : g.getFlags()) {
+                for (Goal.Flag f : nms) {
                     flags[i] = fromNMS(f);
                     i++;
                 }

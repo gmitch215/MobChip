@@ -1,14 +1,11 @@
 .gitpod.yml
 *.iml
-
 .vscode/
 *.class
 .apt_generated_tests/
 build.sh
 .idea/
-
-**/target/
-target/
-
 logs/*.log
 **/logs/*.log
+.gradle/
+build/

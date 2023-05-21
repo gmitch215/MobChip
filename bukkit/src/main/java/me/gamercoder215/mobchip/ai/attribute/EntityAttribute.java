@@ -52,7 +52,7 @@ public final class EntityAttribute implements Attribute {
      */
     public static final Attribute GENERIC_ARMOR_TOUGHNESS = wrapper.getDefaultAttribute("generic.armor_toughness");
     /**
-     * Represents {@link org.bukkit.attribute.Attribute#GENERIC_ATTACK_KNOCKBACK}
+     * Represents Attribute#GENERIC_ATTACK_KNOCKBACK
      */
     public static final Attribute GENERIC_ATTACK_KNOCKBACK = wrapper.getDefaultAttribute("generic.attack_knockback");
     /**

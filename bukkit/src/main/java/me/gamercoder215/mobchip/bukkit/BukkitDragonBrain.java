@@ -5,6 +5,7 @@ import me.gamercoder215.mobchip.DragonBrain;
 import me.gamercoder215.mobchip.ai.enderdragon.DragonPhase;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 class BukkitDragonBrain extends BukkitBrain implements DragonBrain {
@@ -12,7 +13,7 @@ class BukkitDragonBrain extends BukkitBrain implements DragonBrain {
     final EnderDragon m;
 
     BukkitDragonBrain(@NotNull EnderDragon dragon) {
-        super(dragon);
+        super((Mob) dragon);
         this.m = dragon;
     }
 

@@ -481,4 +481,64 @@ final class EntityBody1_17_R1 implements EntityBody {
             for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
         }       
     }
+
+    @Override
+    public int getHurtTime() {
+        return nmsMob.aK;
+    }
+
+    @Override
+    public void setHurtTime(int hurtTime) {
+        nmsMob.aK = hurtTime;
+    }
+
+    @Override
+    public int getHurtDuration() {
+        return nmsMob.aL;
+    }
+
+    @Override
+    public void setHurtDuration(int hurtDuration) {
+        nmsMob.aL = hurtDuration;
+    }
+
+    @Override
+    public int getDeathTime() {
+        return nmsMob.aN;
+    }
+
+    @Override
+    public void setDeathTime(int deathTime) {
+        nmsMob.aN = deathTime;
+    }
+
+    @Override
+    public float getForwardSpeed() {
+        return nmsMob.bq;
+    }
+
+    @Override
+    public void setForwardSpeed(float speed) {
+        nmsMob.u(speed);
+    }
+
+    @Override
+    public float getSidewaysSpeed() {
+        return nmsMob.bo;
+    }
+
+    @Override
+    public void setSidewaysSpeed(float speed) {
+        nmsMob.w(speed);
+    }
+
+    @Override
+    public float getUpwardSpeed() {
+        return nmsMob.bp;
+    }
+
+    @Override
+    public void setUpwardSpeed(float speed) {
+        nmsMob.v(speed);
+    }
 }
