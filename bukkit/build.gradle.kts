@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT") {
         version {
@@ -30,7 +32,6 @@ dependencies {
 }
 
 java {
-    withSourcesJar()
     withJavadocJar()
 }
 
@@ -46,5 +47,20 @@ tasks {
             links("https://hub.spigotmc.org/javadocs/spigot/")
             links("https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/")
         }
+    }
+
+    register("sourcesJar", Jar::class.java) {
+        archiveClassifier.set("sources")
+
+        val sources = listOf(
+            sourceSets["main"].allSource,
+            project(":mobchip-base").sourceSets["main"].allSource
+        )
+
+        from(sources)
+    }
+
+    withType<ShadowJar> {
+        dependsOn("sourcesJar", "javadocJar")
     }
 }
