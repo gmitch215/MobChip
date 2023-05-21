@@ -543,4 +543,34 @@ final class EntityBody1_14_R1 implements EntityBody {
         nmsMob.deathTicks = deathTime;
     }
 
+    @Override
+    public float getForwardSpeed() {
+        return nmsMob.bd;
+    }
+
+    @Override
+    public void setForwardSpeed(float speed) {
+        nmsMob.r(speed);
+    }
+
+    @Override
+    public float getSidewaysSpeed() {
+        return nmsMob.bb;
+    }
+
+    @Override
+    public void setSidewaysSpeed(float speed) {
+        nmsMob.t(speed);
+    }
+
+    @Override
+    public float getUpwardSpeed() {
+        return nmsMob.bc;
+    }
+
+    @Override
+    public void setUpwardSpeed(float speed) {
+        nmsMob.s(speed);
+    }
+
 }

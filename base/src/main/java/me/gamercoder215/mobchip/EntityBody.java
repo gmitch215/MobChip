@@ -677,4 +677,40 @@ public interface EntityBody {
      */
     void setDeathTime(int deathTime);
 
+    /**
+     * Fetches the forward speed of this entity.
+     * @return Forward Speed
+     */
+    float getForwardSpeed();
+
+    /**
+     * Sets the forward speed of this entity.
+     * @param speed Forward Speed to set
+     */
+    void setForwardSpeed(float speed);
+
+    /**
+     * Fetches the sideways speed of this entity.
+     * @return Sideways Speed
+     */
+    float getSidewaysSpeed();
+
+    /**
+     * Sets the sideways speed of this entity.
+     * @param speed Sideways Speed to set
+     */
+    void setSidewaysSpeed(float speed);
+
+    /**
+     * Fetches the upward speed of this entity.
+     * @return Upward Speed
+     */
+    float getUpwardSpeed();
+
+    /**
+     * Sets the upward speed of this entity.
+     * @param speed Upward Speed to set
+     */
+    void setUpwardSpeed(float speed);
+
 }
