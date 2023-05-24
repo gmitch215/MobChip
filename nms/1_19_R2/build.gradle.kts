@@ -30,6 +30,6 @@ tasks {
 
         version.set(mcVersion)
         action.set(RemapTask.Action.MOJANG_TO_SPIGOT)
-        archiveClassifier.set("")
+        archiveName.set("${project.name}-${project.version}.jar")
     }
 }
