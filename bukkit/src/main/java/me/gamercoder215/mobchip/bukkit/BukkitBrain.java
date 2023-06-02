@@ -7,7 +7,7 @@ import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.EntityAI;
 import me.gamercoder215.mobchip.ai.attribute.Attribute;
 import me.gamercoder215.mobchip.ai.attribute.AttributeInstance;
-import me.gamercoder215.mobchip.ai.behavior.EntityBehavior;
+import me.gamercoder215.mobchip.ai.behavior.*;
 import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.memories.Memory;
@@ -26,6 +26,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Constructor;
 
 /**
  * Bukkit Implementation of EntityBrain
@@ -164,32 +166,50 @@ public class BukkitBrain implements EntityBrain {
 	@Override
 	public EntityBehavior getBehaviors() {
 		try {
+			Constructor<? extends EntityBehavior> constr = null;
+			Class<?> entityClass = m.getType().getEntityClass();
+
 			switch (m.getType().name().toLowerCase()) {
 				case "frog": {
-					Class<?> frog = Class.forName(BUKKIT_PACKAGE + "BukkitFrogBehavior");
-					return (EntityBehavior) frog.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends FrogBehavior> frog = Class.forName(BUKKIT_PACKAGE + "BukkitFrogBehavior")
+							.asSubclass(FrogBehavior.class);
+					constr = frog.getDeclaredConstructor(entityClass);
+					break;
 				}
 				case "warden": {
-					Class<?> warden = Class.forName(BUKKIT_PACKAGE + "BukkitWardenBehavior");
-					return (EntityBehavior) warden.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends WardenBehavior> warden = Class.forName(BUKKIT_PACKAGE + "BukkitWardenBehavior")
+							.asSubclass(WardenBehavior.class);
+					constr = warden.getDeclaredConstructor(entityClass);
+					break;
 				}
 				case "ender_dragon": {
-					Class<?> dragon = Class.forName(BUKKIT_PACKAGE + "BukkitDragonBehavior");
-					return (EntityBehavior) dragon.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends DragonBehavior> dragon = Class.forName(BUKKIT_PACKAGE + "BukkitDragonBehavior")
+							.asSubclass(DragonBehavior.class);
+					constr = dragon.getDeclaredConstructor(entityClass);
+					break;
 				}
 				case "axolotl": {
-					Class<?> axolotl = Class.forName(BUKKIT_PACKAGE + "BukkitAxolotlBehavior");
-					return (EntityBehavior) axolotl.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends AxolotlBehavior> axolotl = Class.forName(BUKKIT_PACKAGE + "BukkitAxolotlBehavior")
+							.asSubclass(AxolotlBehavior.class);
+					constr = axolotl.getDeclaredConstructor(entityClass);
+					break;
 				}
 				case "piglin": {
-					Class<?> piglin = Class.forName(BUKKIT_PACKAGE + "BukkitPiglinBehavior");
-					return (EntityBehavior) piglin.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends PiglinBehavior> piglin = Class.forName(BUKKIT_PACKAGE + "BukkitPiglinBehavior")
+							.asSubclass(PiglinBehavior.class);
+					constr = piglin.getDeclaredConstructor(entityClass);
+					break;
 				}
 				case "allay": {
-					Class<?> allay = Class.forName(BUKKIT_PACKAGE + "BukkitAllayBehavior");
-					return (EntityBehavior) allay.getConstructor(m.getClass()).newInstance(m);
+					Class<? extends AllayBehavior> allay = Class.forName(BUKKIT_PACKAGE + "BukkitAllayBehavior")
+							.asSubclass(AllayBehavior.class);
+					constr = allay.getDeclaredConstructor(entityClass);
+					break;
 				}
 			}
+
+			constr.setAccessible(true);
+			return constr.newInstance(m);
 		} catch (ClassNotFoundException | NoSuchMethodException ignored) {}
 		catch (Exception e) {
 			ChipUtil.printStackTrace(e);
