@@ -110,7 +110,9 @@ public final class CombatEntry {
     /**
      * Fetches how long {@link #getOwner()} was in combat, in ticks.
      * @return Duration of Combat, in ticks
+     * @deprecated As of Minecraft 1.20, no longer stored in CombatEntry
      */
+    @Deprecated
     public int getCombatTime() { return this.ticks; }
 
     /**
@@ -133,7 +135,9 @@ public final class CombatEntry {
     /**
      * Fetches the health of this Entity would have had before taking damage.
      * @return Health of entity before damage
+     * @deprecated As of Minecraft 1.20, no longer stored in CombatEntry
      */
+    @Deprecated
     public float getHealthBeforeDamage() {
         return this.health;
     }
@@ -170,8 +174,10 @@ public final class CombatEntry {
      * <br><br>
      * Developers should check {@link #hasAttacker()} before calling this method.
      * @return Entity that attacked the Mob that owns this Combat Entry, or null if not found
+     * @deprecated As of Minecraft 1.20, no longer stored in CombatEntry
      */
     @Nullable
+    @Deprecated
     public Entity getAttacker() {
         return this.attacker;
     }
