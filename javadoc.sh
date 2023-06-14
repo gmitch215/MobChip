@@ -14,7 +14,7 @@ echo "[MobChip JavaDoc Builder] Injecting..."
 
 cp -R build/docs/javadoc/* docs/
 
-git checkout gh-pages
+git switch -f gh-pages
 
 for dir in ./*
 do
@@ -32,9 +32,7 @@ echo "mobchip.gamercoder215.me" > CNAME
 echo "[MobChip JavaDoc Builder] Committing..."
 
 git add .
-git branch -D gh-pages
-git branch -m gh-pages
-git commit -m "Update Javadocs ($1)"
+git commit -m "Update JavaDocs ($1)"
 git push -f origin gh-pages
 
 echo "[MobChip JavaDoc Builder] Done!"
