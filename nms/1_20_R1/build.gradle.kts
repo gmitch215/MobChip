@@ -4,7 +4,7 @@ plugins {
     id("io.github.patrick.remapper") version "1.4.0"
 }
 
-val mcVersion = "1.20"
+val mcVersion = "1.20.1"
 
 dependencies {
     api(project(":mobchip-base"))
