@@ -178,6 +178,9 @@ subprojects {
     publishing {
         publications {
             getByName<MavenPublication>("maven") {
+                pom {
+                    packaging = "jar"
+                }
                 artifact(tasks["shadowJar"])
             }
         }
