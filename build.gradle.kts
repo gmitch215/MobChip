@@ -143,16 +143,6 @@ allprojects {
     }
 }
 
-publishing {
-    publications {
-        getByName<MavenPublication>("maven") {
-            pom {
-                packaging = "pom"
-            }
-        }
-    }
-}
-
 val jvmVersion = JavaVersion.VERSION_1_8
 
 subprojects {
@@ -173,17 +163,6 @@ subprojects {
     java {
         sourceCompatibility = jvmVersion
         targetCompatibility = jvmVersion
-    }
-
-    publishing {
-        publications {
-            getByName<MavenPublication>("maven") {
-                pom {
-                    packaging = "jar"
-                }
-                artifact(tasks["shadowJar"])
-            }
-        }
     }
 
     tasks {
@@ -221,8 +200,10 @@ subprojects {
         }
 
         jar.configure {
-            enabled = false
             dependsOn("shadowJar")
+            artifacts {
+                add("default", getByName<ShadowJar>("shadowJar"))
+            }
         }
 
         withType<ShadowJar> {
@@ -236,6 +217,7 @@ subprojects {
             exclude("META-INF", "META-INF/**")
 
             archiveClassifier.set("")
+            archiveFileName.set("${project.name}-${project.version}.jar")
         }
     }
 }

@@ -39,6 +39,18 @@ java {
 sourceSets["main"].allJava.srcDir("src/main/javadoc")
 
 tasks {
+    compileJava {
+        listOf(
+            "1_17_R1",
+            "1_18_R1",
+            "1_18_R2",
+            "1_19_R1",
+            "1_19_R2",
+            "1_19_R3",
+            "1_20_R1",
+        ).forEach { dependsOn(":mobchip-$it:jar") }
+    }
+
     javadoc {
         enabled = true
 
@@ -59,6 +71,12 @@ tasks {
         )
 
         from(sources)
+    }
+
+    jar.configure {
+        artifacts {
+            add("archives", getByName<Jar>("sourcesJar"))
+        }
     }
 
     withType<ShadowJar> {
