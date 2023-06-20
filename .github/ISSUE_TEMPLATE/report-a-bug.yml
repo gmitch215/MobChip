@@ -66,3 +66,11 @@ body:
       value: |
         In the box below, you can attach any relevant info or files that may help us solve the bug.
         If you think this issue is relevant to any other issues, please mention it here.
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Any additional information that may help us solve the bug.
+      placeholder: |
+        Ex: "Using Paper instead of Spigot"
+    validations:
+      required: false
