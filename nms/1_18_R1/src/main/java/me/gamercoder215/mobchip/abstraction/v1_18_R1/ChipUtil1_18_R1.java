@@ -201,6 +201,7 @@ final class ChipUtil1_18_R1 implements ChipUtil {
             .put(Horse.class, net.minecraft.world.entity.animal.horse.Horse.class)
             .put(HumanEntity.class, net.minecraft.world.entity.player.Player.class)
             .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
+            .put(Illager.class, net.minecraft.world.entity.monster.Illusioner.class)
             .put(IronGolem.class, net.minecraft.world.entity.animal.IronGolem.class)
             .put(Llama.class, net.minecraft.world.entity.animal.horse.Llama.class)
             .put(MagmaCube.class, net.minecraft.world.entity.monster.MagmaCube.class)
@@ -259,7 +260,7 @@ final class ChipUtil1_18_R1 implements ChipUtil {
             nms = Class.forName(PathfinderMob.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
 
             // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
+            if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
         } catch (ClassNotFoundException ignored) {}
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
@@ -1110,18 +1111,24 @@ final class ChipUtil1_18_R1 implements ChipUtil {
         };
     }
 
-    public static float getFloat(Goal o, String name) { return getObject(o, name, Float.class); }
+    public static float getFloat(Goal o, String name) {
+        Float obj = getObject(o, name, Float.class);
+        return obj == null ? 0 : obj;
+    }
 
     public static double getDouble(Goal o, String name) {
-        return getObject(o, name, Double.class);
+        Double obj = getObject(o, name, Double.class);
+        return obj == null ? 0 : obj;
     }
 
     public static boolean getBoolean(Goal o, String name) {
-        return getObject(o, name, Boolean.class);
+        Boolean obj = getObject(o, name, Boolean.class);
+        return obj != null && obj;
     }
 
     public static int getInt(Goal o, String name) {
-        return getObject(o, name, Integer.class);
+        Integer obj = getObject(o, name, Integer.class);
+        return obj == null ? 0 : obj;
     }
 
     public static <T> T getObject(Goal o, String name, Class<T> cast) {

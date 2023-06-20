@@ -89,10 +89,7 @@ final class ChipUtil1_16_R3 implements ChipUtil {
             Set<PathfinderGoalWrapped> goals = (Set<PathfinderGoalWrapped>) f.get(s);
            goals.forEach(w -> pF.add(new WrappedPathfinder(fromNMS(w.j()), w.h())));
         } catch (Exception e) {
-            Bukkit.getLogger().severe(e.getMessage());
-            for (StackTraceElement e1 : e.getStackTrace()) {
-                Bukkit.getLogger().severe(e1.toString());
-            }
+            ChipUtil.printStackTrace(e);
         }
 
         return pF;
@@ -129,6 +126,7 @@ final class ChipUtil1_16_R3 implements ChipUtil {
             .put(Golem.class, EntityGolem.class)
             .put(Husk.class, EntityZombieHusk.class)
             .put(HumanEntity.class, EntityHuman.class)
+            .put(Illusioner.class, EntityIllagerIllusioner.class)
             .put(Mule.class, EntityHorseMule.class)
             .put(SkeletonHorse.class, EntityHorseSkeleton.class)
             .put(Stray.class, EntitySkeletonStray.class)
@@ -149,7 +147,7 @@ final class ChipUtil1_16_R3 implements ChipUtil {
 
         if (nms == null) try {
             // Some Pre-Mojang Mapping Classes start with "Entity"
-            nms = Class.forName(EntityInsentient.class.getPackage().getName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+            nms = Class.forName(EntityInsentient.class.getPackage().getName() + ".Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
         } catch (ClassNotFoundException ignored) {}
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
@@ -1034,13 +1032,25 @@ final class ChipUtil1_16_R3 implements ChipUtil {
         }
     }
 
-    public static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
+    public static float getFloat(PathfinderGoal o, String name) {
+        Float obj = getObject(o, name, Float.class);
+        return obj == null ? 0 : obj;
+    }
 
-    public static double getDouble(PathfinderGoal o, String name) { return getObject(o, name, Double.class); }
+    public static double getDouble(PathfinderGoal o, String name) {
+        Double obj = getObject(o, name, Double.class);
+        return obj == null ? 0 : obj;
+    }
 
-    public static boolean getBoolean(PathfinderGoal o, String name) { return getObject(o, name, Boolean.class); }
+    public static boolean getBoolean(PathfinderGoal o, String name) {
+        Boolean obj = getObject(o, name, Boolean.class);
+        return obj != null && obj;
+    }
 
-    public static int getInt(PathfinderGoal o, String name) { return getObject(o, name, Integer.class); }
+    public static int getInt(PathfinderGoal o, String name) {
+        Integer obj = getObject(o, name, Integer.class);
+        return obj == null ? 0 : obj;
+    }
 
     public static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
         try {

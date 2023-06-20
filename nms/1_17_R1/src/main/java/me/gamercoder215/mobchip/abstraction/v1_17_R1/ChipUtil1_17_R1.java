@@ -251,7 +251,7 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             nms = Class.forName(EntityInsentient.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(EntityLiving.class);
 
             // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackageName() + "." + "Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
+            if (nms == null) nms = Class.forName(EntityInsentient.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(EntityLiving.class);
         } catch (ClassNotFoundException ignored) {}
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
@@ -1114,18 +1114,24 @@ final class ChipUtil1_17_R1 implements ChipUtil {
         };
     }
 
-    public static float getFloat(PathfinderGoal o, String name) { return getObject(o, name, Float.class); }
+    public static float getFloat(PathfinderGoal o, String name) {
+        Float obj = getObject(o, name, Float.class);
+        return obj == null ? 0 : obj;
+    }
 
     public static double getDouble(PathfinderGoal o, String name) {
-        return getObject(o, name, Double.class);
+        Double obj = getObject(o, name, Double.class);
+        return obj == null ? 0 : obj;
     }
 
     public static boolean getBoolean(PathfinderGoal o, String name) {
-        return getObject(o, name, Boolean.class);
+        Boolean obj = getObject(o, name, Boolean.class);
+        return obj != null && obj;
     }
 
-    public static int getInt(PathfinderGoal o, String name) {
-        return getObject(o, name, Integer.class);
+    public static int getInt(PathfinderGoal o, String name) { 
+        Integer obj = getObject(o, name, Integer.class);
+        return obj == null ? 0 : obj;
     }
 
     public static <T> T getObject(PathfinderGoal o, String name, Class<T> cast) {
