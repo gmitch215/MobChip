@@ -4,8 +4,7 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a Pathfinder Goal of an Entity.
- * <p>
+ * <p>Represents a Pathfinder Goal of an Entity.</p>
  * <strong>For custom pathfinders, extend {@link CustomPathfinder}.</strong>
  */
 public abstract class Pathfinder implements PathfinderInfo {
@@ -35,8 +34,9 @@ public abstract class Pathfinder implements PathfinderInfo {
 	}
 
 	/**
-	 * Fetches a Set of Flags that this Pathfinder has.
-	 * @return Set of Pathfinder Flags
+	 * <p>Fetches an Array of Flags that this Pathfinder has.</p>
+	 * @apiNote On Paper Implementations, this enum is converted into a byte for optimization. MobChip does not plan to add functionality for Paper to make this array mutable on those implementations.
+	 * @return Array of Pathfinder Flags
 	 */
 	@NotNull
 	public abstract PathfinderFlag[] getFlags();

@@ -1131,7 +1131,7 @@ final class ChipUtil1_16_R3 implements ChipUtil {
      */
     public static Set<PathfinderGoal.Type> getFlags(PathfinderGoal g) {
         try {
-            Method getFlags = PathfinderGoal.class.getDeclaredMethod("getFlags");
+            Method getFlags = PathfinderGoal.class.getDeclaredMethod("getGoalTypes");
             getFlags.setAccessible(true);
 
             Object optimizedSmallEnumSet = getFlags.invoke(g);
