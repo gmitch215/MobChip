@@ -49,6 +49,8 @@ tasks {
 
             links("https://hub.spigotmc.org/javadocs/spigot/")
             links("https://javadoc.io/doc/org.jetbrains/annotations-java5/23.0.0/")
+
+            addStringOption("tag", "apiNote:a:API Note:")
         }
     }
 }
@@ -195,8 +197,15 @@ subprojects {
 
         javadoc {
             enabled = false
-            options.encoding = "UTF-8"
-            options.memberLevel = JavadocMemberLevel.PROTECTED
+
+            options {
+                require(this is StandardJavadocDocletOptions)
+
+                encoding = "UTF-8"
+                memberLevel = JavadocMemberLevel.PROTECTED
+
+                addStringOption("tag", "apiNote:a:API Note:")
+            }
         }
 
         jar.configure {
