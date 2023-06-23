@@ -210,9 +210,7 @@ subprojects {
 
         jar.configure {
             dependsOn("shadowJar")
-            artifacts {
-                add("default", getByName<ShadowJar>("shadowJar"))
-            }
+            archiveClassifier.set("dev")
         }
 
         withType<ShadowJar> {
@@ -228,5 +226,9 @@ subprojects {
             archiveClassifier.set("")
             archiveFileName.set("${project.name}-${project.version}.jar")
         }
+    }
+
+    artifacts {
+        add("default", tasks.getByName<ShadowJar>("shadowJar"))
     }
 }
