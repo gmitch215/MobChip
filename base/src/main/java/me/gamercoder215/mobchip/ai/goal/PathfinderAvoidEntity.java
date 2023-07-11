@@ -54,8 +54,8 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	 * @param walkMod Walking away modifier
 	 * @throws IllegalArgumentException if filter is null
 	 */
-	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double sprintMod, double walkMod) throws IllegalArgumentException {
-		this(m, filter, dist, sprintMod, walkMod, null);
+	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod) throws IllegalArgumentException {
+		this(m, filter, dist, walkMod, sprintMod, null);
 	}
 
 	/**
@@ -68,8 +68,8 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	 * @param avoidPredicate Predicate to check when determining the entity to avoid
 	 * @throws IllegalArgumentException if filter is null
 	 */
-	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double sprintMod, double walkMod, @Nullable Predicate<T> avoidPredicate) throws IllegalArgumentException {
-		this(m, filter, dist, sprintMod, walkMod, avoidPredicate, null);
+	public PathfinderAvoidEntity(@NotNull Creature m, @NotNull Class<T> filter, float dist, double walkMod, double sprintMod, @Nullable Predicate<T> avoidPredicate) throws IllegalArgumentException {
+		this(m, filter, dist, walkMod, sprintMod, avoidPredicate, null);
 	}
 
 
