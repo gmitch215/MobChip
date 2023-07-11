@@ -30,6 +30,7 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.entity.*;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
@@ -298,7 +299,7 @@ final class ChipUtil1_15_R1 implements ChipUtil {
             }
             case "RemoveBlock": {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                return new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                return new PathfinderGoalRemoveBlock(CraftMagicNumbers.getBlock(p.getBlock()), (EntityCreature) m, p.getSpeedModifier(), p.getVerticalSearchRange());
             }
             case "RestrictSun": return new PathfinderGoalRestrictSun((EntityCreature) m);
             case "Sit": return new PathfinderGoalSit((EntityTameableAnimal) m);
@@ -1283,7 +1284,7 @@ final class ChipUtil1_15_R1 implements ChipUtil {
                 case "RandomStrollLand": return new PathfinderRandomStrollLand((Creature) m, getDouble(g, "e"), getFloat(g, "h"));
                 case "RandomSwim": return new PathfinderRandomSwim((Creature) m, getDouble(g, "e"), getInt(g, "f"));
                 case "RandomFly": return new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "e"));
-                case "RemoveBlock": return new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock(getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
+                case "RemoveBlock": return new PathfinderRemoveBlock((Creature) m, CraftMagicNumbers.getMaterial(getObject(g, "g", Block.class)), getDouble(g, "b"), getInt(g, "i"));
                 case "RestrictSun": return new PathfinderRestrictSun((Creature) m);
                 case "Sit": return new PathfinderSit((Tameable) m);
                 case "StrollVillage": return new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "e"));

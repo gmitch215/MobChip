@@ -74,7 +74,6 @@ import net.minecraft.world.entity.monster.warden.WardenAi;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
@@ -82,10 +81,10 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.entity.*;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Chicken;
@@ -434,7 +433,7 @@ final class ChipUtil1_20_R1 implements ChipUtil {
             }
             case "RemoveBlock" -> {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                yield new RemoveBlockGoal(((CraftBlock) p.getBlock()).getNMS().getBlock(), (PathfinderMob) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                yield new RemoveBlockGoal(CraftMagicNumbers.getBlock(p.getBlock()), (PathfinderMob) m, p.getSpeedModifier(), p.getVerticalSearchRange());
             }
             case "RestrictSun" -> new RestrictSunGoal((PathfinderMob) m);
             case "Sit" -> new SitWhenOrderedToGoal((TamableAnimal) m);
@@ -1378,15 +1377,6 @@ final class ChipUtil1_20_R1 implements ChipUtil {
         };
     }
 
-    public static BlockPos getPosWithBlock(Block block, BlockPos bp, BlockGetter g) {
-        if (g.getBlockState(bp).is(block)) return bp;
-        else {
-            BlockPos[] bp1 = new BlockPos[]{new BlockPos(bp.below()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPos(bp.above())};
-            for (BlockPos bps : bp1) if (g.getBlockState(bps).is(block)) return bps;
-            return null;
-        }
-    }
-
     public static Location fromNMS(BlockPos p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
     public static Location fromNMS(Position p, World w) { return new Location(w, p.x(), p.y(), p.z()); }
@@ -1445,7 +1435,7 @@ final class ChipUtil1_20_R1 implements ChipUtil {
                 case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
                 case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
                 case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
-                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
+                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, CraftMagicNumbers.getMaterial(getObject(g, "g", Block.class)), getDouble(g, "b"), getInt(g, "i"));
                 case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
                 case "Sit" -> new PathfinderSit((Tameable) m);
                 case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
