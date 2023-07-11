@@ -377,6 +377,21 @@ public final class EntityMemory<T> implements Memory<T> {
      */
     public static final EntityMemory<Integer> ITEM_PICKUP_COOLDOWN_TICKS = new EntityMemory<>(Integer.class, "item_pickup_cooldown_ticks");
 
+    /**
+     * Represents an array of explored positions this Sniffer has looked at.
+     */
+    public static final EntityMemory<Location[]> SNIFFER_SNIFFING_TARGET = new EntityMemory<>(Location[].class, "sniffer_sniffing_target");
+
+    /**
+     * Represents whether the Sniffer is digging.
+     */
+    public static final EntityMemory<Boolean> SNIFFER_DIGGING = new EntityMemory<>(Boolean.class, "sniffer_digging");
+
+    /**
+     * Represents whether the Sniffer is happy.
+     */
+    public static final EntityMemory<Boolean> SNIFFER_HAPPY = new EntityMemory<>(Boolean.class, "sniffer_happy");
+
     private final Class<T> bukkit;
 
     private final String key;
