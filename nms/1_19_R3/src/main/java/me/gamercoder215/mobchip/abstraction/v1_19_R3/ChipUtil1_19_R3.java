@@ -29,8 +29,8 @@ import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess.Frozen;
 import net.minecraft.core.*;
+import net.minecraft.core.RegistryAccess.Frozen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -81,9 +81,9 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftSound;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.*;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Cat;
@@ -433,7 +433,7 @@ final class ChipUtil1_19_R3 implements ChipUtil {
             }
             case "RemoveBlock" -> {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                yield new RemoveBlockGoal(((CraftBlock) p.getBlock()).getNMS().getBlock(), (PathfinderMob) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                yield new RemoveBlockGoal(CraftMagicNumbers.getBlock(p.getBlock()), (PathfinderMob) m, p.getSpeedModifier(), p.getVerticalSearchRange());
             }
             case "RestrictSun" -> new RestrictSunGoal((PathfinderMob) m);
             case "Sit" -> new SitWhenOrderedToGoal((TamableAnimal) m);
@@ -891,6 +891,7 @@ final class ChipUtil1_19_R3 implements ChipUtil {
         }
         else if (value instanceof DamageSource c) value = fromNMS(c);
         else if (value instanceof net.minecraft.util.Unit u) value = Unit.INSTANCE;
+        else if (value instanceof Optional<?> o) value = fromNMS(m, key, o.orElse(null));
         else value = nmsValue;
 
         return value;
@@ -1443,7 +1444,7 @@ final class ChipUtil1_19_R3 implements ChipUtil {
                 case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
                 case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
                 case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
-                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
+                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, CraftMagicNumbers.getMaterial(getObject(g, "g", Block.class)), getDouble(g, "b"), getInt(g, "i"));
                 case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
                 case "Sit" -> new PathfinderSit((Tameable) m);
                 case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));

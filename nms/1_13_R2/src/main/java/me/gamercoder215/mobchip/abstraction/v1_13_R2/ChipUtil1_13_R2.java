@@ -29,6 +29,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.entity.*;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftNamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
@@ -294,7 +295,7 @@ final class ChipUtil1_13_R2 implements ChipUtil {
             }
             case "RemoveBlock": {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                return new PathfinderGoalRemoveBlock(((CraftBlock) p.getBlock()).getNMS().getBlock(), (EntityCreature) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                return new PathfinderGoalRemoveBlock(CraftMagicNumbers.getBlock(p.getBlock()), (EntityCreature) m, p.getSpeedModifier(), p.getVerticalSearchRange());
             }
             case "RestrictSun": return new PathfinderGoalRestrictSun((EntityCreature) m);
             case "Sit": return new PathfinderGoalSit((EntityTameableAnimal) m);

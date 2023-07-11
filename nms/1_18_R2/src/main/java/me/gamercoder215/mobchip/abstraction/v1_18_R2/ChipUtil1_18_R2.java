@@ -38,7 +38,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
@@ -69,23 +71,18 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftSound;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.entity.*;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
-import org.bukkit.entity.*;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cod;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Dolphin;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Panda;
@@ -99,12 +96,16 @@ import org.bukkit.entity.Squid;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -415,7 +416,7 @@ final class ChipUtil1_18_R2 implements ChipUtil {
             }
             case "RemoveBlock" -> {
                 PathfinderRemoveBlock p = (PathfinderRemoveBlock) b;
-                yield new RemoveBlockGoal(((CraftBlock) p.getBlock()).getNMS().getBlock(), (PathfinderMob) m, p.getSpeedModifier(), Math.min((int) p.getBlock().getLocation().distance(mob.getLocation()), 1));
+                yield new RemoveBlockGoal(CraftMagicNumbers.getBlock(p.getBlock()), (PathfinderMob) m, p.getSpeedModifier(), p.getVerticalSearchRange());
             }
             case "RestrictSun" -> new RestrictSunGoal((PathfinderMob) m);
             case "Sit" -> new SitWhenOrderedToGoal((TamableAnimal) m);
@@ -819,6 +820,7 @@ final class ChipUtil1_18_R2 implements ChipUtil {
         }
         else if (value instanceof DamageSource c) value = fromNMS(c);
         else if (value instanceof net.minecraft.util.Unit u) value = Unit.INSTANCE;
+        else if (value instanceof Optional<?> o) value = fromNMS(m, key, o.orElse(null));
         else value = nmsValue;
 
         return value;
@@ -1357,8 +1359,7 @@ final class ChipUtil1_18_R2 implements ChipUtil {
                 case "RandomStrollLand" -> new PathfinderRandomStrollLand((Creature) m, getDouble(g, "f"), getFloat(g, "j"));
                 case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
                 case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
-                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, m.getWorld().getBlockAt(fromNMS(getPosWithBlock( getObject(g, "g", Block.class), toNMS(m.getLocation()), toNMS(m.getWorld())), m.getWorld())), getDouble(g, "b"));
-                case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
+                case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, CraftMagicNumbers.getMaterial(getObject(g, "g", Block.class)), getDouble(g, "b"));                case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
                 case "Sit" -> new PathfinderSit((Tameable) m);
                 case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
                 case "StrollVillageGolem" -> new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
