@@ -741,6 +741,10 @@ final class ChipUtil1_16_R3 implements ChipUtil {
             value = fromNMS(c);
         }
         else if (value instanceof Unit) value = me.gamercoder215.mobchip.ai.memories.Unit.INSTANCE;
+        else if (value instanceof Optional<?>) {
+            Optional<?> o = (Optional<?>) value;
+            value = fromNMS(m, key, o.orElse(null));
+        }
         else value = nmsValue;
 
         return value;

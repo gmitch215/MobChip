@@ -874,6 +874,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         }
         else if (value instanceof DamageSource c) value = fromNMS(c);
         else if (value instanceof net.minecraft.util.Unit u) value = Unit.INSTANCE;
+        else if (value instanceof Optional<?> o) value = fromNMS(m, key, o.orElse(null));
         else value = nmsValue;
 
         return value;
