@@ -154,7 +154,7 @@ subprojects {
 
     dependencies {
         testImplementation("org.mockito:mockito-core:5.4.0")
-        testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 
         testImplementation("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
         testImplementation("net.md-5:bungeecord-chat:1.16-R0.4")
