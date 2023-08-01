@@ -28,7 +28,6 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R1.entity.*;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
@@ -120,9 +119,11 @@ final class ChipUtil1_16_R1 implements ChipUtil {
             .put(Player.class, EntityHuman.class)
 
             .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(Animals.class, EntityAnimal.class)
             .put(AbstractVillager.class, EntityVillagerAbstract.class)
             .put(Donkey.class, EntityHorseDonkey.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Giant.class, EntityGiantZombie.class)
             .put(Golem.class, EntityGolem.class)
             .put(Husk.class, EntityZombieHusk.class)
             .put(HumanEntity.class, EntityHuman.class)

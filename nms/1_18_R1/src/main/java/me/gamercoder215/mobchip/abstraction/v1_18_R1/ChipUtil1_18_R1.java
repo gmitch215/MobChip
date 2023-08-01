@@ -19,17 +19,19 @@ import me.gamercoder215.mobchip.ai.memories.Memory;
 import me.gamercoder215.mobchip.ai.memories.MemoryStatus;
 import me.gamercoder215.mobchip.ai.memories.Unit;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
+import me.gamercoder215.mobchip.ai.schedule.Activity;
+import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
+import me.gamercoder215.mobchip.ai.schedule.Schedule;
 import me.gamercoder215.mobchip.ai.sensing.EntitySenses;
 import me.gamercoder215.mobchip.ai.sensing.Sensor;
 import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
-import me.gamercoder215.mobchip.ai.schedule.Activity;
-import me.gamercoder215.mobchip.ai.schedule.EntityScheduleManager;
-import me.gamercoder215.mobchip.ai.schedule.Schedule;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -38,7 +40,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.behavior.Behavior;
@@ -55,6 +59,7 @@ import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
@@ -69,24 +74,18 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R1.entity.*;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
-import org.bukkit.entity.*;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cod;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Dolphin;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Panda;
@@ -100,12 +99,16 @@ import org.bukkit.entity.Squid;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -173,6 +176,7 @@ final class ChipUtil1_18_R1 implements ChipUtil {
             // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
             .put(AbstractHorse.class, net.minecraft.world.entity.animal.horse.AbstractHorse.class)
             .put(AbstractVillager.class, net.minecraft.world.entity.npc.AbstractVillager.class)
+            .put(Animals.class, Animal.class)
             .put(Ambient.class, AmbientCreature.class)
             .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
             .put(Bat.class, net.minecraft.world.entity.ambient.Bat.class)
@@ -202,7 +206,8 @@ final class ChipUtil1_18_R1 implements ChipUtil {
             .put(Horse.class, net.minecraft.world.entity.animal.horse.Horse.class)
             .put(HumanEntity.class, net.minecraft.world.entity.player.Player.class)
             .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
-            .put(Illager.class, net.minecraft.world.entity.monster.Illusioner.class)
+            .put(Illager.class, AbstractIllager.class)
+            .put(Illusioner.class, net.minecraft.world.entity.monster.Illusioner.class)
             .put(IronGolem.class, net.minecraft.world.entity.animal.IronGolem.class)
             .put(Llama.class, net.minecraft.world.entity.animal.horse.Llama.class)
             .put(MagmaCube.class, net.minecraft.world.entity.monster.MagmaCube.class)

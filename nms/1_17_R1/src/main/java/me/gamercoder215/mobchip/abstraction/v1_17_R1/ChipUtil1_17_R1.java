@@ -79,7 +79,6 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.*;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
@@ -165,6 +164,7 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
             .put(AbstractHorse.class, EntityHorseAbstract.class)
             .put(AbstractVillager.class, EntityVillagerAbstract.class)
+            .put(Animals.class, EntityAnimal.class)
             .put(Ambient.class, EntityAmbient.class)
             .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
             .put(Bat.class, EntityBat.class)
@@ -194,6 +194,8 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Horse.class, EntityHorse.class)
             .put(HumanEntity.class, EntityHuman.class)
             .put(Husk.class, EntityZombieHusk.class)
+            .put(Illager.class, EntityIllagerAbstract.class)
+            .put(Illusioner.class, EntityIllagerIllusioner.class)
             .put(IronGolem.class, EntityIronGolem.class)
             .put(Llama.class, EntityLlama.class)
             .put(MagmaCube.class, EntityMagmaCube.class)

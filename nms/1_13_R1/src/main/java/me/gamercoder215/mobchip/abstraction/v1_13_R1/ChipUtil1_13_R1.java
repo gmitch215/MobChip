@@ -27,7 +27,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_13_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R1.entity.*;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R1.util.CraftMagicNumbers;
@@ -39,7 +38,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -140,8 +141,10 @@ final class ChipUtil1_13_R1 implements ChipUtil {
             .put(Player.class, EntityHuman.class)
 
             .put(AbstractHorse.class, EntityHorseAbstract.class)
+            .put(Animals.class, EntityAnimal.class)
             .put(Donkey.class, EntityHorseDonkey.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Giant.class, EntityGiantZombie.class)
             .put(Golem.class, EntityGolem.class)
             .put(Husk.class, EntityZombieHusk.class)
             .put(HumanEntity.class, EntityHuman.class)

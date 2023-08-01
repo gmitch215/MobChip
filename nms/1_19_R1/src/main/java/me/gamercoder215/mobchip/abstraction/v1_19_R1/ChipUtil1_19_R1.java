@@ -59,6 +59,7 @@ import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
@@ -75,7 +76,6 @@ import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R1.entity.*;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
@@ -175,6 +175,7 @@ final class ChipUtil1_19_R1 implements ChipUtil {
             // Below are not in the root package (LET'S KEEP THEM ALPHABETICAL!!!)
             .put(AbstractHorse.class, net.minecraft.world.entity.animal.horse.AbstractHorse.class)
             .put(AbstractVillager.class, net.minecraft.world.entity.npc.AbstractVillager.class)
+            .put(Animals.class, Animal.class)
             .put(Allay.class, net.minecraft.world.entity.animal.allay.Allay.class)
             .put(Ambient.class, AmbientCreature.class)
             .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
@@ -206,7 +207,8 @@ final class ChipUtil1_19_R1 implements ChipUtil {
             .put(Horse.class, net.minecraft.world.entity.animal.horse.Horse.class)
             .put(HumanEntity.class, net.minecraft.world.entity.player.Player.class)
             .put(Husk.class, net.minecraft.world.entity.monster.Husk.class)
-            .put(Illager.class, net.minecraft.world.entity.monster.Illusioner.class)
+            .put(Illager.class, AbstractIllager.class)
+            .put(Illusioner.class, net.minecraft.world.entity.monster.Illusioner.class)
             .put(IronGolem.class, net.minecraft.world.entity.animal.IronGolem.class)
             .put(Llama.class, net.minecraft.world.entity.animal.horse.Llama.class)
             .put(MagmaCube.class, net.minecraft.world.entity.monster.MagmaCube.class)
