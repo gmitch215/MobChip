@@ -30,7 +30,7 @@ improve the hassle of playing around with NMS and learning how to import and use
 ```xml
 <project>
     
-    <!-- Import JitPack Repo -->
+    <!-- Import CodeMC Repo -->
     
     <repositories>
         <repository>
@@ -44,9 +44,7 @@ improve the hassle of playing around with NMS and learning how to import and use
             <groupId>me.gamercoder215</groupId>
             <artifactId>mobchip-bukkit</artifactId>
             <version>[VERSION]</version>
-            
-            <!-- Use master-SNAPSHOT for Experimental Features on master branch -->
-            
+
             <!-- Use something like 1.7.0-SNAPSHOT for a stable release -->
         </dependency>
     </dependencies>
@@ -64,10 +62,8 @@ repositories {
 }
 
 dependencies {
+    // Use something like 1.9.1-SNAPSHOT for a stable release
     implementation 'me.gamercoder215:mobchip-bukkit:[VERSION]'
-    
-    // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.7.0-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
@@ -81,10 +77,8 @@ repositories {
 }
 
 dependencies {
+    // Use something like 1.9.1-SNAPSHOT for a stable release
     implementation('me.gamercoder215:mobchip-bukkit:[VERSION]')
-
-    // Use "master-SNAPSHOT" as version for Experimental Features on master branch
-    // Use something like "1.7.0-SNAPSHOT" as version for a stable release
 }
 ```
 </details>
