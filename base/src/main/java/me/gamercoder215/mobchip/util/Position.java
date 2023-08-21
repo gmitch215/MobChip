@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Represents a {@link Location} without a World
  */
-public final class Position {
+public final class Position implements Cloneable {
     
     private int x;
     private int y;
@@ -305,5 +305,14 @@ public final class Position {
     public Position setZ(int z) {
         this.z = z;
         return this;
+    }
+
+    @Override
+    public Position clone() {
+        try {
+            return (Position) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
     }
 }

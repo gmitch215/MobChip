@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     id("org.sonarqube") version "4.0.0.2929"
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    kotlin("jvm") version "1.9.0"
 
     java
     `maven-publish`
@@ -13,7 +14,7 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.9.1-SNAPSHOT"
+val pVersion = "1.9.2-SNAPSHOT"
 val pAuthor = "GamerCoder215"
 
 val github = "$pAuthor/MobChip"
@@ -149,6 +150,7 @@ val jvmVersion = JavaVersion.VERSION_1_8
 
 subprojects {
     apply<JacocoPlugin>()
+    apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.sonarqube")
     apply(plugin = "com.github.johnrengelman.shadow")
 
@@ -160,6 +162,7 @@ subprojects {
         testImplementation("net.md-5:bungeecord-chat:1.20-R0.1")
 
         compileOnly("org.jetbrains:annotations:24.0.1")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
     }
 
     java {
@@ -173,6 +176,10 @@ subprojects {
             options.isDeprecation = false
             options.isWarnings = false
             options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing"))
+        }
+
+        compileKotlin {
+            kotlinOptions.jvmTarget = jvmVersion.toString()
         }
 
         jacocoTestReport {
