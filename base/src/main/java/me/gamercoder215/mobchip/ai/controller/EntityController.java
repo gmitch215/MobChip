@@ -1,11 +1,9 @@
 package me.gamercoder215.mobchip.ai.controller;
 
+import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-
-import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 
 /**
  * Represents an Entity Controller, used for calling direct actions for an entity.
@@ -118,31 +116,6 @@ public interface EntityController {
      * @return this controller, for chaining
      */
     EntityController naturalMoveTo(double x, double y, double z, NaturalMoveType type);
-
-    /**
-     * <p>Performs a Natural Entity Movement.</p>
-     * <p>The Vector's X, Y, and Z are relative to the entity's current location.</p>
-     * <p>Example: {@code naturalMoveTo(new Vector(1, 0, 3), }{@link NaturalMoveType#SELF}{@code )} is a natural movement by
-     * the entity's self +1 X-Axis step and +3 Z-Axis steps.</p>
-     * @param vec Relative Vector to move by
-     * @param type Natural Movement Type
-     * @return this controller, for chaining
-     */
-    default EntityController naturalMoveTo(Vector vec, NaturalMoveType type) {
-        return naturalMoveTo(vec.getX(), vec.getY(), vec.getZ(), type);
-    }
-
-    /**
-     * <p>Performs a Natural Entity Movement.</p>
-     * <p>The X, Y, and Z are relative to the entity's current location.</p>
-     * @param add Relative Location to move by
-     * @param type Natural Movement Type
-     * @see #naturalMoveTo(double, double, double, NaturalMoveType)
-     * @return this controller, for chaining
-     */
-    default EntityController naturalMoveTo(Location add, NaturalMoveType type) {
-        return naturalMoveTo(add.toVector(), type);
-    }
 
     /**
      * Makes this Entity strafe.
