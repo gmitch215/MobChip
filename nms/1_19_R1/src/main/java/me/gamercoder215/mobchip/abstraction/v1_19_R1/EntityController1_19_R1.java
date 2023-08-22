@@ -50,6 +50,8 @@ final class EntityController1_19_R1 implements EntityController {
     public EntityController moveTo(double x, double y, double z, double speedMod) {
         moveC.setWantedPosition(x, y, z, speedMod);
         moveC.tick();
+        nms.getNavigation().moveTo(moveC.getWantedX(), moveC.getWantedY(), moveC.getWantedZ(), moveC.getSpeedModifier());
+        nms.getNavigation().tick();
         return this;
     }
 
@@ -72,6 +74,8 @@ final class EntityController1_19_R1 implements EntityController {
     public EntityController strafe(float fwd, float right) {
         moveC.strafe(fwd, right);
         moveC.tick();
+        nms.getNavigation().moveTo(moveC.getWantedX(), moveC.getWantedY(), moveC.getWantedZ(), moveC.getSpeedModifier());
+        nms.getNavigation().tick();
         return this;
     }
 

@@ -46,6 +46,8 @@ final class EntityController1_16_R3 implements EntityController {
     public EntityController moveTo(double x, double y, double z, double speedMod) {
         moveC.a(x, y, z, speedMod);
         moveC.a();
+        nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
+        nms.getNavigation().c();
         return this;
     }
 
@@ -79,6 +81,8 @@ final class EntityController1_16_R3 implements EntityController {
     public EntityController strafe(float fwd, float right) {
         moveC.a(fwd, right);
         moveC.a();
+        nms.getNavigation().a(moveC.d(), moveC.e(), moveC.f(), moveC.c());
+        nms.getNavigation().c();
         return this;
     }
 
