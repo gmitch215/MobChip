@@ -769,7 +769,7 @@ final class ChipUtil1_18_R2 implements ChipUtil {
             nmsValue = s;
         }
         else if (value instanceof EntityDamageEvent.DamageCause c) nmsValue = toNMS(c);
-        else if (value instanceof Unit u) nmsValue = net.minecraft.util.Unit.INSTANCE;
+        else if (value instanceof Unit) nmsValue = net.minecraft.util.Unit.INSTANCE;
         else nmsValue = value;
 
         return nmsValue;
@@ -822,7 +822,7 @@ final class ChipUtil1_18_R2 implements ChipUtil {
             }
         }
         else if (value instanceof DamageSource c) value = fromNMS(c);
-        else if (value instanceof net.minecraft.util.Unit u) value = Unit.INSTANCE;
+        else if (value instanceof net.minecraft.util.Unit) value = Unit.INSTANCE;
         else if (value instanceof Optional<?> o) value = fromNMS(m, key, o.orElse(null));
         else value = nmsValue;
 
