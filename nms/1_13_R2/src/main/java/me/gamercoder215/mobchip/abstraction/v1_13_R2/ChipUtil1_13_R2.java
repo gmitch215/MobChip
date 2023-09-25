@@ -260,7 +260,7 @@ final class ChipUtil1_13_R2 implements ChipUtil {
             }
             case "MoveThroughVillage": {
                 PathfinderMoveThroughVillage p = (PathfinderMoveThroughVillage) b;
-                return new PathfinderGoalMoveThroughVillage((EntityVillager) m, p.getSpeedModifier(), p.mustBeNight());
+                return new PathfinderGoalMoveThroughVillage((EntityCreature) m, p.getSpeedModifier(), p.mustBeNight());
             }
             case "MoveTowardsRestriction": {
                 PathfinderMoveTowardsRestriction p = (PathfinderMoveTowardsRestriction) b;
