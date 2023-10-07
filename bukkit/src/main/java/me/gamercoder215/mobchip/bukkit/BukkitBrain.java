@@ -206,6 +206,12 @@ public class BukkitBrain implements EntityBrain {
 					constr = allay.getDeclaredConstructor(entityClass);
 					break;
 				}
+				case "camel": {
+					Class<? extends CamelBehavior> camel = Class.forName(BUKKIT_PACKAGE + "BukkitCamelBehavior")
+							.asSubclass(CamelBehavior.class);
+					constr = camel.getDeclaredConstructor(entityClass);
+					break;
+				}
 			}
 
 			constr.setAccessible(true);
