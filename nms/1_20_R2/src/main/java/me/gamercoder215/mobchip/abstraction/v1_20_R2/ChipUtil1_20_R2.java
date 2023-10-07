@@ -61,6 +61,7 @@ import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
+import net.minecraft.world.entity.animal.camel.CamelAi;
 import net.minecraft.world.entity.animal.frog.FrogAi;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
@@ -1628,6 +1629,7 @@ final class ChipUtil1_20_R2 implements ChipUtil {
         else if (c instanceof Axolotl) AxolotlAi.updateActivity((net.minecraft.world.entity.animal.axolotl.Axolotl) nms);
         else if (c instanceof Frog) FrogAi.updateActivity((net.minecraft.world.entity.animal.frog.Frog) nms);
         else if (c instanceof org.bukkit.entity.Warden) WardenAi.updateActivity((Warden) nms);
+        else if (c instanceof Camel) CamelAi.updateActivity((net.minecraft.world.entity.animal.camel.Camel) nms);
     }
 
     public static MemoryModuleType<?> toNMS(Memory<?> mem) {

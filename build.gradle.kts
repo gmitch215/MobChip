@@ -14,7 +14,7 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.9.2-SNAPSHOT"
+val pVersion = "1.9.3-SNAPSHOT"
 val pAuthor = "GamerCoder215"
 
 val github = "$pAuthor/MobChip"

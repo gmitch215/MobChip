@@ -1167,7 +1167,10 @@ final class ChipUtil1_17_R1 implements ChipUtil {
 
     public static BlockPosition toNMS(Location l) { return new BlockPosition(l.getX(), l.getY(), l.getZ()); }
 
-    public static List<ItemStack> fromNMS(RecipeItemStack in) { return Arrays.stream(in.c).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
+    public static List<ItemStack> fromNMS(RecipeItemStack in) {
+        in.buildChoices();
+        return Arrays.stream(in.c).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList());
+    }
 
     public static Sound fromNMS(SoundEffect s) { return CraftSound.getBukkit(s); }
 
