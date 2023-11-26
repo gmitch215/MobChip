@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     id("org.sonarqube") version "4.0.0.2929"
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
 
     java
     `maven-publish`
