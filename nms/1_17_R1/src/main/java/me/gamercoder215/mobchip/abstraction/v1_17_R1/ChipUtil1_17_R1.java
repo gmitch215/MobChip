@@ -786,6 +786,9 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().l.d(IRegistry.Q).a(l.getDimensionManager()).getWorld();
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
+        else if (nmsValue instanceof BlockPosition p) {
+            value = new Location(m.getWorld(), p.getX(), p.getY(), p.getZ());
+        }
         else if (nmsValue instanceof List<?> li) {
             switch (key) {
                 case "secondary_job_site", "interactable_doors" -> {

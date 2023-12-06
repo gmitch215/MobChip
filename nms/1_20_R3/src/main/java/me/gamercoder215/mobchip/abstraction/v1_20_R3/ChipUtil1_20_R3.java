@@ -1,4 +1,4 @@
-package me.gamercoder215.mobchip.abstraction.v1_19_R2;
+package me.gamercoder215.mobchip.abstraction.v1_20_R3;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Lifecycle;
@@ -30,6 +30,7 @@ import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
 import net.minecraft.core.Registry;
 import net.minecraft.core.*;
+import net.minecraft.core.RegistryAccess.Frozen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -40,6 +41,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.damagesource.FallLocation;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
@@ -57,6 +61,7 @@ import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.AllayAi;
 import net.minecraft.world.entity.animal.axolotl.AxolotlAi;
+import net.minecraft.world.entity.animal.camel.CamelAi;
 import net.minecraft.world.entity.animal.frog.FrogAi;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.phases.*;
@@ -71,18 +76,17 @@ import net.minecraft.world.entity.monster.warden.WardenAi;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R2.CraftSound;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.*;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R3.CraftSound;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.entity.*;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Chicken;
@@ -121,7 +125,7 @@ import java.util.stream.Collectors;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
-final class ChipUtil1_19_R2 implements ChipUtil {
+final class ChipUtil1_20_R3 implements ChipUtil {
 
     @Override
     public void addCustomPathfinder(CustomPathfinder p, int priority, boolean target) {
@@ -129,7 +133,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         net.minecraft.world.entity.Mob mob = toNMS(m);
         GoalSelector s = target ? mob.targetSelector : mob.goalSelector;
         Goal g = custom(p);
-        Set<Goal.Flag> nms = ChipUtil1_19_R2.getFlags(g);
+        Set<Goal.Flag> nms = ChipUtil1_20_R3.getFlags(g);
 
         Pathfinder.PathfinderFlag[] flags = p.getFlags() == null ? new Pathfinder.PathfinderFlag[0] : p.getFlags();
         for (Pathfinder.PathfinderFlag f : flags) {
@@ -185,6 +189,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             .put(Bat.class, net.minecraft.world.entity.ambient.Bat.class)
             .put(Bee.class, net.minecraft.world.entity.animal.Bee.class)
             .put(Blaze.class, net.minecraft.world.entity.monster.Blaze.class)
+            .put(Breeze.class, net.minecraft.world.entity.monster.breeze.Breeze.class)
             .put(Cat.class, net.minecraft.world.entity.animal.Cat.class)
             .put(Camel.class, net.minecraft.world.entity.animal.camel.Camel.class)
             .put(CaveSpider.class, net.minecraft.world.entity.monster.CaveSpider.class)
@@ -240,6 +245,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             .put(Skeleton.class, net.minecraft.world.entity.monster.Skeleton.class)
             .put(SkeletonHorse.class, net.minecraft.world.entity.animal.horse.SkeletonHorse.class)
             .put(Slime.class, net.minecraft.world.entity.monster.Slime.class)
+            .put(Sniffer.class, net.minecraft.world.entity.animal.sniffer.Sniffer.class)
             .put(Snowman.class, SnowGolem.class)
             .put(Spider.class, net.minecraft.world.entity.monster.Spider.class)
             .put(Squid.class, net.minecraft.world.entity.animal.Squid.class)
@@ -286,7 +292,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static SoundEvent toNMS(Sound s) {
-        return CraftSound.getSoundEffect(s);
+        return CraftSound.bukkitToMinecraft(s);
     }
 
     public static Goal toNMS(Pathfinder b) {
@@ -326,7 +332,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             case "Breath" -> new BreathAirGoal((PathfinderMob) m);
             case "Breed" -> {
                 PathfinderBreed p = (PathfinderBreed) b;
-                yield new BreedGoal((net.minecraft.world.entity.animal.Animal) m, p.getSpeedModifier());
+                yield new BreedGoal((Animal) m, p.getSpeedModifier());
             }
             case "CatSitOnBed" -> {
                 PathfinderCatOnBed p = (PathfinderCatOnBed) b;
@@ -588,12 +594,12 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             if (Behavior.class.isAssignableFrom(bClass)) {
                 Constructor<?> c = bClass.getConstructor(ChipUtil.getArgTypes(args));
                 Behavior<? super net.minecraft.world.entity.LivingEntity> b = (Behavior<? super net.minecraft.world.entity.LivingEntity>) c.newInstance(args);
-                return new BehaviorResult1_19_R2(b, nms);
+                return new BehaviorResult1_20_R3(b, nms);
             } else {
                 Method create = bClass.getDeclaredMethod("a", ChipUtil.getArgTypes(args));
                 create.setAccessible(true);
                 BehaviorControl<? super net.minecraft.world.entity.LivingEntity> control = (BehaviorControl<? super net.minecraft.world.entity.LivingEntity>) create.invoke(null, args);
-                return new BehaviorResult1_19_R2(control, nms);
+                return new BehaviorResult1_20_R3(control, nms);
             }
 
 
@@ -608,7 +614,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public Attribute getDefaultAttribute(String s) {
-        return new Attribute1_19_R2((RangedAttribute) BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
+        return new Attribute1_20_R3((RangedAttribute) BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
     }
 
     public static net.minecraft.world.entity.schedule.Activity toNMS(Activity a) {
@@ -633,7 +639,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static net.minecraft.world.entity.schedule.Schedule toNMS(Schedule s) {
-        net.minecraft.world.entity.schedule.ScheduleBuilder b = new ScheduleBuilder(new net.minecraft.world.entity.schedule.Schedule());
+        ScheduleBuilder b = new ScheduleBuilder(new net.minecraft.world.entity.schedule.Schedule());
         for (int i = 0; i < 24000; i++) {
             if (!s.contains(i)) continue;
             net.minecraft.world.entity.schedule.Activity a = toNMS(s.get(i));
@@ -660,7 +666,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public EntityScheduleManager getManager(Mob m) {
-        return new EntityScheduleManager1_19_R2(m);
+        return new EntityScheduleManager1_20_R3(m);
     }
 
     public static AbstractDragonPhaseInstance toNMS(CustomPhase c) {
@@ -709,7 +715,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         try {
             Method m = net.minecraft.world.entity.boss.enderdragon.EnderDragon.class.getDeclaredMethod("a", List.class);
             m.setAccessible(true);
-            m.invoke(nmsMob, list.stream().map(ChipUtil1_19_R2::toNMS).collect(Collectors.toList()));
+            m.invoke(nmsMob, list.stream().map(ChipUtil1_20_R3::toNMS).collect(Collectors.toList()));
         } catch (Exception e) {
             ChipUtil.printStackTrace(e);
         }
@@ -717,17 +723,31 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public EntityController getController(Mob m) {
-        return new EntityController1_19_R2(m);
+        return new EntityController1_20_R3(m);
     }
 
     @Override
     public EntityNavigation getNavigation(Mob m) {
-        return new EntityNavigation1_19_R2(m);
+        return new EntityNavigation1_20_R3(m);
     }
 
     @Override
     public EntityBody getBody(Mob m) {
-        return new EntityBody1_19_R2(m);
+        return new EntityBody1_20_R3(m);
+    }
+
+    private static DamageSource fromType(ResourceKey<DamageType> key) {
+        return fromType(key, null);
+    }
+
+    private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause) {
+        return fromType(key, cause, null);
+    }
+
+    private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause, net.minecraft.world.entity.Entity target) {
+        Frozen access = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess();        
+        
+        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), cause, target);
     }
 
     public static DamageSource toNMS(EntityDamageEvent.DamageCause c, Entity en) {
@@ -735,33 +755,33 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             net.minecraft.world.entity.Entity nmsEntity = toNMS(en);
 
             if (c == EntityDamageEvent.DamageCause.FALLING_BLOCK)
-              return DamageSource.fallingBlock(nmsEntity);
+              return fromType(DamageTypes.FALLING_BLOCK, nmsEntity);
         }
 
         return switch (c) {
-            case FIRE -> DamageSource.IN_FIRE;
-            case LIGHTNING -> DamageSource.LIGHTNING_BOLT;
-            case FIRE_TICK -> DamageSource.ON_FIRE;
-            case SUFFOCATION -> DamageSource.IN_WALL;
-            case LAVA -> DamageSource.LAVA;
-            case HOT_FLOOR -> DamageSource.HOT_FLOOR;
-            case CRAMMING -> DamageSource.CRAMMING;
-            case DROWNING -> DamageSource.DROWN;
-            case STARVATION -> DamageSource.STARVE;
-            case CONTACT -> DamageSource.CACTUS;
-            case MAGIC -> DamageSource.MAGIC;
-            case FALL -> DamageSource.FALL;
-            case FLY_INTO_WALL -> DamageSource.FLY_INTO_WALL;
-            case VOID -> DamageSource.OUT_OF_WORLD;
-            case WITHER -> DamageSource.WITHER;
-            case DRAGON_BREATH -> DamageSource.DRAGON_BREATH;
-            case FREEZE -> DamageSource.FREEZE;
-            case DRYOUT -> DamageSource.DRY_OUT;
-            default -> DamageSource.GENERIC;
+            case FIRE -> fromType(DamageTypes.IN_FIRE);
+            case LIGHTNING -> fromType(DamageTypes.LIGHTNING_BOLT);
+            case FIRE_TICK -> fromType(DamageTypes.ON_FIRE);
+            case SUFFOCATION -> fromType(DamageTypes.IN_WALL);
+            case LAVA -> fromType(DamageTypes.LAVA);
+            case HOT_FLOOR -> fromType(DamageTypes.HOT_FLOOR);
+            case CRAMMING -> fromType(DamageTypes.CRAMMING);
+            case DROWNING -> fromType(DamageTypes.DROWN);
+            case STARVATION -> fromType(DamageTypes.STARVE);
+            case CONTACT -> fromType(DamageTypes.CACTUS);
+            case MAGIC -> fromType(DamageTypes.MAGIC);
+            case FALL -> fromType(DamageTypes.FALL);
+            case FLY_INTO_WALL -> fromType(DamageTypes.FLY_INTO_WALL);
+            case VOID -> fromType(DamageTypes.FELL_OUT_OF_WORLD);
+            case WITHER -> fromType(DamageTypes.WITHER);
+            case DRAGON_BREATH -> fromType(DamageTypes.DRAGON_BREATH);
+            case FREEZE -> fromType(DamageTypes.FREEZE);
+            case DRYOUT -> fromType(DamageTypes.DRY_OUT);
+            default -> fromType(DamageTypes.GENERIC);
         };
     }
 
-    public static ItemEntity toNMS(org.bukkit.entity.Item i) {
+    public static ItemEntity toNMS(Item i) {
         return (ItemEntity) ((CraftItem) i).getHandle();
     }
 
@@ -774,15 +794,15 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
         if (value instanceof Location l) {
             nmsValue = switch (key) {
-                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location" -> new BlockPos(l.getX(), l.getY(), l.getZ());
-                default -> GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ()));
+                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location", "breeze_jump_target" -> new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+                default -> GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ()));
             };
         }
         else if (value instanceof Location[] ls) {
             List<GlobalPos> p = new ArrayList<>();
 
             for (Location l : ls) {
-                p.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ())));
+                p.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
             }
 
             nmsValue = p;
@@ -804,7 +824,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
             for (org.bukkit.block.Block bl : b) {
                 Location l = bl.getLocation();
-                s.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getX(), l.getY(), l.getZ())));
+                s.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
             }
             nmsValue = s;
         }
@@ -888,7 +908,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static EntityDamageEvent.DamageCause fromNMS(DamageSource c) {
-        return switch (c.msgId) {
+        return switch (c.getMsgId()) {
             case "inFire" -> FIRE;
             case "lightningBolt" -> LIGHTNING;
             case "onFire" -> FIRE_TICK;
@@ -1009,7 +1029,12 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     @Override
     public void restrictTo(Mob m, double x, double y, double z, int radius) {
         net.minecraft.world.entity.Mob nms = toNMS(m);
-        nms.restrictTo(new BlockPos(x, y, z), radius);
+
+        int bX = (int) x;
+        int bY = (int) y;
+        int bZ = (int) z;
+
+        nms.restrictTo(new BlockPos(bX, bY, bZ), radius);
     }
 
     @Override
@@ -1221,11 +1246,11 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     public static ServerLevel toNMS(World w) { return ((CraftWorld) w).getHandle(); }
 
-    public static BlockPos toNMS(Location l) { return new BlockPos(l.getX(), l.getY(), l.getZ()); }
+    public static BlockPos toNMS(Location l) { return new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ()); }
 
     public static List<ItemStack> fromNMS(Ingredient in) { return Arrays.stream(in.getItems()).map(CraftItemStack::asBukkitCopy).collect(Collectors.toList()); }
 
-    public static Sound fromNMS(SoundEvent s) { return CraftSound.getBukkit(s); }
+    public static Sound fromNMS(SoundEvent s) { return CraftSound.minecraftToBukkit(s); }
 
     public static Mob getEntity(Goal g) {
         // For no discernible reason, the Mob field in DoorInteractGoal
@@ -1275,6 +1300,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         return flags;
     }
 
+
     /**
      * Paper removes the default Goal#getFlags method for performance reasons, causing NoSuchMethodErrors.
      */
@@ -1307,9 +1333,9 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static Goal custom(CustomPathfinder p) {
-        CustomGoal1_19_R2 g = new CustomGoal1_19_R2(p);
+        CustomGoal1_20_R3 g = new CustomGoal1_20_R3(p);
         EnumSet<Goal.Flag> set = EnumSet.noneOf(Goal.Flag.class);
-        Arrays.stream(p.getFlags()).map(ChipUtil1_19_R2::toNMS).forEach(set::add);
+        Arrays.stream(p.getFlags()).map(ChipUtil1_20_R3::toNMS).forEach(set::add);
         g.setFlags(set);
         return g;
     }
@@ -1322,7 +1348,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         return new CustomPathfinder(getEntity(g)) {
             @Override
             public @NotNull PathfinderFlag[] getFlags() {
-                Set<Goal.Flag> nms = ChipUtil1_19_R2.getFlags(g);
+                Set<Goal.Flag> nms = ChipUtil1_20_R3.getFlags(g);
 
                 PathfinderFlag[] flags = new PathfinderFlag[nms.size()];
                 int i = 0;
@@ -1361,21 +1387,12 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         };
     }
 
-    public static BlockPos getPosWithBlock(net.minecraft.world.level.block.Block block, BlockPos bp, BlockGetter g) {
-        if (g.getBlockState(bp).is(block)) return bp;
-        else {
-            BlockPos[] bp1 = new BlockPos[]{new BlockPos(bp.below()),  bp.west(), bp.east(), bp.north(), bp.south(), new BlockPos(bp.above())};
-            for (BlockPos bps : bp1) if (g.getBlockState(bps).is(block)) return bps;
-            return null;
-        }
-    }
-
     public static Location fromNMS(BlockPos p, World w) { return new Location(w, p.getX(), p.getY(), p.getZ()); }
 
-    public static Location fromNMS(net.minecraft.core.Position p, World w) { return new Location(w, p.x(), p.y(), p.z()); }
+    public static Location fromNMS(Position p, World w) { return new Location(w, p.x(), p.y(), p.z()); }
 
     private Pathfinder fromNMS(Goal g) {
-        if (g instanceof CustomGoal1_19_R2 custom) {
+        if (g instanceof CustomGoal1_20_R3 custom) {
             return custom.getPathfinder();
         }
 
@@ -1429,6 +1446,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
                 case "RandomSwim" -> new PathfinderRandomSwim((Creature) m, getDouble(g, "f"), getInt(g, "g"));
                 case "RandomFly" -> new PathfinderRandomStrollFlying((Creature) m, getDouble(g, "f"));
                 case "RemoveBlock" -> new PathfinderRemoveBlock((Creature) m, CraftMagicNumbers.getMaterial(getObject(g, "g", Block.class)), getDouble(g, "b"), getInt(g, "i"));
+                case "RestrictSun" -> new PathfinderRestrictSun((Creature) m);
                 case "Sit" -> new PathfinderSit((Tameable) m);
                 case "StrollVillage" -> new PathfinderRandomStrollToVillage((Creature) m, getDouble(g, "f"));
                 case "StrollVillageGolem" -> new PathfinderRandomStrollInVillage((Creature) m, getDouble(g, "f"));
@@ -1480,7 +1498,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute> writable = (WritableRegistry<net.minecraft.world.entity.ai.attributes.Attribute>) server.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
         ResourceKey<net.minecraft.world.entity.ai.attributes.Attribute> nmsKey = ResourceKey.create(Registries.ATTRIBUTE, toNMS(key));
-        Attribute1_19_R2 att = new Attribute1_19_R2(key, defaultV, min, max, client);
+        Attribute1_20_R3 att = new Attribute1_20_R3(key, defaultV, min, max, client);
         writable.register(nmsKey, att, Lifecycle.stable());
 
         changeRegistryLock(BuiltInRegistries.ATTRIBUTE, true);
@@ -1500,17 +1518,17 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     public Attribute getAttribute(NamespacedKey key) {
         net.minecraft.world.entity.ai.attributes.Attribute a = BuiltInRegistries.ATTRIBUTE.get(toNMS(key));
         if (!(a instanceof RangedAttribute)) return null;
-        return new Attribute1_19_R2((RangedAttribute) a);
+        return new Attribute1_20_R3((RangedAttribute) a);
     }
 
     @NotNull
-    private AttributeInstance1_19_R2 getOrCreateInstance(Mob m, Attribute a) {
+    private AttributeInstance1_20_R3 getOrCreateInstance(Mob m, Attribute a) {
         net.minecraft.world.entity.Mob nms = toNMS(m);
         AttributeMap map = nms.getAttributes();
         net.minecraft.world.entity.ai.attributes.Attribute nmsA = BuiltInRegistries.ATTRIBUTE.get(toNMS(a.getKey()));
 
         net.minecraft.world.entity.ai.attributes.AttributeInstance handle = toNMS(m).getAttribute(nmsA);
-        if (handle != null) return new AttributeInstance1_19_R2(a, handle);
+        if (handle != null) return new AttributeInstance1_20_R3(a, handle);
 
         try {
             Field attributesF = AttributeMap.class.getDeclaredField("b");
@@ -1520,7 +1538,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             handle = new net.minecraft.world.entity.ai.attributes.AttributeInstance(nmsA, ignored -> {});
             attributes.put(nmsA, handle);
 
-            return new AttributeInstance1_19_R2(a, handle);
+            return new AttributeInstance1_20_R3(a, handle);
         } catch (ReflectiveOperationException e) {
             ChipUtil.printStackTrace(e);
         }
@@ -1548,7 +1566,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public EntityGossipContainer getGossipContainer(Villager v) {
-        return new EntityGossipContainer1_19_R2(v);
+        return new EntityGossipContainer1_20_R3(v);
     }
 
     public static Entity fromNMS(net.minecraft.world.entity.Entity en) {
@@ -1556,15 +1574,15 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static CombatEntry fromNMS(Mob m, net.minecraft.world.damagesource.CombatEntry en) {
-        return new CombatEntry(m, fromNMS(en.getSource()), en.getTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getFallDistance(), en.getLocation() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.getLocation())), en.getAttacker() == null ? null : fromNMS(en.getAttacker()));
+        return new CombatEntry(m, fromNMS(en.source()), 0, 0, en.damage(), en.fallDistance(), en.fallLocation() == null ? null : CombatLocation.getByKey(NamespacedKey.minecraft(en.fallLocation().id())));
     }
 
     public static net.minecraft.world.damagesource.CombatEntry toNMS(CombatEntry en) {
-        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause(), en.getAttacker()), en.getCombatTime(), en.getHealthBeforeDamage(), en.getDamage(), en.getLocation().getKey().getKey(), en.getFallDistance());
+        return new net.minecraft.world.damagesource.CombatEntry(toNMS(en.getCause(), en.getAttacker()), en.getDamage(), new FallLocation(en.getLocation().getKey().getKey().toLowerCase()), en.getFallDistance());
     }
 
     @Override
-    public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_19_R2(m); }
+    public EntityCombatTracker getCombatTracker(Mob m) { return new EntityCombatTracker1_20_R3(m); }
 
     @Override
     public BehaviorResult hearNoteblock(Creature c, Location loc) {
@@ -1600,12 +1618,12 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             default -> new DragonHoverPhase(nms);
         };
 
-        return new DragonPhase1_19_R2(d, i);
+        return new DragonPhase1_20_R3(d, i);
     }
 
     @Override
     public DragonPhase getCurrentPhase(EnderDragon dragon) {
-        return new DragonPhase1_19_R2(dragon, toNMS(dragon).getPhaseManager().getCurrentPhase());
+        return new DragonPhase1_20_R3(dragon, toNMS(dragon).getPhaseManager().getCurrentPhase());
     }
 
     @Override
@@ -1615,6 +1633,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
         else if (c instanceof Axolotl) AxolotlAi.updateActivity((net.minecraft.world.entity.animal.axolotl.Axolotl) nms);
         else if (c instanceof Frog) FrogAi.updateActivity((net.minecraft.world.entity.animal.frog.Frog) nms);
         else if (c instanceof org.bukkit.entity.Warden) WardenAi.updateActivity((Warden) nms);
+        else if (c instanceof Camel) CamelAi.updateActivity((net.minecraft.world.entity.animal.camel.Camel) nms);
     }
 
     public static MemoryModuleType<?> toNMS(Memory<?> mem) {
@@ -1639,12 +1658,12 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public EntityNBT getNBTEditor(Mob m) {
-        return new EntityNBT1_19_R2(m);
+        return new EntityNBT1_20_R3(m);
     }
 
     public static net.minecraft.world.entity.ai.sensing.Sensor<?> toNMS(Sensor<?> s) {
-        if (s instanceof SensorDefault1_19_R2) return ((SensorDefault1_19_R2) s).getHandle();
-        return new Sensor1_19_R2(s);
+        if (s instanceof SensorDefault1_20_R3) return ((SensorDefault1_20_R3) s).getHandle();
+        return new Sensor1_20_R3(s);
     }
 
     public static SensorType<?> toNMSType(Sensor<?> s) {
@@ -1664,8 +1683,8 @@ final class ChipUtil1_19_R2 implements ChipUtil {
     }
 
     public static Sensor<?> fromNMS(net.minecraft.world.entity.ai.sensing.Sensor<?> type) {
-        if (type instanceof Sensor1_19_R2) return ((Sensor1_19_R2) type).getSensor();
-        return new SensorDefault1_19_R2(type);
+        if (type instanceof Sensor1_20_R3) return ((Sensor1_20_R3) type).getSensor();
+        return new SensorDefault1_20_R3(type);
     }
 
     public static NamespacedKey fromNMS(ResourceLocation loc) {
@@ -1702,7 +1721,7 @@ final class ChipUtil1_19_R2 implements ChipUtil {
 
     @Override
     public EntitySenses getSenses(Mob m) {
-        return new EntitySenses1_19_R2(m);
+        return new EntitySenses1_20_R3(m);
     }
 
     @Override

@@ -28,6 +28,7 @@ dependencies {
         "1_19_R3",
         "1_20_R1",
         "1_20_R2",
+        "1_20_R3"
     ).forEach {
         api(project(":mobchip-$it"))
     }
@@ -50,6 +51,7 @@ tasks {
             "1_19_R3",
             "1_20_R1",
             "1_20_R2",
+            "1_20_R3"
         ).forEach { dependsOn(":mobchip-$it:jar") }
     }
 

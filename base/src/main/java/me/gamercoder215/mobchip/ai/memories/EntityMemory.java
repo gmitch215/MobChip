@@ -392,6 +392,41 @@ public final class EntityMemory<T> implements Memory<T> {
      */
     public static final EntityMemory<Boolean> SNIFFER_HAPPY = new EntityMemory<>(Boolean.class, "sniffer_happy");
 
+    /**
+     * A Breeze's Jump Cooldown.
+     */
+    public static final EntityMemory<Unit> BREEZE_JUMP_COOLDOWN = new EntityMemory<>(Unit.class, "breeze_jump_cooldown"); 
+
+    /**
+     * A Breeze's Shooting Duration.
+     */
+    public static final EntityMemory<Unit> BREEZE_SHOOT = new EntityMemory<>(Unit.class, "breeze_shoot");
+
+    /**
+     * A Breeze's Charging duration for its Shooting.
+     */
+    public static final EntityMemory<Unit> BREEZE_SHOOT_CHARGING = new EntityMemory<>(Unit.class, "breeze_shoot_charging");
+
+    /**
+     * A Breeze's Recovery duration after Shooting.
+     */
+    public static final EntityMemory<Unit> BREEZE_SHOOT_RECOVERING = new EntityMemory<>(Unit.class, "breeze_shoot_recovering");
+
+    /**
+     * A Breeze's Shooting Cooldown.
+     */
+    public static final EntityMemory<Unit> BREEZE_SHOOT_COOLDOWN = new EntityMemory<>(Unit.class, "breeze_shoot_cooldown");
+
+    /**
+     * The duration of a Breeze's Inhaling before Jumping.
+     */
+    public static final EntityMemory<Unit> BREEZE_JUMP_INHALING = new EntityMemory<>(Unit.class, "breeze_jump_inhaling");
+
+    /**
+     * The location of where a Breeze should jump.
+     */
+    public static final EntityMemory<Location> BREEZE_JUMP_TARGET = new EntityMemory<>(Location.class, "breeze_jump_target");
+
     private final Class<T> bukkit;
 
     private final String key;
