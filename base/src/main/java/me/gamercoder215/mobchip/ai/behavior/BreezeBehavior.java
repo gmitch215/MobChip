@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.behavior;
 
+import me.gamercoder215.mobchip.ai.memories.EntityMemory;
 import me.gamercoder215.mobchip.ai.schedule.Updatable;
 
 /**
