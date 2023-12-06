@@ -839,6 +839,9 @@ final class ChipUtil1_19_R2 implements ChipUtil {
             if (w == null) w = Bukkit.getWorlds().get(0);
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
+        else if (nmsValue instanceof BlockPos p) {
+            value = new Location(m.getWorld(), p.getX(), p.getY(), p.getZ());
+        }
         else if (nmsValue instanceof List<?> li) {
             switch (key) {
                 case "secondary_job_site", "interactable_doors" -> {

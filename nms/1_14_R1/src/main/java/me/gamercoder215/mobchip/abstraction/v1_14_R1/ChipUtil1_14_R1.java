@@ -634,6 +634,10 @@ final class ChipUtil1_14_R1 implements ChipUtil {
             org.bukkit.World w = Bukkit.getWorld(DimensionManager.a(l.getDimensionManager()).getKey());
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
+        else if (nmsValue instanceof BlockPosition) {
+            BlockPosition p = (BlockPosition) nmsValue;
+            value = new Location(m.getWorld(), p.getX(), p.getY(), p.getZ());
+        }
         else if (nmsValue instanceof EntityHuman) {
             EntityHuman p = (EntityHuman) nmsValue;
             value = Bukkit.getPlayer(p.getUniqueID());

@@ -794,7 +794,7 @@ final class ChipUtil1_20_R3 implements ChipUtil {
 
         if (value instanceof Location l) {
             nmsValue = switch (key) {
-                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location" -> new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location", "breeze_jump_target" -> new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ());
                 default -> GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ()));
             };
         }
@@ -858,6 +858,9 @@ final class ChipUtil1_20_R3 implements ChipUtil {
             World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess().registryOrThrow(Registries.DIMENSION).get(l.dimension()).getWorld();
             if (w == null) w = Bukkit.getWorlds().get(0);
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
+        }
+        else if (nmsValue instanceof BlockPos p) {
+            value = new Location(m.getWorld(), p.getX(), p.getY(), p.getZ());
         }
         else if (nmsValue instanceof List<?> li) {
             switch (key) {
