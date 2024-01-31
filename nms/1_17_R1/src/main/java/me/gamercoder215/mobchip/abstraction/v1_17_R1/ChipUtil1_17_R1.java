@@ -184,6 +184,7 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Enderman.class, EntityEnderman.class)
             .put(Endermite.class, EntityEndermite.class)
             .put(Evoker.class, EntityEvoker.class)
+            .put(Fish.class, EntityFish.class)
             .put(Fox.class, EntityFox.class)
             .put(Ghast.class, EntityGhast.class)
             .put(Giant.class, EntityGiantZombie.class)
