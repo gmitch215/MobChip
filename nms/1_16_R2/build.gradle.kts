@@ -1,4 +1,4 @@
-val mcVersion = "1.16.2"
+val mcVersion = "1.16.3"
 
 dependencies {
     api(project(":mobchip-base"))
