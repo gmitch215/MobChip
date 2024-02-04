@@ -236,6 +236,7 @@ final class ChipUtil1_17_R1 implements ChipUtil {
             .put(Villager.class, EntityVillager.class)
             .put(Vindicator.class, EntityVindicator.class)
             .put(WanderingTrader.class, EntityVillagerTrader.class)
+            .put(WaterMob.class, EntityWaterAnimal.class)
             .put(Witch.class, EntityWitch.class)
             .put(Wither.class, EntityWither.class)
             .put(WitherSkeleton.class, EntitySkeletonWither.class)
