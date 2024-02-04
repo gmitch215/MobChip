@@ -1,12 +1,11 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
+import me.gamercoder215.mobchip.ai.SpeedModifier;
+import me.gamercoder215.mobchip.ai.controller.EntityController;
 import me.gamercoder215.mobchip.util.Position;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
-
-import me.gamercoder215.mobchip.ai.SpeedModifier;
-import me.gamercoder215.mobchip.ai.controller.EntityController;
 
 /**
  * Represents Entity Navigation.

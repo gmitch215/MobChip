@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.ai.navigation;
 
+import me.gamercoder215.mobchip.ai.SpeedModifier;
 import me.gamercoder215.mobchip.util.Position;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a Path for an Entity
  */
-public interface NavigationPath extends Iterable<Position> {
+public interface NavigationPath extends Iterable<Position>, SpeedModifier {
 
     /**
      * Whether this NavigationPath is complete.
