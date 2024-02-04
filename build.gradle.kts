@@ -238,8 +238,6 @@ subprojects {
                     "Implementation-Vendor" to pAuthor
                 )
             }
-            exclude("META-INF", "META-INF/**")
-
             archiveClassifier.set("")
             archiveFileName.set("${project.name}-${project.version}.jar")
         }
