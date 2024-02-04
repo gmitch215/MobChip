@@ -5,6 +5,8 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
+import net.minecraft.world.level.pathfinder.PathEntity;
+import net.minecraft.world.level.pathfinder.PathPoint;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,10 +74,18 @@ final class EntityNavigation1_17_R1 implements EntityNavigation {
         return this;
     }
 
+    private List<PathPoint> toNodes() {
+        List<PathPoint> nodes = new ArrayList<>();
+        for (Position p : this.points)
+            nodes.add(new PathPoint(p.getX(), p.getY(), p.getZ()));
+
+        return nodes;
+    }
+
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new NavigationPath1_17_R1(handle.a(finalPos, range, speedMod), m);
+        return new NavigationPath1_17_R1(new PathEntity(toNodes(), finalPos, true), m, speedMod);
     }
 
     @Override

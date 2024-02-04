@@ -124,6 +124,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
             .put(Animals.class, EntityAnimal.class)
             .put(Donkey.class, EntityHorseDonkey.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Fox.class, EntityFox.class)
             .put(Giant.class, EntityGiantZombie.class)
             .put(Golem.class, EntityGolem.class)
             .put(Husk.class, EntityZombieHusk.class)
@@ -687,7 +688,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
         if (nmsValue instanceof GlobalPos) {
             GlobalPos l = (GlobalPos) nmsValue;
             BlockPosition pos = l.getBlockPosition();
-            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().f.b(IRegistry.L).a(l.getDimensionManager()).getWorld();
+            World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().customRegistry.b(IRegistry.L).a(l.getDimensionManager()).getWorld();
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
         else if (nmsValue instanceof BlockPosition) {
@@ -1060,7 +1061,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
         return obj != null && obj;
     }
 
-    public static int getInt(PathfinderGoal o, String name) { 
+    public static int getInt(PathfinderGoal o, String name) {
         Integer obj = getObject(o, name, Integer.class);
         return obj == null ? 0 : obj;
     }
@@ -1346,7 +1347,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
         if (existsAttribute(key)) return null;
 
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        IRegistryWritable<AttributeBase> writable = server.aX().b(IRegistry.y);
+        IRegistryWritable<AttributeBase> writable = server.getCustomRegistry().b(IRegistry.y);
         ResourceKey<AttributeBase> nmsKey = ResourceKey.a(IRegistry.y, toNMS(key));
         Attribute1_16_R2 att = new Attribute1_16_R2(key, defaultV, min, max, client);
         writable.a(nmsKey, att, Lifecycle.stable());
@@ -1494,7 +1495,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
     @Override
     public void registerMemory(Memory<?> m) {
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        IRegistryWritable<MemoryModuleType<?>> writable = server.aX().b(IRegistry.D);
+        IRegistryWritable<MemoryModuleType<?>> writable = server.getCustomRegistry().b(IRegistry.D);
         ResourceKey<MemoryModuleType<?>> nmsKey = ResourceKey.a(IRegistry.D, toNMS(m.getKey()));
         writable.a(nmsKey, toNMS(m), Lifecycle.stable());
     }
@@ -1551,7 +1552,7 @@ final class ChipUtil1_16_R2 implements ChipUtil {
     @Override
     public void registerSensor(me.gamercoder215.mobchip.ai.sensing.Sensor<?> s) {
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        IRegistryWritable<SensorType<?>> writable = server.aX().b(IRegistry.E);
+        IRegistryWritable<SensorType<?>> writable = server.getCustomRegistry().b(IRegistry.E);
         ResourceKey<SensorType<?>> nmsKey = ResourceKey.a(IRegistry.E, toNMS(s.getKey()));
         writable.a(nmsKey, toNMSType(s), Lifecycle.stable());
     }

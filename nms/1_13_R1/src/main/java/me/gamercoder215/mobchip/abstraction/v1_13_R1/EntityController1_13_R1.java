@@ -6,6 +6,7 @@ import net.minecraft.server.v1_13_R1.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 final class EntityController1_13_R1 implements EntityController {
 
@@ -104,6 +105,18 @@ final class EntityController1_13_R1 implements EntityController {
         lookC.a(x, y, z, 0, 0);
         lookC.a();
         return this;
+    }
+
+    @Override
+    public @NotNull Vector getDeltaMovement() {
+        return new Vector(nms.motX, nms.motY, nms.motZ);
+    }
+
+    @Override
+    public void setDeltaMovement(@NotNull Vector delta) {
+        nms.motX = delta.getX();
+        nms.motY = delta.getY();
+        nms.motZ = delta.getZ();
     }
 
 }

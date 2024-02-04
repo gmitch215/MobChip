@@ -18,11 +18,13 @@ final class NavigationPath1_13_R1 implements NavigationPath {
     private String name;
     private final Mob m;
     private final PathEntity handle;
+    private double speedMod;
 
-    public NavigationPath1_13_R1(@NotNull PathEntity nms, @NotNull Mob m) {
+    public NavigationPath1_13_R1(@NotNull PathEntity nms, @NotNull Mob m, double speedMod) {
         this.m = m;
         this.name = "bukkitpath";
         this.handle = nms;
+        this.speedMod = speedMod;
     }
 
     private final List<Position> nodes = new ArrayList<>();
@@ -40,7 +42,7 @@ final class NavigationPath1_13_R1 implements NavigationPath {
             PathPoint[] pathPoints = (PathPoint[]) points.get(this.handle);
 
             PathPoint n = pathPoints[handle.e()];
-            new EntityController1_13_R1(m).moveTo(n.a, n.b, n.c);
+            new EntityController1_13_R1(m).moveTo(n.a, n.b, n.c, speedMod);
         } catch (Exception e) {
             ChipUtil.printStackTrace(e);
         }
@@ -143,5 +145,15 @@ final class NavigationPath1_13_R1 implements NavigationPath {
     @Override
     public int lastIndexOf(@Nullable Position o) {
         return nodes.lastIndexOf(o);
+    }
+
+    @Override
+    public double getSpeedModifier() {
+        return speedMod;
+    }
+
+    @Override
+    public void setSpeedModifier(double mod) {
+        this.speedMod = mod;
     }
 }

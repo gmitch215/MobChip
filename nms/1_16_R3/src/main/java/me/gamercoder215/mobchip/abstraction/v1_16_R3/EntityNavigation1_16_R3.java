@@ -5,6 +5,8 @@ import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.NavigationAbstract;
+import net.minecraft.server.v1_16_R3.PathEntity;
+import net.minecraft.server.v1_16_R3.PathPoint;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,12 +74,19 @@ final class EntityNavigation1_16_R3 implements EntityNavigation {
         return this;
     }
 
+    private List<PathPoint> toNodes() {
+        List<PathPoint> nodes = new ArrayList<>();
+        for (Position p : this.points)
+            nodes.add(new PathPoint(p.getX(), p.getY(), p.getZ()));
+
+        return nodes;
+    }
+
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new NavigationPath1_16_R3(handle.a(finalPos, range), m);
+        return new NavigationPath1_16_R3(new PathEntity(toNodes(), finalPos, true), m, speedMod);
     }
-
     @Override
     public EntityNavigation setFinalPoint(@NotNull Position node) {
         this.finalPos = new BlockPosition(node.getX(), node.getY(), node.getZ());

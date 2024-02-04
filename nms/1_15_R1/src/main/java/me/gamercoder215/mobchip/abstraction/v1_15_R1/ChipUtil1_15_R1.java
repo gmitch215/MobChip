@@ -123,6 +123,7 @@ final class ChipUtil1_15_R1 implements ChipUtil {
             .put(Animals.class, EntityAnimal.class)
             .put(Donkey.class, EntityHorseDonkey.class)
             .put(ElderGuardian.class, EntityGuardianElder.class)
+            .put(Fox.class, EntityFox.class)
             .put(Giant.class, EntityGiantZombie.class)
             .put(Golem.class, EntityGolem.class)
             .put(Husk.class, EntityZombieHusk.class)

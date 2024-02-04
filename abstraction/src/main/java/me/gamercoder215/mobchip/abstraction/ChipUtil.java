@@ -178,8 +178,28 @@ public interface ChipUtil {
         return types;
     }
 
+    static String bukkitToCraftBukkkit() {
+        String bukkit = Bukkit.getServer().getBukkitVersion().split("-")[0];
+        switch (bukkit) {
+            case "1.20.1": 
+                return "1_20_R1";
+            case "1.20.2": 
+                return "1_20_R2";
+            case "1.20.3":
+            case "1.20.4":
+                return "1_20_R3";
+            default:
+                throw new AssertionError("Invalid Version: " + bukkit);
+        }
+    }
+
     static String getServerVersion() {
-        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
+        try {
+            return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
+        } catch (IndexOutOfBoundsException e) {
+            // Using CraftBukkit Relocation
+            return bukkitToCraftBukkkit();
+        }
     }
 
     static ChipUtil getWrapper() {
