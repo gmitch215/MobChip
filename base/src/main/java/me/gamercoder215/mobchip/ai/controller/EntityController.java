@@ -3,6 +3,7 @@ package me.gamercoder215.mobchip.ai.controller;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public interface EntityController {
     
     /**
-     * Forces this Entity to jump.
+     * Forces this Entity to jump naturally.
      * @return this controller, for chaining
      */
     EntityController jump();
@@ -148,5 +149,77 @@ public interface EntityController {
      * @return true if looking, else false
      */
     boolean isLookingAtTarget();
+
+    /**
+     * Gets the Delta Movement of this Entity.
+     * @return Delta Movement
+     */
+    @NotNull
+    Vector getDeltaMovement();
+
+    /**
+     * Sets the Delta Movement of this Entity.
+     * <p>Delta Movement is a vector representing the current motion of an entity. You can use it to manually change the direction of motion for an entity without calculating for any collisions.</p>
+     * @param delta Delta Movement
+     */
+    void setDeltaMovement(@NotNull Vector delta);
+
+    /**
+     * Sets the Delta Movement of this Entity.
+     * @param x Δx
+     * @param y ΔY
+     * @param z ΔZ
+     */
+    default void setDeltaMovement(double x, double y, double z) {
+        setDeltaMovement(new Vector(x, y, z));
+    }
+
+    /**
+     * Gets the ΔX of this Entity.
+     * @return ΔX
+     */
+    default double getDeltaMovementX() {
+        return getDeltaMovement().getX();
+    }
+
+    /**
+     * Sets the ΔX of this Entity.
+     * @param x New ΔX
+     */
+    default void setDeltaMovementX(double x) {
+        setDeltaMovement(new Vector(x, getDeltaMovementY(), getDeltaMovementZ()));
+    }
+
+    /**
+     * Gets the ΔY of this Entity.
+     * @return ΔY
+     */
+    default double getDeltaMovementY() {
+        return getDeltaMovement().getY();
+    }
+
+    /**
+     * Sets the ΔY of this Entity.
+     * @param y New ΔY
+     */
+    default void setDeltaMovementY(double y) {
+        setDeltaMovement(new Vector(getDeltaMovementX(), y, getDeltaMovementZ()));
+    }
+
+    /**
+     * Gets the ΔZ of this Entity.
+     * @return ΔZ
+     */
+    default double getDeltaMovementZ() {
+        return getDeltaMovement().getZ();
+    }
+
+    /**
+     * Sets the ΔZ of this Entity.
+     * @param z New ΔZ
+     */
+    default void setDeltaMovementZ(double z) {
+        setDeltaMovement(new Vector(getDeltaMovementX(), getDeltaMovementY(), z));
+    }
     
 }

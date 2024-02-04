@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 final class EntityController1_17_R1 implements EntityController {
 
@@ -100,6 +101,18 @@ final class EntityController1_17_R1 implements EntityController {
         lookC.a(x, y, z);
         lookC.a();
         return this;
+    }
+
+    @Override
+    public @NotNull Vector getDeltaMovement() {
+        Vec3D delta = nms.getMot();
+        return new Vector(delta.getX(), delta.getY(), delta.getZ());
+    }
+
+    @Override
+    public void setDeltaMovement(@NotNull Vector delta) {
+        Vec3D vec = new Vec3D(delta.getX(), delta.getY(), delta.getZ());
+        nms.setMot(vec);
     }
 
 }
