@@ -1,6 +1,5 @@
 package me.gamercoder215.mobchip.abstraction.v1_15_R1;
 
-import me.gamercoder215.mobchip.abstraction.v1_14_R1.EntityController1_14_R1;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_15_R1.PathEntity;
