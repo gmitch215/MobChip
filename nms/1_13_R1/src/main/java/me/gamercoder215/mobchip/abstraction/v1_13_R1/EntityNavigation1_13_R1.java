@@ -3,7 +3,6 @@ package me.gamercoder215.mobchip.abstraction.v1_13_R1;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
-import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.NavigationAbstract;
 import net.minecraft.server.v1_13_R1.PathEntity;
 import net.minecraft.server.v1_13_R1.PathPoint;
@@ -20,7 +19,6 @@ final class EntityNavigation1_13_R1 implements EntityNavigation {
     private int speedMod;
     private int range;
     private final List<Position> points;
-    private BlockPosition finalPos;
 
     private final Mob m;
 
@@ -79,21 +77,15 @@ final class EntityNavigation1_13_R1 implements EntityNavigation {
         for (Position p : this.points)
             nodes.add(new PathPoint(p.getX(), p.getY(), p.getZ()));
 
-        nodes.add(new PathPoint(finalPos.getX(), finalPos.getY(), finalPos.getZ()));
-
         return nodes;
     }
 
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new NavigationPath1_13_R1(new PathEntity(toNodes().toArray(new PathPoint[0])), m, speedMod);
-    }
+        if (this.points.isEmpty()) throw new IllegalArgumentException("Path is empty");
 
-    @Override
-    public EntityNavigation setFinalPoint(@NotNull Position node) {
-        this.finalPos = new BlockPosition(node.getX(), node.getY(), node.getZ());
-        return this;
+        return new NavigationPath1_13_R1(new PathEntity(toNodes().toArray(new PathPoint[0])), m, speedMod);
     }
 
     @Override

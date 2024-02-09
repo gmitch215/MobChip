@@ -3,7 +3,6 @@ package me.gamercoder215.mobchip.abstraction.v1_20_R3;
 import me.gamercoder215.mobchip.ai.navigation.EntityNavigation;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
@@ -20,7 +19,6 @@ final class EntityNavigation1_20_R3 implements EntityNavigation {
     private int speedMod;
     private int range;
     private final List<Position> points;
-    private BlockPos finalPos;
 
     private final Mob m;
 
@@ -85,13 +83,9 @@ final class EntityNavigation1_20_R3 implements EntityNavigation {
     @Override
     @NotNull
     public NavigationPath buildPath() {
-        return new NavigationPath1_20_R3(new Path(toNodes(), finalPos, true), m, speedMod);
-    }
+        if (this.points.isEmpty()) throw new IllegalArgumentException("Path is empty");
 
-    @Override
-    public EntityNavigation setFinalPoint(@NotNull Position node) {
-        this.finalPos = new BlockPos(node.getX(), node.getY(), node.getZ());
-        return this;
+        return new NavigationPath1_20_R3(new Path(toNodes(), null, true), m, speedMod);
     }
 
     @Override

@@ -35,7 +35,7 @@ final class NavigationPath1_13_R1 implements NavigationPath {
     @Override
     public void advance() {
         try {
-            this.handle.a();
+            if (isDone()) throw new IllegalArgumentException("Path is already done");
 
             Field points = this.handle.getClass().getDeclaredField("a");
             points.setAccessible(true);
@@ -43,6 +43,8 @@ final class NavigationPath1_13_R1 implements NavigationPath {
 
             PathPoint n = pathPoints[handle.e()];
             new EntityController1_13_R1(m).moveTo(n.a, n.b, n.c, speedMod);
+
+            this.handle.a();
         } catch (Exception e) {
             ChipUtil.printStackTrace(e);
         }

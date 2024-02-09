@@ -32,9 +32,12 @@ final class NavigationPath1_19_R2 implements NavigationPath {
      */
     @Override
     public void advance() {
-        this.getHandle().advance();
+        if (isDone()) throw new IllegalArgumentException("Path is already done");
+
         Node n = handle.getNextNode();
         new EntityController1_19_R2(m).moveTo(n.x, n.y, n.z, speedMod);
+
+        this.getHandle().advance();
     }
 
     /**

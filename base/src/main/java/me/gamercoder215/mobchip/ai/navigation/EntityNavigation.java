@@ -19,7 +19,9 @@ public interface EntityNavigation extends SpeedModifier {
     /**
      * Recomputes this Entity's Path.
      * @return this class, for chaining
+     * @deprecated Called automatically by the internal EntityController
      */
+    @Deprecated
     EntityNavigation recompute();
 
     /**
@@ -122,42 +124,6 @@ public interface EntityNavigation extends SpeedModifier {
     }
 
     /**
-     * Sets the final point of this EntityNavigation.
-     * @param node Position to set
-     * @return this class, for chaining
-     */
-    EntityNavigation setFinalPoint(@NotNull Position node);
-
-    /**
-     * Sets the final point of this EntityNavigation.
-     * @param loc Location to set
-     * @return this class, for chaining
-     */
-    default EntityNavigation setFinalPoint(@NotNull Location loc) {
-        return setFinalPoint(new Position(loc));
-    }
-
-    /**
-     * Sets the final point of this EntityNavigation.
-     * @param x X coord
-     * @param y Y coord
-     * @param z Z coord
-     * @return this class, for chaining
-     */
-    default EntityNavigation setFinalPoint(int x, int y, int z) {
-        return setFinalPoint(new Position(x, y, z));
-    }
-
-    /**
-     * Sets the final point of this EntityNavigation.
-     * @param en Entity to set
-     * @return this class, for chaining
-     */
-    default EntityNavigation setFinalPoint(@NotNull Entity en) {
-        return setFinalPoint(en.getLocation());
-    }
-
-    /**
      * Sets the maximum range of this Navigation.
      * @param range Range of Navigation
      * @return this class, for chaining
@@ -173,7 +139,7 @@ public interface EntityNavigation extends SpeedModifier {
     /**
      * Constructs a NavigationPath.
      * @return Constructed NavigationPath
-     * @throws IllegalArgumentException if final point is missing
+     * @throws IllegalArgumentException if the Path is empty
      */
     NavigationPath buildPath() throws IllegalArgumentException;
 

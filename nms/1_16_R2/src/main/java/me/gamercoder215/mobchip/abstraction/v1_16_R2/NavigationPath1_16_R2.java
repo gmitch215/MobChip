@@ -32,9 +32,12 @@ final class NavigationPath1_16_R2 implements NavigationPath {
      */
     @Override
     public void advance() {
-        this.handle.a();
+        if (isDone()) throw new IllegalArgumentException("Path is already done");
+
         PathPoint n = handle.h();
         new EntityController1_16_R2(m).moveTo(n.a, n.b, n.c, speedMod);
+
+        this.handle.a();
     }
 
     /**

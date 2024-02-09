@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_15_R1;
 
+import me.gamercoder215.mobchip.abstraction.v1_14_R1.EntityController1_14_R1;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_15_R1.PathEntity;
@@ -32,9 +33,12 @@ final class NavigationPath1_15_R1 implements NavigationPath {
      */
     @Override
     public void advance() {
-        this.handle.a();
+        if (isDone()) throw new IllegalArgumentException("Path is already done");
+
         PathPoint n = handle.d().get(handle.f());
         new EntityController1_15_R1(m).moveTo(n.a, n.b, n.c, speedMod);
+
+        this.handle.a();
     }
 
     /**

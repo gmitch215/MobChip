@@ -48,8 +48,9 @@ public interface NavigationPath extends Iterable<Position>, SpeedModifier {
 
     /**
      * Advances this path.
+     * @throws IllegalArgumentException if {@link #isDone()} is true
      */
-    void advance();
+    void advance() throws IllegalArgumentException;
 
     /**
      * Converts this NavigationPath into an Array of Nodes.
