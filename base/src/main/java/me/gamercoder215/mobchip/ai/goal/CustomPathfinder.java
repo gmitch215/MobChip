@@ -24,7 +24,7 @@ public abstract class CustomPathfinder extends Pathfinder {
      * // public class LavaFloat extends CustomPathfinder {
      *
      * // This Pathfinder Goal will involve movement and jumping, so we have to add it as a flag
-     * public Set PathfinderFlag> getFlags() {
+     * getFlags() {
      *    return new PathfinderFlag[] { PathfinderFlag.MOVEMENT, PathfinderFlag.JUMPING; }
      * }
      * </pre>
