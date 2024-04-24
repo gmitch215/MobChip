@@ -1,22 +1,23 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val versions = listOf(
-    "1_13_R1",
-    "1_13_R2",
-    "1_14_R1",
-    "1_15_R1",
-    "1_16_R1",
-    "1_16_R2",
-    "1_16_R3",
-    "1_17_R1",
-    "1_18_R1",
-    "1_18_R2",
-    "1_19_R1",
-    "1_19_R2",
-    "1_19_R3",
-    "1_20_R1",
-    "1_20_R2",
-    "1_20_R3"
+val versions = mapOf(
+    "1_13_R1" to 8,
+    "1_13_R2" to 8,
+    "1_14_R1" to 8,
+    "1_15_R1" to 8,
+    "1_16_R1" to 8,
+    "1_16_R2" to 8,
+    "1_16_R3" to 8,
+    "1_17_R1" to 16,
+    "1_18_R1" to 17,
+    "1_18_R2" to 17,
+    "1_19_R1" to 17,
+    "1_19_R2" to 17,
+    "1_19_R3" to 17,
+    "1_20_R1" to 17,
+    "1_20_R2" to 17,
+    "1_20_R3" to 17,
+    "1_20_R4" to 21
 )
 
 dependencies {
@@ -31,7 +32,10 @@ dependencies {
     api(project(":mobchip-base"))
     api(project(":mobchip-abstraction"))
 
-    versions.forEach { api(project(":mobchip-$it")) }
+    versions.forEach {
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.toVersion(it.value)))
+            api(project(":mobchip-${it.key}"))
+    }
 }
 
 java {
@@ -42,7 +46,8 @@ sourceSets["main"].allJava.srcDir("src/main/javadoc")
 
 tasks {
     compileJava {
-        versions.subList(versions.indexOf("1_18_R1"), versions.size).forEach { dependsOn(project(":mobchip-$it").tasks["assemble"]) }
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17))
+            versions.filterValues { it >= 17 }.keys.forEach { dependsOn(project(":mobchip-$it").tasks["remap"]) }
     }
 
     javadoc {

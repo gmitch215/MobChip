@@ -14,8 +14,8 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.9.5-SNAPSHOT"
-val pAuthor = "GamerCoder215"
+val pVersion = "1.10.0-SNAPSHOT"
+val pAuthor = "gmitch215"
 
 val github = "$pAuthor/MobChip"
 
@@ -102,9 +102,8 @@ allprojects {
                         developer {
                             id.set(pAuthor)
                             roles.add("Owner")
-                            email.set("gamer@gamercoder.me")
+                            email.set("me@gmitch215.xyz")
                             organization.set("Team Inceptus")
-                            organizationUrl.set("https://teaminceptus.us")
                         }
                     }
 
