@@ -34,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [17, 18, 19]
+        java-version: [8, 11, 16, 17, 21]
 
     name: Build Java ${{ matrix.java-version }}
     steps:
