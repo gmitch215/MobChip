@@ -188,6 +188,8 @@ public interface ChipUtil {
             case "1.20.3":
             case "1.20.4":
                 return "1_20_R3";
+            case "1.20.5":
+                return "1_20_R4";
             default:
                 throw new AssertionError("Invalid Version: " + bukkit);
         }
