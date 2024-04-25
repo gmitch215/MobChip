@@ -21,8 +21,8 @@ val github = "$pAuthor/MobChip"
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "${pAuthor}_MobChip")
-        property("sonar.organization", "gamercoder215")
+        property("sonar.projectKey", "GamerCoder215_MobChip")
+        property("sonar.organization", "gmitch215")
         property("sonar.host.url", "https://sonarcloud.io")
     }
 }
