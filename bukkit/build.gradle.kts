@@ -46,8 +46,11 @@ sourceSets["main"].allJava.srcDir("src/main/javadoc")
 
 tasks {
     compileJava {
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17))
-            versions.filterValues { it >= 17 }.keys.forEach { dependsOn(project(":mobchip-$it").tasks["remap"]) }
+        for (version in versions) {
+            if (JavaVersion.current().isCompatibleWith(JavaVersion.toVersion(version.value)) && version.value >= 17) {
+                dependsOn(project(":mobchip-${version.key}").tasks["remap"])
+            }
+        }
     }
 
     javadoc {
