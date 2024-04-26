@@ -1501,7 +1501,6 @@ final class ChipUtil1_19_R1 implements ChipUtil {
 
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
-        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = Registry.ATTRIBUTE.get(toNMS(a.getKey()));
         return getOrCreateInstance(m, a);
     }
 
