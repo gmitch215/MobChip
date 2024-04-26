@@ -505,13 +505,17 @@ public interface EntityBody {
     /**
      * Fetches the maximum block height this entity can walk up without jumping.
      * @return Maximum step height
+     * @deprecated Exposed in Minecraft 1.20.5 via Attribute#STEP_HEIGHT
      */
+    @Deprecated
     float getMaxUpStep();
 
     /**
      * Sets the maximum block height this entity can walk up without jumping.
      * @param maxUpStep Maximum step height
+     * @deprecated Exposed in Minecraft 1.20.5 via Attribute#STEP_HEIGHT
      */
+    @Deprecated
     void setMaxUpStep(float maxUpStep);
     
     /**

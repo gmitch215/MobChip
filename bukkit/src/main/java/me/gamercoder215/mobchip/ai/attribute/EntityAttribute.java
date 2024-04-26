@@ -67,6 +67,43 @@ public final class EntityAttribute implements Attribute {
      * Represents {@link org.bukkit.attribute.Attribute#HORSE_JUMP_STRENGTH}
      */
     public static final Attribute HORSE_JUMP_STRENGTH = wrapper.getDefaultAttribute("horse.jump_strength");
+    /**
+     * Represents Attribute#GENERIC_MAX_ABSORPTION
+     */
+    public static final Attribute MAX_ABSORPTION = wrapper.getDefaultAttribute("generic.max_absorption");
+    /**
+     * Represents Attribute#GENERIC_GRAVITY
+     */
+    public static final Attribute GRAVITY = wrapper.getDefaultAttribute("generic.gravity");
+    /**
+     * Represents Attribute#GENERIC_SCALE
+     */
+    public static final Attribute SCALE = wrapper.getDefaultAttribute("generic.scale");
+    /**
+     * Represents Attribute#GENERIC_STEP_HEIGHT
+     */
+    public static final Attribute STEP_HEIGHT = wrapper.getDefaultAttribute("generic.step_height");
+    /**
+     * Represents Attribute#SAFE_FALL_DISTANCE
+     */
+    public static final Attribute SAFE_FALL_DISTANCE = wrapper.getDefaultAttribute("generic.safe_fall_distance");
+    /**
+     * Represents Attribute#FALL_DAMAGE_MULTIPLIER
+     */
+    public static final Attribute FALL_DAMAGE_MULTIPLIER = wrapper.getDefaultAttribute("generic.fall_damage_multiplier");
+    /**
+     * Represents Attribute#BLOCK_INTERACTION_RANGE
+     */
+    public static final Attribute BLOCK_INTERACTION_RANGE = wrapper.getDefaultAttribute("player.block_interaction_range");
+    /**
+     * Represents Attribute#ENTITY_INTERACTION_RANGE
+     */
+    public static final Attribute ENTITY_INTERACTION_RANGE = wrapper.getDefaultAttribute("player.entity_interaction_range");
+    /**
+     * Represents Attribute#BLOCK_BREAK_SPEED
+     */
+    public static final Attribute BLOCK_BREAK_SPEED = wrapper.getDefaultAttribute("player.block_break_speed");
+
 
     /**
      * Converts a Bukkit Attribute to a MobChip Attribute.
