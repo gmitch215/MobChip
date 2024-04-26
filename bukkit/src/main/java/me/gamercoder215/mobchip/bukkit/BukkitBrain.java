@@ -259,7 +259,9 @@ public class BukkitBrain implements EntityBrain {
 	 * @param <T> Memory Type
 	 */
 	@Override
-	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value) throws IllegalArgumentException {
+	public <T> void setMemory(@NotNull Memory<T> memory, @Nullable T value) throws IllegalArgumentException {
+		if (value == null) removeMemory(memory);
+
 		Object old = getMemory(memory);
 		w.setMemory(m, memory, value);
 
@@ -278,7 +280,9 @@ public class BukkitBrain implements EntityBrain {
 	 * @param <T> Memory Type
 	 */
 	@Override
-	public <T> void setMemory(@NotNull Memory<T> memory, @NotNull T value, long expire) throws IllegalArgumentException {
+	public <T> void setMemory(@NotNull Memory<T> memory, @Nullable T value, long expire) throws IllegalArgumentException {
+		if (value == null) removeMemory(memory);
+
 		Object old = getMemory(memory);
 		w.setMemory(m, memory, value, expire);
 

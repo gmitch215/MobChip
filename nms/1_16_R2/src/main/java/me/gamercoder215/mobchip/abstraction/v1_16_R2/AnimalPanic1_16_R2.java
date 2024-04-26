@@ -25,7 +25,9 @@ final class AnimalPanic1_16_R2 extends Behavior<EntityCreature> {
         c.getBehaviorController().removeMemory(MemoryModuleType.WALK_TARGET);
     }
 
-    protected void stop(WorldServer w, EntityCreature c, long var2) {}
+    protected void stop(WorldServer w, EntityCreature c, long var2) {
+        // Do nothing
+    }
 
     protected void tick(WorldServer w, EntityCreature c, long var2) {
         if (c.getNavigation().m()) {

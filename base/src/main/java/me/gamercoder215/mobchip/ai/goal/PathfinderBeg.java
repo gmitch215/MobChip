@@ -25,6 +25,7 @@ public final class PathfinderBeg extends Pathfinder implements Ranged {
 	 */
 	public PathfinderBeg(@NotNull Wolf w, float lookRange) {
 		super(w);
+		this.lookRange = lookRange;
 	}
 
 	@Override

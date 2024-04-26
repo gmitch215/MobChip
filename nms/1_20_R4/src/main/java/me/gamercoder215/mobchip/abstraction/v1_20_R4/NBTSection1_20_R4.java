@@ -6,7 +6,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.*;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
@@ -50,48 +51,49 @@ class NBTSection1_20_R4 implements NBTSection {
             return tag;
         }
 
-        if (v instanceof Collection<?>) {
-            List<?> collection = new ArrayList<>((Collection<?>) v);
-            CompoundTag coll = new CompoundTag();
+        switch (v) {
+            case Collection<?> objects -> {
+                List<?> collection = new ArrayList<>(objects);
+                CompoundTag coll = new CompoundTag();
 
-            try {
-                coll.putString(ChipUtil.CLASS_TAG, Collection.class.getName());
-                ListTag tag = new ListTag();
-                for (int i = 0; i < collection.size(); i++) tag.add(i, serialize(collection.get(i)));
-                coll.put("values", tag);
+                try {
+                    coll.putString(ChipUtil.CLASS_TAG, Collection.class.getName());
+                    ListTag tag = new ListTag();
+                    for (int i = 0; i < collection.size(); i++) tag.add(i, serialize(collection.get(i)));
+                    coll.put("values", tag);
 
-                Field idF = ListTag.class.getDeclaredField("w");
-                idF.setAccessible(true);
+                    Field idF = ListTag.class.getDeclaredField("w");
+                    idF.setAccessible(true);
 
-                coll.putByte("id", idF.getByte(tag));
-            } catch (ReflectiveOperationException e) {
-                Bukkit.getLogger().severe("Failed to serialize collection: " + e.getMessage());
-                for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                    coll.putByte("id", idF.getByte(tag));
+                } catch (ReflectiveOperationException e) {
+                    Bukkit.getLogger().severe("Failed to serialize collection: " + e.getMessage());
+                    for (StackTraceElement ste : e.getStackTrace()) Bukkit.getLogger().severe(ste.toString());
+                }
+
+                return coll;
             }
-
-            return coll;
-        }
-
-        if (v instanceof Map<?, ?> map) {
-            CompoundTag tag = new CompoundTag();
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                tag.put(entry.getKey().toString(), serialize(entry.getValue()));
+            case Map<?, ?> map -> {
+                CompoundTag tag = new CompoundTag();
+                for (Map.Entry<?, ?> entry : map.entrySet()) {
+                    tag.put(entry.getKey().toString(), serialize(entry.getValue()));
+                }
+                return tag;
             }
-            return tag;
-        }
-
-        if (v instanceof Enum<?> enumeration) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString(ChipUtil.CLASS_TAG, enumeration.getClass().getName());
-            tag.putString("value", ((Enum<?>) v).name());
-            return tag;
-        }
-
-        if (v instanceof ConfigurationSerializable serializable) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString(ChipUtil.CLASS_TAG, serializable.getClass().getName());
-            tag.put("value", serialize(serializable.serialize()));
-            return tag;
+            case Enum<?> enumeration -> {
+                CompoundTag tag = new CompoundTag();
+                tag.putString(ChipUtil.CLASS_TAG, enumeration.getClass().getName());
+                tag.putString("value", ((Enum<?>) v).name());
+                return tag;
+            }
+            case ConfigurationSerializable serializable -> {
+                CompoundTag tag = new CompoundTag();
+                tag.putString(ChipUtil.CLASS_TAG, serializable.getClass().getName());
+                tag.put("value", serialize(serializable.serialize()));
+                return tag;
+            }
+            default -> {
+            }
         }
 
         return switch (v.getClass().getSimpleName().toLowerCase()) {
@@ -121,7 +123,7 @@ class NBTSection1_20_R4 implements NBTSection {
                 ItemStack item = (ItemStack) v;
                 CompoundTag stack = new CompoundTag();
                 stack.putString(ChipUtil.CLASS_TAG, item.getClass().getName());
-                stack.put("item", CraftItemStack.asNMSCopy(item).getOrCreateTag());
+                stack.put("item", CraftItemStack.asNMSCopy(item).saveOptional(CraftRegistry.getMinecraftRegistry()));
 
                 yield stack;
             }
@@ -238,7 +240,9 @@ class NBTSection1_20_R4 implements NBTSection {
                         }
                         case "itemstack" -> {
                             CompoundTag item = cmp.getCompound("item");
-                            yield CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.of(item));
+                            Optional<ItemStack> stack = net.minecraft.world.item.ItemStack.parse(CraftRegistry.getMinecraftRegistry(), item)
+                                    .map(CraftItemStack::asBukkitCopy);
+                            yield stack.orElse(null);
                         }
                         case "location" -> {
                             String world = cmp.getString("world");

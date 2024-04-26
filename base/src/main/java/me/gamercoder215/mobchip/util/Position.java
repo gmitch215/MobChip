@@ -87,11 +87,11 @@ public final class Position implements Cloneable {
      * @return distance squared
      */
     public double distanceSquared(@NotNull Position node) {
-        double x = this.x - node.x;
-        double y = this.y - node.y;
-        double z = this.z - node.z;
+        int x = this.x - node.x;
+        int y = this.y - node.y;
+        int z = this.z - node.z;
 
-        return x * x + y * y + z * z;
+        return (x * x) + (y * y) + (z * z);
     }
     
     /**
@@ -309,10 +309,6 @@ public final class Position implements Cloneable {
 
     @Override
     public Position clone() {
-        try {
-            return (Position) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error(e);
-        }
+        return new Position(x, y, z);
     }
 }

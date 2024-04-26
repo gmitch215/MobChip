@@ -21,10 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a Boss Entity.
@@ -51,7 +48,7 @@ public abstract class Boss<T extends Mob> {
     private float pitch;
     
 	private double health = DEFAULT_HEALTH;
-	private final Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
+	private final Map<EquipmentSlot, ItemStack> equipment = new EnumMap<>(EquipmentSlot.class);
 
 	private final Map<AttributeInstance, Double> attributes = new HashMap<>();
 
@@ -237,7 +234,7 @@ public abstract class Boss<T extends Mob> {
                                 Bukkit.getLogger().severe(e.getCause().getMessage());
                                 for (StackTraceElement s : e.getCause().getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             } catch (Exception e) {
-                                                    Bukkit.getLogger().severe(e.getMessage());
+                                Bukkit.getLogger().severe(e.getMessage());
                                 for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe(s.toString());
                             }
                         }

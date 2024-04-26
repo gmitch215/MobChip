@@ -118,8 +118,10 @@ public final class PathfinderTempt extends Pathfinder implements SpeedModifier {
      * @param items Array of Items to use
      * @throws IllegalArgumentException if Items are null or empty
      */
-    public void setItems(@NotNull ItemStack... items) throws IllegalArgumentException
-    { if (items == null) throw new IllegalArgumentException("Items cannot be null"); setItems(Arrays.asList(items)); }
+    public void setItems(@NotNull ItemStack... items) throws IllegalArgumentException {
+        if (items == null) throw new IllegalArgumentException("Items cannot be null");
+        setItems(Arrays.asList(items));
+    }
 
     @Override
     public double getSpeedModifier() {
