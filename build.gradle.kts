@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("org.sonarqube") version "4.0.0.2929"
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("io.github.goooler.shadow") version "8.1.7" apply false
     kotlin("jvm") version "1.9.23"
 
     java
@@ -151,7 +151,7 @@ subprojects {
     apply<JacocoPlugin>()
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.sonarqube")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "io.github.goooler.shadow")
 
     dependencies {
         testImplementation("org.mockito:mockito-core:5.11.0")
@@ -170,6 +170,10 @@ subprojects {
     }
 
     tasks {
+        clean {
+            delete("logs")
+        }
+
         compileJava {
             options.encoding = "UTF-8"
             options.isDeprecation = false
