@@ -1,5 +1,8 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.github.patrick.gradle.remapper.RemapTask
+
 plugins {
-    id("xyz.gmitch215.specialsource-gradle") version "1.0.0"
+    id("io.github.patrick.remapper") version "1.4.1"
 }
 
 val mcVersion = "1.20.1"
@@ -30,7 +33,9 @@ tasks {
     remap {
         dependsOn("shadowJar")
 
-        inputTaskName.set("shadowJar")
-        archiveFileName.set("${project.name}-${project.version}.jar")
+        inputTask.set(getByName<ShadowJar>("shadowJar"))
+        version.set(mcVersion)
+        action.set(RemapTask.Action.MOJANG_TO_SPIGOT)
+        archiveName.set("${project.name}-${project.version}.jar")
     }
 }
