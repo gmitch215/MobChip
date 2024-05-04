@@ -269,10 +269,12 @@ final class ChipUtil1_19_R1 implements ChipUtil {
         try {
             // Sometimes we can get lucky...
             nms = Class.forName(PathfinderMob.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
-
-            // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
-        } catch (ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {
+            try {
+                // Some Pre-Mojang Mapping Classes start with "Entity"
+                if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
+            } catch (ClassNotFoundException ignored2) {}
+        }
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
 

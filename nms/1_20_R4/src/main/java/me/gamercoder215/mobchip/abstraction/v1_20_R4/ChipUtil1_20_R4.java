@@ -188,6 +188,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
             .put(Animals.class, Animal.class)
             .put(Allay.class, net.minecraft.world.entity.animal.allay.Allay.class)
             .put(Ambient.class, AmbientCreature.class)
+            .put(Armadillo.class, net.minecraft.world.entity.animal.armadillo.Armadillo.class)
             .put(Axolotl.class, net.minecraft.world.entity.animal.axolotl.Axolotl.class)
             .put(Bat.class, net.minecraft.world.entity.ambient.Bat.class)
             .put(Bee.class, net.minecraft.world.entity.animal.Bee.class)
@@ -282,10 +283,12 @@ final class ChipUtil1_20_R4 implements ChipUtil {
         try {
             // Sometimes we can get lucky...
             nms = Class.forName(PathfinderMob.class.getPackageName() + "." + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
-
-            // Some Pre-Mojang Mapping Classes start with "Entity"
-            if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
-        } catch (ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {
+            try {
+                // Some Pre-Mojang Mapping Classes start with "Entity"
+                if (nms == null) nms = Class.forName(PathfinderMob.class.getPackageName() + ".Entity" + clazz.getSimpleName()).asSubclass(net.minecraft.world.entity.LivingEntity.class);
+            } catch (ClassNotFoundException ignored2) {}
+        }
 
         if (nms == null) throw new AssertionError("Could not convert " + clazz.getName() + " to NMS class");
 
