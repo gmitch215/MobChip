@@ -54,7 +54,7 @@ public interface ChipUtil {
         getGoals(mob, target).forEach(w -> removePathfinder(w.getPathfinder(), target));
     }
 
-    default void addPathfinders(Collection<? extends WrappedPathfinder> c, boolean target) {
+    default void addPathfinders(Collection<WrappedPathfinder> c, boolean target) {
         for (WrappedPathfinder p : c) addPathfinder(p.getPathfinder(), p.getPriority(), target);
     }
 
@@ -178,7 +178,7 @@ public interface ChipUtil {
         return types;
     }
 
-    static String bukkitToCraftBukkkit() {
+    static String bukkitToCraftBukkit() {
         String bukkit = Bukkit.getServer().getBukkitVersion().split("-")[0];
         switch (bukkit) {
             case "1.20.1": 
@@ -188,6 +188,8 @@ public interface ChipUtil {
             case "1.20.3":
             case "1.20.4":
                 return "1_20_R3";
+            case "1.20.5":
+                return "1_20_R4";
             default:
                 throw new AssertionError("Invalid Version: " + bukkit);
         }
@@ -198,7 +200,7 @@ public interface ChipUtil {
             return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
         } catch (IndexOutOfBoundsException e) {
             // Using CraftBukkit Relocation
-            return bukkitToCraftBukkkit();
+            return bukkitToCraftBukkit();
         }
     }
 
@@ -217,7 +219,8 @@ public interface ChipUtil {
 
     static void printStackTrace(Throwable e) {
         Bukkit.getLogger().severe(e.getClass().getName() + ": " + e.getMessage());
-        for (StackTraceElement s : e.getStackTrace()) Bukkit.getLogger().severe("    " + s.toString());
+        for (StackTraceElement s : e.getStackTrace())
+            Bukkit.getLogger().severe(s.toString());
         if (e.getCause() != null) {
             Bukkit.getLogger().severe("Caused by:");
             printStackTrace(e.getCause());

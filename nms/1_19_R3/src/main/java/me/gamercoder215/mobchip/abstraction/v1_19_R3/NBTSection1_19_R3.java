@@ -74,7 +74,7 @@ class NBTSection1_19_R3 implements NBTSection {
 
         if (v instanceof Map<?, ?> map) {
             CompoundTag tag = new CompoundTag();
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
                 tag.put(entry.getKey().toString(), serialize(entry.getValue()));
             }
             return tag;

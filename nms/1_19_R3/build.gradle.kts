@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.github.patrick.gradle.remapper.RemapTask
 
 plugins {
-    id("io.github.patrick.remapper") version "1.4.0"
+    id("io.github.patrick.remapper") version "1.4.1"
 }
 
 val mcVersion = "1.19.4"

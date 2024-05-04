@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("org.sonarqube") version "4.0.0.2929"
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("io.github.goooler.shadow") version "8.1.7" apply false
     kotlin("jvm") version "1.9.23"
 
     java
@@ -14,15 +14,15 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.9.5-SNAPSHOT"
-val pAuthor = "GamerCoder215"
+val pVersion = "1.10.0-SNAPSHOT"
+val pAuthor = "gmitch215"
 
 val github = "$pAuthor/MobChip"
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "${pAuthor}_MobChip")
-        property("sonar.organization", "gamercoder215")
+        property("sonar.projectKey", "GamerCoder215_MobChip")
+        property("sonar.organization", "gmitch215")
         property("sonar.host.url", "https://sonarcloud.io")
     }
 }
@@ -102,9 +102,8 @@ allprojects {
                         developer {
                             id.set(pAuthor)
                             roles.add("Owner")
-                            email.set("gamer@gamercoder.me")
+                            email.set("me@gmitch215.xyz")
                             organization.set("Team Inceptus")
-                            organizationUrl.set("https://teaminceptus.us")
                         }
                     }
 
@@ -152,7 +151,7 @@ subprojects {
     apply<JacocoPlugin>()
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.sonarqube")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "io.github.goooler.shadow")
 
     dependencies {
         testImplementation("org.mockito:mockito-core:5.11.0")
@@ -171,6 +170,10 @@ subprojects {
     }
 
     tasks {
+        clean {
+            delete("logs")
+        }
+
         compileJava {
             options.encoding = "UTF-8"
             options.isDeprecation = false
@@ -200,16 +203,6 @@ subprojects {
                 events("passed", "skipped", "failed")
             }
             finalizedBy(jacocoTestReport)
-        }
-
-        jacocoTestReport {
-            reports {
-                xml.required.set(false)
-                csv.required.set(false)
-
-                html.required.set(true)
-                html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-            }
         }
 
         javadoc {

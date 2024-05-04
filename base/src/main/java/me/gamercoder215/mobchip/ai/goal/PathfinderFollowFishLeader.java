@@ -23,6 +23,6 @@ public final class PathfinderFollowFishLeader extends Pathfinder {
 
     @Override
     public String getInternalName() {
-        return "FollowFlockLeaderGoal";
+        return "PathfinderGoalFishSchool";
     }
 }

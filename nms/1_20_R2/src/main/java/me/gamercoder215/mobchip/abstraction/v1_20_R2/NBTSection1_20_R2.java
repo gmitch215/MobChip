@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"unchecked", "deprecation"})
+@SuppressWarnings("unchecked")
 class NBTSection1_20_R2 implements NBTSection {
 
     private final CompoundTag tag;
@@ -74,7 +74,7 @@ class NBTSection1_20_R2 implements NBTSection {
 
         if (v instanceof Map<?, ?> map) {
             CompoundTag tag = new CompoundTag();
-            for (Map.Entry<?, ?> entry : ((Map<?, ?>) v).entrySet()) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
                 tag.put(entry.getKey().toString(), serialize(entry.getValue()));
             }
             return tag;

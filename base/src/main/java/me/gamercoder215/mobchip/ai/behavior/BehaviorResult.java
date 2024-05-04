@@ -16,7 +16,9 @@ public abstract class BehaviorResult {
             return Status.STOPPED;
         }
         @Override
-        public void stop() {}
+        public void stop() {
+            // Do nothing
+        }
     };
 
     /**
