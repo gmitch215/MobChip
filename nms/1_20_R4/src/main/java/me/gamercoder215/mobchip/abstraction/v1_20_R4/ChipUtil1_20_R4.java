@@ -193,6 +193,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
             .put(Bat.class, net.minecraft.world.entity.ambient.Bat.class)
             .put(Bee.class, net.minecraft.world.entity.animal.Bee.class)
             .put(Blaze.class, net.minecraft.world.entity.monster.Blaze.class)
+            .put(Bogged.class, net.minecraft.world.entity.monster.Bogged.class)
             .put(Breeze.class, net.minecraft.world.entity.monster.breeze.Breeze.class)
             .put(Cat.class, net.minecraft.world.entity.animal.Cat.class)
             .put(Camel.class, net.minecraft.world.entity.animal.camel.Camel.class)
