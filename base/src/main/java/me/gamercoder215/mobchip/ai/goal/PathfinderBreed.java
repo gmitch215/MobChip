@@ -30,7 +30,7 @@ public final class PathfinderBreed extends Pathfinder implements SpeedModifier {
 	}
 
 	@Override
-	public Animals getEntity() { return (Animals) entity; }
+	public @NotNull Animals getEntity() { return (Animals) entity; }
 
 	@Override
 	public double getSpeedModifier() {

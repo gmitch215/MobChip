@@ -43,7 +43,7 @@ public abstract class CustomSensor<T extends LivingEntity> implements Sensor<T> 
     }
 
     @Override
-    public final Class<T> getEntityClass() {
+    public final @NotNull Class<T> getEntityClass() {
         return entityClass;
     }
 

@@ -28,6 +28,7 @@ import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
+import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
@@ -69,6 +70,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
@@ -1623,5 +1625,9 @@ final class ChipUtil1_18_R1 implements ChipUtil {
         net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
         if (nms.nearestCrystal == null) return null;
         return (EnderCrystal) nms.nearestCrystal.getBukkitEntity();
+    }
+
+    public static Position fromNMS(Node point) {
+        return new Position(point.x, point.y, point.z);
     }
 }

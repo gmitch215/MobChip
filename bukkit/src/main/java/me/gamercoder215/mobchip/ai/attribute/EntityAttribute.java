@@ -190,7 +190,6 @@ public final class EntityAttribute implements Attribute {
      * @param key Key of the Attribute
      * @return true if attribute exists, else false
      */
-    @Nullable
     public static boolean exists(@Nullable NamespacedKey key) {
         return getAttribute(key) != null;
     }

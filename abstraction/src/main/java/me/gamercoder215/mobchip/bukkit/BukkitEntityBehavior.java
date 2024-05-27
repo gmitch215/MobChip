@@ -30,7 +30,7 @@ class BukkitEntityBehavior implements EntityBehavior {
     }
     
     @Override
-    public BehaviorResult backupIfClose(int min, float speedMod) {
+    public @NotNull BehaviorResult backupIfClose(int min, float speedMod) {
         return run("BehaviorRetreat", min, speedMod);
     }
 

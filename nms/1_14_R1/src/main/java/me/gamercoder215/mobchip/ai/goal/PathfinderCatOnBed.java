@@ -35,7 +35,7 @@ public final class PathfinderCatOnBed extends Pathfinder implements SpeedModifie
 	}
 
 	@Override
-	public Cat getEntity() { return (Cat) entity; }
+	public @NotNull Cat getEntity() { return (Cat) entity; }
 	
 	@Override
 	public float getRange() {

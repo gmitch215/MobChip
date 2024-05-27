@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.Consumer;
 
+@SuppressWarnings("deprecation")
 final class EntityScheduleManager1_16_R2 implements EntityScheduleManager {
 
     private final EntityInsentient nmsMob;

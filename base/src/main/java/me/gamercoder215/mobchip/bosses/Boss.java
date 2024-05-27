@@ -277,7 +277,6 @@ public abstract class Boss<T extends Mob> {
      * Sets the Death Sound.
      * @param s New Death Sound, or Null to reset
      */
-    @NotNull
     public final void setSpawnSound(@Nullable Sound s) {
         if (s == null) this.spawnSound = s; else this.spawnSound = Sound.ENTITY_WITHER_SPAWN;
     }

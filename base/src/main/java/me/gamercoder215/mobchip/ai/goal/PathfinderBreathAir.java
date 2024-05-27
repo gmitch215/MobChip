@@ -17,7 +17,7 @@ public final class PathfinderBreathAir extends Pathfinder {
 	}
 
 	@Override
-	public Creature getEntity() { return (Creature) entity; }
+	public @NotNull Creature getEntity() { return (Creature) entity; }
 
 	@Override
 	public @NotNull PathfinderFlag[] getFlags() {

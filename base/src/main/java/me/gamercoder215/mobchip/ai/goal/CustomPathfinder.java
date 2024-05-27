@@ -1,6 +1,7 @@
 package me.gamercoder215.mobchip.ai.goal;
 
 import org.bukkit.entity.Mob;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -111,7 +112,7 @@ public abstract class CustomPathfinder extends Pathfinder {
     /**
      * @deprecated Internal Use only
      */
-    @Deprecated
+    @ApiStatus.Internal
     public String getInternalName() {
         return "CustomPathfinder";
     }

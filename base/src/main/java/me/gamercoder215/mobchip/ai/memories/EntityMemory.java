@@ -441,6 +441,7 @@ public final class EntityMemory<T> implements Memory<T> {
      * @return Bukkit Class
      */
     @Override
+    @NotNull
     public Class<T> getBukkitClass() {
     	return this.bukkit;
     }

@@ -58,9 +58,13 @@ public abstract class CustomPhase implements DragonPhase {
 
     public void clientTick() {}
 
-    public void onCrystalDestroyed(EnderCrystal c, EntityDamageEvent.DamageCause cause, @Nullable Player p) {}
+    public void onCrystalDestroyed(EnderCrystal c, EntityDamageEvent.DamageCause cause, @Nullable Player p) {
+        DragonPhase.super.onCrystalDestroyed(c, cause, p);
+    }
 
-    public float onDamage(EntityDamageEvent.DamageCause cause, float amount) { return amount; }
+    public float onDamage(EntityDamageEvent.DamageCause cause, float amount) {
+        return DragonPhase.super.onDamage(cause, amount);
+    }
 
     public boolean isSitting() {
         return false;

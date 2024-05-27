@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PathfinderBeg extends Pathfinder implements Ranged {
 	
-	private float lookRange = DEFAULT_LOOK_RANGE;
+	private float lookRange;
 	
 	/**
 	 * Constructs a PathfinderBeg with the default look range.
@@ -29,7 +29,7 @@ public final class PathfinderBeg extends Pathfinder implements Ranged {
 	}
 
 	@Override
-	public Wolf getEntity() { return (Wolf) entity; }
+	public @NotNull Wolf getEntity() { return (Wolf) entity; }
 
 	/**
 	 * Get the look range of this PathfinderBeg.

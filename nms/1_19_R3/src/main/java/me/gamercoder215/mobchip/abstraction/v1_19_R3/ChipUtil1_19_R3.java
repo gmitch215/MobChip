@@ -77,6 +77,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
@@ -744,13 +745,9 @@ final class ChipUtil1_19_R3 implements ChipUtil {
     }
 
     private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause) {
-        return fromType(key, cause, null);
-    }
-
-    private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause, net.minecraft.world.entity.Entity target) {
         Frozen access = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess();        
         
-        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), cause, target);
+        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), cause, null);
     }
 
     public static DamageSource toNMS(EntityDamageEvent.DamageCause c, Entity en) {
@@ -1740,6 +1737,10 @@ final class ChipUtil1_19_R3 implements ChipUtil {
         net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
         if (nms.nearestCrystal == null) return null;
         return (EnderCrystal) nms.nearestCrystal.getBukkitEntity();
+    }
+
+    public static me.gamercoder215.mobchip.util.Position fromNMS(Node point) {
+        return new me.gamercoder215.mobchip.util.Position(point.x, point.y, point.z);
     }
 
 }

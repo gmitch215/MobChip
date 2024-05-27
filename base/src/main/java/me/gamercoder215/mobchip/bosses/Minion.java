@@ -23,9 +23,9 @@ public final class Minion<T extends Mob> {
 
 	private final Class<T> entityClazz;
 	private double health;
-	private Map<EquipmentSlot, ItemStack> equipment;
+	private final Map<EquipmentSlot, ItemStack> equipment;
 	
-	private Map<AttributeInstance, Double> attributes;
+	private final Map<AttributeInstance, Double> attributes;
 
 	/**
 	 * Creates a Minion.

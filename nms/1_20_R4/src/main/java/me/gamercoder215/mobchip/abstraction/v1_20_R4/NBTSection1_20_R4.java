@@ -96,49 +96,44 @@ class NBTSection1_20_R4 implements NBTSection {
             }
         }
 
-        return switch (v.getClass().getSimpleName().toLowerCase()) {
-            case "short" -> ShortTag.valueOf((short) v);
-            case "float" -> FloatTag.valueOf((float) v);
-            case "long" -> LongTag.valueOf((long) v);
-            case "byte" -> ByteTag.valueOf((byte) v);
-            case "integer", "int" -> IntTag.valueOf((int) v);
-            case "double" -> DoubleTag.valueOf((double) v);
-            case "uuid" -> {
-                UUID uid = (UUID) v;
+        return switch (v) {
+            case Short s -> ShortTag.valueOf(s);
+            case Float f -> FloatTag.valueOf(f);
+            case Long l -> LongTag.valueOf(l);
+            case Byte b -> ByteTag.valueOf(b);
+            case Integer i -> IntTag.valueOf(i);
+            case Double d -> DoubleTag.valueOf(d);
+            case UUID uid -> {
                 CompoundTag uuid = new CompoundTag();
                 uuid.putString(ChipUtil.CLASS_TAG, uid.getClass().getName());
                 uuid.putLong("least", uid.getLeastSignificantBits());
                 uuid.putLong("most", uid.getMostSignificantBits());
                 yield uuid;
             }
-            case "namespacedkey" -> {
-                NamespacedKey key = (NamespacedKey) v;
+            case NamespacedKey key -> {
                 CompoundTag nmsKey = new CompoundTag();
                 nmsKey.putString(ChipUtil.CLASS_TAG, key.getClass().getName());
                 nmsKey.putString("namespace", key.getNamespace());
                 nmsKey.putString("key", key.getKey());
                 yield nmsKey;
             }
-            case "itemstack" -> {
-                ItemStack item = (ItemStack) v;
+            case ItemStack item -> {
                 CompoundTag stack = new CompoundTag();
                 stack.putString(ChipUtil.CLASS_TAG, item.getClass().getName());
                 stack.put("item", CraftItemStack.asNMSCopy(item).saveOptional(CraftRegistry.getMinecraftRegistry()));
 
                 yield stack;
             }
-            case "offlineplayer" -> {
-                OfflinePlayer p = (OfflinePlayer) v;
+            case OfflinePlayer p -> {
                 CompoundTag player = new CompoundTag();
                 player.putString(ChipUtil.CLASS_TAG, OfflinePlayer.class.getName());
                 player.putString("id", p.getUniqueId().toString());
 
                 yield player;
             }
-            case "location" -> {
-                Location l = (Location) v;
+            case Location l -> {
                 CompoundTag loc = new CompoundTag();
-                loc.putString(ChipUtil.CLASS_TAG, l.getClass().getName());
+                loc.putString(ChipUtil.CLASS_TAG, Location.class.getName());
                 loc.putDouble("x", l.getX());
                 loc.putDouble("y", l.getY());
                 loc.putDouble("z", l.getZ());
@@ -147,24 +142,21 @@ class NBTSection1_20_R4 implements NBTSection {
                 loc.putString("world", l.getWorld().getName());
                 yield loc;
             }
-            case "vector" -> {
-                Vector vec = (Vector) v;
+            case Vector vec -> {
                 CompoundTag vector = new CompoundTag();
-                vector.putString(ChipUtil.CLASS_TAG, vec.getClass().getName());
+                vector.putString(ChipUtil.CLASS_TAG, Vector.class.getName());
                 vector.putDouble("x", vec.getX());
                 vector.putDouble("y", vec.getY());
                 vector.putDouble("z", vec.getZ());
                 yield vector;
             }
-            case "color" -> {
-                Color color = (Color) v;
+            case Color color -> {
                 CompoundTag clr = new CompoundTag();
-                clr.putString(ChipUtil.CLASS_TAG, color.getClass().getName());
+                clr.putString(ChipUtil.CLASS_TAG, Color.class.getName());
                 clr.putInt("rgb", color.asRGB());
                 yield clr;
             }
-            case "eulerangle" -> {
-                EulerAngle angle = (EulerAngle) v;
+            case EulerAngle angle -> {
                 CompoundTag euler = new CompoundTag();
                 euler.putString(ChipUtil.CLASS_TAG, angle.getClass().getName());
                 euler.putDouble("x", angle.getX());
@@ -329,7 +321,7 @@ class NBTSection1_20_R4 implements NBTSection {
 
     @Override
     public boolean isSet(@Nullable String key) {
-        return false;
+        return tag.contains(key);
     }
 
     @Override

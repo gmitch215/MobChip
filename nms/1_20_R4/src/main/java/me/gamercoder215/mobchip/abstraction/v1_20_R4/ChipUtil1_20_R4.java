@@ -80,6 +80,7 @@ import net.minecraft.world.entity.schedule.ScheduleBuilder;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_20_R4.CraftServer;
@@ -126,7 +127,7 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
-@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation", "UnstableApiUsage"})
 final class ChipUtil1_20_R4 implements ChipUtil {
 
     @Override
@@ -347,10 +348,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
                 PathfinderCatOnBed p = (PathfinderCatOnBed) b;
                 yield new CatLieOnBedGoal((net.minecraft.world.entity.animal.Cat) m, p.getSpeedModifier(), Math.min((int) p.getRange(), 1));
             }
-            case "ClimbOnTopOfPowderSnowGoal" -> {
-                PathfinderClimbPowderedSnow p = (PathfinderClimbPowderedSnow) b;
-                yield new ClimbOnTopOfPowderSnowGoal(m, toNMS(mob.getWorld()));
-            }
+            case "ClimbOnTopOfPowderSnowGoal" -> new ClimbOnTopOfPowderSnowGoal(m, toNMS(mob.getWorld()));
             case "CrossbowAttack" -> {
                 PathfinderRangedCrossbowAttack p = (PathfinderRangedCrossbowAttack) b;
                 yield new RangedCrossbowAttackGoal((net.minecraft.world.entity.monster.Monster) m, p.getSpeedModifier(), p.getRange());
@@ -360,10 +358,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
                 yield new OpenDoorGoal(m, p.mustClose());
             }
             case "EatTile" -> new EatBlockGoal(m);
-            case "FishSchool" -> {
-                PathfinderFollowFishLeader p = (PathfinderFollowFishLeader) b;
-                yield new FollowFlockLeaderGoal((AbstractSchoolingFish) m);
-            }
+            case "FishSchool" -> new FollowFlockLeaderGoal((AbstractSchoolingFish) m);
             case "FleeSun" -> {
                 PathfinderFleeSun p = (PathfinderFleeSun) b;
                 yield new FleeSunGoal((PathfinderMob) m, p.getSpeedModifier());
@@ -398,10 +393,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
                 PathfinderLookAtEntity<?> p = (PathfinderLookAtEntity) b;
                 yield new LookAtPlayerGoal(m, toNMS(p.getFilter()), p.getRange(), p.getProbability(), p.isHorizontal());
             }
-            case "LookAtTradingPlayer" -> {
-                PathfinderLookAtTradingPlayer p = (PathfinderLookAtTradingPlayer) b;
-                yield new LookAtTradingPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
-            }
+            case "LookAtTradingPlayer" -> new LookAtTradingPlayerGoal((net.minecraft.world.entity.npc.AbstractVillager) m);
             case "MeleeAttack" -> {
                 PathfinderMeleeAttack p = (PathfinderMeleeAttack) b;
                 yield new MeleeAttackGoal((PathfinderMob) m, p.getSpeedModifier(), p.mustSee());
@@ -488,10 +480,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
                 PathfinderResetAnger p = (PathfinderResetAnger) b;
                 yield new ResetUniversalAngerTargetGoal<>((net.minecraft.world.entity.Mob & NeutralMob) m, p.isAlertingOthers());
             }
-            case "RandomStandGoal" -> {
-                PathfinderRandomStand p = (PathfinderRandomStand) b;
-                yield new RandomStandGoal((net.minecraft.world.entity.animal.horse.AbstractHorse) m);
-            }
+            case "RandomStandGoal" -> new RandomStandGoal((net.minecraft.world.entity.animal.horse.AbstractHorse) m);
 
             // Target
 
@@ -750,13 +739,9 @@ final class ChipUtil1_20_R4 implements ChipUtil {
     }
 
     private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause) {
-        return fromType(key, cause, null);
-    }
+        Frozen access = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess();
 
-    private static DamageSource fromType(ResourceKey<DamageType> key, net.minecraft.world.entity.Entity cause, net.minecraft.world.entity.Entity target) {
-        Frozen access = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess();        
-        
-        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), cause, target);
+        return new DamageSource(access.registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), cause, null);
     }
 
     public static DamageSource toNMS(EntityDamageEvent.DamageCause c, Entity en) {
@@ -791,7 +776,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
     }
 
     public static ItemEntity toNMS(Item i) {
-        return (ItemEntity) ((CraftItem) i).getHandle();
+        return ((CraftItem) i).getHandle();
     }
 
     public static net.minecraft.world.entity.LivingEntity toNMS(LivingEntity en) {
@@ -801,60 +786,63 @@ final class ChipUtil1_20_R4 implements ChipUtil {
     public static Object toNMS(String key, Object value) {
         final Object nmsValue;
 
-        if (value instanceof Location l) {
-            nmsValue = switch (key) {
-                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location", "breeze_jump_target" -> new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ());
-                default -> GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ()));
+        switch (value) {
+            case Location l -> nmsValue = switch (key) {
+                case "nearest_bed", "celebrate_location", "nearest_repellent", "disturbance_location",
+                     "breeze_jump_target" -> new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+                default ->
+                        GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ()));
             };
-        }
-        else if (value instanceof Location[] ls) {
-            List<GlobalPos> p = new ArrayList<>();
+            case Location[] ls -> {
+                List<GlobalPos> p = new ArrayList<>();
 
-            for (Location l : ls) {
-                p.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
+                for (Location l : ls) {
+                    p.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
+                }
+
+                nmsValue = p;
             }
-
-            nmsValue = p;
-        }
-        else if (value instanceof Player p) {
-            if (key.equals("liked_player")) nmsValue = p.getUniqueId();
-            else nmsValue = toNMS(p);
-        }
-        else if (value instanceof Memory.WalkingTarget t) nmsValue = new WalkTarget(toNMS(t.getLocation()), (float) t.getSpeedModifier(), t.getDistance());
-        else if (value instanceof LivingEntity l) nmsValue = toNMS(l);
-        else if (value instanceof Entity e) {
-            if (key.equals("angry_at")) nmsValue = e.getUniqueId();
-            else nmsValue = toNMS(e);
-        }
-        else if (value instanceof org.bukkit.block.Block[] b) {
-            final Collection<GlobalPos> s;
-            if (key.equals("doors_to_close")) s = new HashSet<>();
-            else s = new ArrayList<>();
-
-            for (org.bukkit.block.Block bl : b) {
-                Location l = bl.getLocation();
-                s.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
+            case Player p -> {
+                if (key.equals("liked_player")) nmsValue = p.getUniqueId();
+                else nmsValue = toNMS(p);
             }
-            nmsValue = s;
+            case Memory.WalkingTarget t ->
+                    nmsValue = new WalkTarget(toNMS(t.getLocation()), (float) t.getSpeedModifier(), t.getDistance());
+            case LivingEntity l -> nmsValue = toNMS(l);
+            case Entity e -> {
+                if (key.equals("angry_at")) nmsValue = e.getUniqueId();
+                else nmsValue = toNMS(e);
+            }
+            case org.bukkit.block.Block[] b -> {
+                final Collection<GlobalPos> s;
+                if (key.equals("doors_to_close")) s = new HashSet<>();
+                else s = new ArrayList<>();
+
+                for (org.bukkit.block.Block bl : b) {
+                    Location l = bl.getLocation();
+                    s.add(GlobalPos.of(toNMS(l.getWorld()).dimension(), new BlockPos(l.getBlockX(), l.getBlockY(), l.getBlockZ())));
+                }
+                nmsValue = s;
+            }
+            case Villager[] vs -> {
+                List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
+                for (Villager v : vs) s.add(toNMS(v));
+                nmsValue = s;
+            }
+            case Player[] ps -> {
+                List<net.minecraft.world.entity.player.Player> s = new ArrayList<>();
+                for (Player p : ps) s.add(toNMS(p));
+                nmsValue = s;
+            }
+            case LivingEntity[] ls -> {
+                List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
+                for (LivingEntity l : ls) s.add(toNMS(l));
+                nmsValue = s;
+            }
+            case EntityDamageEvent.DamageCause c -> nmsValue = toNMS(c, null);
+            case Unit ignored -> nmsValue = net.minecraft.util.Unit.INSTANCE;
+            case null, default -> nmsValue = value;
         }
-        else if (value instanceof Villager[] vs) {
-            List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
-            for (Villager v : vs) s.add(toNMS(v));
-            nmsValue = s;
-        }
-        else if (value instanceof Player[] ps) {
-            List<net.minecraft.world.entity.player.Player> s = new ArrayList<>();
-            for (Player p : ps) s.add(toNMS(p));
-            nmsValue = s;
-        }
-        else if (value instanceof LivingEntity[] ls) {
-            List<net.minecraft.world.entity.LivingEntity> s = new ArrayList<>();
-            for (LivingEntity l : ls) s.add(toNMS(l));
-            nmsValue = s;
-        }
-        else if (value instanceof EntityDamageEvent.DamageCause c) nmsValue = toNMS(c, null);
-        else if (value instanceof Unit) nmsValue = net.minecraft.util.Unit.INSTANCE;
-        else nmsValue = value;
 
         return nmsValue;
     }
@@ -865,7 +853,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
         if (nmsValue instanceof GlobalPos l) {
             BlockPos pos = l.pos();
             World w = ((CraftServer) Bukkit.getServer()).getHandle().getServer().registries().compositeAccess().registryOrThrow(Registries.DIMENSION).get(l.dimension()).getWorld();
-            if (w == null) w = Bukkit.getWorlds().get(0);
+            if (w == null) w = Bukkit.getWorlds().getFirst();
             value = new Location(w, pos.getX(), pos.getY(), pos.getZ());
         }
         else if (nmsValue instanceof BlockPos p) {
@@ -1559,7 +1547,6 @@ final class ChipUtil1_20_R4 implements ChipUtil {
 
     @Override
     public AttributeInstance getAttributeInstance(Mob m, Attribute a) {
-        net.minecraft.world.entity.ai.attributes.Attribute nmsAttribute = BuiltInRegistries.ATTRIBUTE.get(toNMS(a.getKey()));
         return getOrCreateInstance(m, a);
     }
 
@@ -1679,7 +1666,7 @@ final class ChipUtil1_20_R4 implements ChipUtil {
 
     public static SensorType<?> toNMSType(Sensor<?> s) {
         try {
-            Constructor<SensorType> c = SensorType.class.getConstructor(Supplier.class);
+            Constructor<SensorType> c = SensorType.class.getDeclaredConstructor(Supplier.class);
             c.setAccessible(true);
 
             Supplier<net.minecraft.world.entity.ai.sensing.Sensor<?>> sup = () -> toNMS(s);
@@ -1704,10 +1691,6 @@ final class ChipUtil1_20_R4 implements ChipUtil {
 
     public static Memory<?> fromNMS(MemoryModuleType<?> memory) {
         return EntityMemory.getByKey(fromNMS(BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(memory)));
-    }
-
-    public static MemoryModuleType<?> getMemory(NamespacedKey key) {
-        return BuiltInRegistries.MEMORY_MODULE_TYPE.get(new ResourceLocation(key.getNamespace(), key.getKey()));
     }
 
     @Override
@@ -1744,6 +1727,10 @@ final class ChipUtil1_20_R4 implements ChipUtil {
 
     public static RegistrationInfo registration(NamespacedKey key) {
         return new RegistrationInfo(Optional.of(new KnownPack(key.getNamespace(), key.getKey(), Registration.getVersion())), Lifecycle.stable());
+    }
+
+    public static me.gamercoder215.mobchip.util.Position fromNMS(Node point) {
+        return new me.gamercoder215.mobchip.util.Position(point.x, point.y, point.z);
     }
 
 }

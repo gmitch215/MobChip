@@ -15,12 +15,12 @@ class BukkitVillagerBrain extends BukkitBrain implements VillagerBrain {
     }
 
     @Override
-    public EntityGossipContainer getGossipContainer() {
+    public @NotNull EntityGossipContainer getGossipContainer() {
         return w.getGossipContainer(v);
     }
 
     @Override
-    public Villager getEntity() {
+    public @NotNull Villager getEntity() {
         return v;
     }
 }

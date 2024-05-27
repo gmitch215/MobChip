@@ -11,8 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class NavigationPath1_13_R2 implements NavigationPath {
     private String name;
@@ -25,6 +27,18 @@ final class NavigationPath1_13_R2 implements NavigationPath {
         this.name = "bukkitpath";
         this.handle = nms;
         this.speedMod = speedMod;
+
+        try {
+            Field points = this.handle.getClass().getDeclaredField("a");
+            points.setAccessible(true);
+            PathPoint[] pathPoints = (PathPoint[]) points.get(this.handle);
+
+            nodes.addAll(Arrays.stream(pathPoints)
+                    .map(ChipUtil1_13_R2::fromNMS)
+                    .collect(Collectors.toSet()));
+        } catch (ReflectiveOperationException e) {
+            ChipUtil.printStackTrace(e);
+        }
     }
 
     private final List<Position> nodes = new ArrayList<>();

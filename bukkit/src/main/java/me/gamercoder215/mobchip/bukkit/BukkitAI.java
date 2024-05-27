@@ -25,7 +25,7 @@ final class BukkitAI implements EntityAI {
 
 	private final Mob m;
 
-	protected BukkitAI(Mob m, boolean target) {
+	 BukkitAI(Mob m, boolean target) {
 		this.target = target;
 		this.m = m;
 		updateMap();
@@ -66,7 +66,7 @@ final class BukkitAI implements EntityAI {
 	}
 
 	@Override
-	public boolean contains(Pathfinder value) {
+	public boolean contains(@NotNull Pathfinder value) {
 		return wrapper.getGoals(m, target).stream().map(WrappedPathfinder::getPathfinder).collect(Collectors.toList()).contains(value);
 	}
 
@@ -88,7 +88,7 @@ final class BukkitAI implements EntityAI {
 	}
 
 	@Override
-	public boolean isRunning(Pathfinder p) {
+	public boolean isRunning(@NotNull Pathfinder p) {
 		return wrapper.getRunningGoals(m, target).stream().map(WrappedPathfinder::getPathfinder).collect(Collectors.toList()).contains(p);
 	}
 
@@ -100,12 +100,12 @@ final class BukkitAI implements EntityAI {
 
 	@NotNull
 	@Override
-	public WrappedPathfinder[] toArray() {
+	public WrappedPathfinder @NotNull [] toArray() {
 		return goals.toArray(new WrappedPathfinder[0]);
 	}
 
 	@Override
-	public <T> T[] toArray(@NotNull T[] a) {
+	public <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
 		return a;
 	}
 
