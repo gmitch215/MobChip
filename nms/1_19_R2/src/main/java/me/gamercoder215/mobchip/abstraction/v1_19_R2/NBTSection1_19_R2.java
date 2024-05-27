@@ -325,7 +325,7 @@ class NBTSection1_19_R2 implements NBTSection {
 
     @Override
     public boolean isSet(@Nullable String key) {
-        return false;
+        return tag.contains(key);
     }
 
     @Override

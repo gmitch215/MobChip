@@ -4,7 +4,6 @@ package me.gamercoder215.mobchip.abstraction.v1_20_R3;
 // Used for Testing Purposes
 
 public final class OptimizedSmallEnumSet1_20_R3<E extends Enum<E>> {
-    private final Class<E> enumClass;
     private long backingSet;
 
     public OptimizedSmallEnumSet1_20_R3(Class<E> clazz) {
@@ -13,7 +12,6 @@ public final class OptimizedSmallEnumSet1_20_R3<E extends Enum<E>> {
         } else if (!clazz.isEnum()) {
             throw new IllegalArgumentException("Class must be enum, not " + clazz.getCanonicalName());
         } else {
-            this.enumClass = clazz;
         }
     }
 

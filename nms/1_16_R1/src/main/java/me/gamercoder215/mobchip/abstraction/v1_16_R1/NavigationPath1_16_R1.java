@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class NavigationPath1_16_R1 implements NavigationPath {
     private String name;
@@ -23,6 +24,9 @@ final class NavigationPath1_16_R1 implements NavigationPath {
         this.name = "bukkitpath";
         this.handle = nms;
         this.speedMod = speedMod;
+        this.nodes.addAll(handle.d().stream()
+                .map(ChipUtil1_16_R1::fromNMS)
+                .collect(Collectors.toSet()));
     }
 
     private final List<Position> nodes = new ArrayList<>();

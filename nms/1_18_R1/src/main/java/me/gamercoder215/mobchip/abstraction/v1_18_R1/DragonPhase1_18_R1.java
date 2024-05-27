@@ -58,7 +58,7 @@ final class DragonPhase1_18_R1 implements DragonPhase {
     }
 
     @Override
-    public NamespacedKey getKey() {
+    public @NotNull NamespacedKey getKey() {
         return NamespacedKey.minecraft(handle.toString().split(" ")[0].toLowerCase());
     }
 }

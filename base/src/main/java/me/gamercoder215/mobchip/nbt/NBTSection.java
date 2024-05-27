@@ -1,6 +1,9 @@
 package me.gamercoder215.mobchip.nbt;
 
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
@@ -552,7 +555,7 @@ public interface NBTSection {
      */
     @Nullable
     default List<String> getStringList(@Nullable String key, @Nullable List<String> def) {
-        if (getList(key) == null) return def;
+        if (getList(key).isEmpty()) return def;
         return getStringList(key);
     }
 
@@ -563,7 +566,7 @@ public interface NBTSection {
      */
     @NotNull
     default List<Integer> getIntegerList(@Nullable String key) {
-        if (getList(key) == null) return null;
+        if (getList(key).isEmpty()) return null;
         return getList(key).stream().map(Object::toString).map(s -> { try { return Integer.parseInt(s); } catch (NumberFormatException e) { return null; } }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -575,7 +578,7 @@ public interface NBTSection {
      */
     @Nullable
     default List<Integer> getIntegerList(@Nullable String key, @Nullable List<Integer> def) {
-        if (getList(key) == null) return def;
+        if (getList(key).isEmpty()) return def;
         return getIntegerList(key);
     }
 

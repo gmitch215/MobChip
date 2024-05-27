@@ -17,6 +17,7 @@ public interface VillagerBrain extends EntityBrain {
     EntityGossipContainer getGossipContainer();
 
     @Override
+    @NotNull
     Villager getEntity();
 
 }

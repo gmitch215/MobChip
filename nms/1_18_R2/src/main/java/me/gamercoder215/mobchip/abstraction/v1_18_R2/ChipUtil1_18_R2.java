@@ -67,6 +67,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
@@ -1644,5 +1645,9 @@ final class ChipUtil1_18_R2 implements ChipUtil {
         net.minecraft.world.entity.boss.enderdragon.EnderDragon nms = toNMS(d);
         if (nms.nearestCrystal == null) return null;
         return (EnderCrystal) nms.nearestCrystal.getBukkitEntity();
+    }
+
+    public static me.gamercoder215.mobchip.util.Position fromNMS(Node point) {
+        return new me.gamercoder215.mobchip.util.Position(point.x, point.y, point.z);
     }
 }

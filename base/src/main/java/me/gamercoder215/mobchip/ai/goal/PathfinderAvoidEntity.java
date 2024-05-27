@@ -182,7 +182,7 @@ public final class PathfinderAvoidEntity<T extends LivingEntity> extends Pathfin
 	}
 
 	@Override
-	public Creature getEntity() { return (Creature) entity; }
+	public @NotNull Creature getEntity() { return (Creature) entity; }
 
 	@Override
 	public @NotNull PathfinderFlag[] getFlags() {

@@ -329,7 +329,7 @@ class NBTSection1_13_R1 implements NBTSection {
 
     @Override
     public boolean isSet(@Nullable String key) {
-        return false;
+        return tag.hasKey(key);
     }
 
     @Override

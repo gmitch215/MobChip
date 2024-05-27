@@ -38,7 +38,7 @@ public final class PathfinderCatOnBlock extends Pathfinder implements SpeedModif
 	}
 
 	@Override
-	public Cat getEntity() { return (Cat) entity; }
+	public @NotNull Cat getEntity() { return (Cat) entity; }
 
 	@Override
 	public String getInternalName() { return "PathfinderGoalJumpOnBlock"; }

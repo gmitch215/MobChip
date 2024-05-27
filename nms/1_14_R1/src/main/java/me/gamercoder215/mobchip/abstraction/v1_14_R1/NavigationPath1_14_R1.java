@@ -1,5 +1,6 @@
 package me.gamercoder215.mobchip.abstraction.v1_14_R1;
 
+import me.gamercoder215.mobchip.abstraction.ChipUtil;
 import me.gamercoder215.mobchip.ai.navigation.NavigationPath;
 import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_14_R1.PathEntity;
@@ -8,9 +9,12 @@ import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class NavigationPath1_14_R1 implements NavigationPath {
     private String name;
@@ -23,6 +27,9 @@ final class NavigationPath1_14_R1 implements NavigationPath {
         this.name = "bukkitpath";
         this.handle = nms;
         this.speedMod = speedMod;
+        this.nodes.addAll(handle.d().stream()
+                .map(ChipUtil1_14_R1::fromNMS)
+                .collect(Collectors.toSet()));
     }
 
     private final List<Position> nodes = new ArrayList<>();

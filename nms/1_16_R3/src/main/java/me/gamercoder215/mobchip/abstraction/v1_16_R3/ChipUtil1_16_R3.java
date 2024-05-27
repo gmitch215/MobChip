@@ -25,6 +25,7 @@ import me.gamercoder215.mobchip.combat.CombatEntry;
 import me.gamercoder215.mobchip.combat.CombatLocation;
 import me.gamercoder215.mobchip.combat.EntityCombatTracker;
 import me.gamercoder215.mobchip.nbt.EntityNBT;
+import me.gamercoder215.mobchip.util.Position;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.World;
 import org.bukkit.*;
@@ -1557,6 +1558,10 @@ final class ChipUtil1_16_R3 implements ChipUtil {
         EntityEnderDragon nms = toNMS(d);
         if (nms.currentEnderCrystal == null) return null;
         return (EnderCrystal) nms.currentEnderCrystal.getBukkitEntity();
+    }
+
+    public static Position fromNMS(PathPoint point) {
+        return new Position(point.a, point.b, point.c);
     }
 
 }

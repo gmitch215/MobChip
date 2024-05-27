@@ -21,17 +21,13 @@ final class AnimalPanic1_15_R1 extends Behavior<EntityCreature> {
         this.speedMultiplier = speedMod;
     }
 
-    protected boolean canStillUse(WorldServer var0, EntityCreature var1, long var2) { return true; }
+    protected boolean g(WorldServer var0, EntityCreature var1, long var2) { return true; }
 
-    protected void start(WorldServer w, EntityCreature c, long var2) {
+    protected void a(WorldServer w, EntityCreature c, long var2) {
         c.getBehaviorController().removeMemory(MemoryModuleType.WALK_TARGET);
     }
 
-    protected void stop(WorldServer w, EntityCreature c, long var2) {
-        // Do nothing
-    }
-
-    protected void tick(WorldServer w, EntityCreature c, long var2) {
+    protected void d(WorldServer w, EntityCreature c, long var2) {
         if (c.getNavigation().m()) {
             Vec3D var4 = this.getPanicPos(c, w);
             if (var4 != null) {

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents registration under a specific context.
  * <br><br>
- * Minecraft 1.20.5 introduced new changes to how registering new items (e.g. attributes, sensors, etc) work.
+ * Minecraft 1.20.5 introduced new changes to how registering new items (e.g. attributes, sensors, etc.) work.
  * You are now required to pass a namespace, key, and version, as opposed to just a namespace and key.
  * There is no functional difference if this is not provided, so MobChip will default to "unknown" for the version.
  * You can provide custom parameters here for improved native interoperability with the registry.

@@ -19,7 +19,7 @@ package me.gamercoder215.mobchip.ai.memories;
  * <p>
  *     A Memory being registered means that the memory is present in the Minecraft Registry, and is supported by the mob type. All native memories, such as the ones listed in this class, are all
  *     registered in the Minecraft Registry by default, but can be unregistered at any time. However, custom memories are not registered in the Minecraft Registry, and thus, would not be able to be present in the brain.
- *
+ * <p>
  *     Additionally, not all mobs support the same memory, making them unregistered when applicable. Passive Mobs do not have {@link EntityMemory#ANGRY_AT} registered in their Brain, and Wardens are the only ones with {@link EntityMemory#DISTURBANCE_LOCATION} registered.
  * </p>
  */

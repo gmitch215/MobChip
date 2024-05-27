@@ -9,15 +9,12 @@ import org.jetbrains.annotations.NotNull;
 final class EntityNBT1_14_R1 extends NBTSection1_14_R1 implements EntityNBT {
 
     private final Mob mob;
-    private final EntityInsentient handle;
-
-    private final NBTTagCompound root;
 
     public EntityNBT1_14_R1(Mob m) {
         super(m);
         this.mob = m;
-        this.handle = ChipUtil1_14_R1.toNMS(m);
-        this.root = new NBTTagCompound();
+        EntityInsentient handle = ChipUtil1_14_R1.toNMS(m);
+        NBTTagCompound root = new NBTTagCompound();
         handle.d(root);
     }
 

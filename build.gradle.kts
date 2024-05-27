@@ -1,6 +1,5 @@
-@file:Suppress("UnstableApiUsage")
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("org.sonarqube") version "4.0.0.2929"
@@ -14,7 +13,7 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.10.0-SNAPSHOT"
+val pVersion = "1.10.1-SNAPSHOT"
 val pAuthor = "gmitch215"
 
 val github = "$pAuthor/MobChip"
@@ -178,11 +177,13 @@ subprojects {
             options.encoding = "UTF-8"
             options.isDeprecation = false
             options.isWarnings = false
-            options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing"))
+            options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-processing", "-Xlint:-options"))
         }
 
         compileKotlin {
-            kotlinOptions.jvmTarget = jvmVersion.toString()
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_1_8)
+            }
         }
 
         jacocoTestReport {

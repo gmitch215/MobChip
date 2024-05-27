@@ -8,15 +8,12 @@ import org.jetbrains.annotations.NotNull;
 final class EntityNBT1_20_R2 extends NBTSection1_20_R2 implements EntityNBT {
 
     private final Mob mob;
-    private final net.minecraft.world.entity.Mob handle;
-
-    private final CompoundTag root;
 
     public EntityNBT1_20_R2(Mob m) {
         super(m);
         this.mob = m;
-        this.handle = ChipUtil1_20_R2.toNMS(m);
-        this.root = new CompoundTag();
+        net.minecraft.world.entity.Mob handle = ChipUtil1_20_R2.toNMS(m);
+        CompoundTag root = new CompoundTag();
         handle.saveWithoutId(root);
     }
 
