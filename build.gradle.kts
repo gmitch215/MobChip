@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -14,7 +12,7 @@ plugins {
 }
 
 val pGroup = "me.gamercoder215"
-val pVersion = "1.10.0-SNAPSHOT"
+val pVersion = "1.10.1-SNAPSHOT"
 val pAuthor = "gmitch215"
 
 val github = "$pAuthor/MobChip"
