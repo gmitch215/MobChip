@@ -1,7 +1,7 @@
 package me.gamercoder215.mobchip.ai.memories
 
 /**
- * Registeres this [Memory] to the Memory Registry.
+ * Registers this [Memory] to the Memory Registry.
  * @throws IllegalStateException if this [Memory] is already registered.
  */
 @Throws(IllegalStateException::class)

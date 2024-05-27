@@ -12,7 +12,7 @@ AI into your own plugins for simple use.
 ## ❓ Why?
 
 - **Simple**: MobChip has documentation, API usage, and other utilities to help ease the experience of working with Entity AI.
-- **Flexible**: MobChip uses Reflection and Abstraction to help create flexibility, in order to ensure modern functionality on older versions. We also providing an easy-to-read API and JavaDocs to access important fields and methods. 
+- **Flexible**: MobChip uses Reflection and Abstraction to help create flexibility, in order to ensure modern functionality on older versions. We also provide an easy-to-read API and JavaDocs to access important fields and methods. 
 - **Compatibility**: MobChip uses Abstraction to create compatibility on multiple versions of Minecraft. We also provide a version checker to ensure that your plugin is running on a compatible version.
 - **Transparent**: MobChip is completely open source.
 
