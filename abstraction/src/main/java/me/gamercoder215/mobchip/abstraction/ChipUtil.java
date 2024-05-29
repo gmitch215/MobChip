@@ -181,14 +181,15 @@ public interface ChipUtil {
     static String bukkitToCraftBukkit() {
         String bukkit = Bukkit.getServer().getBukkitVersion().split("-")[0];
         switch (bukkit) {
-            case "1.20.1": 
+            case "1.20.1":
                 return "1_20_R1";
-            case "1.20.2": 
+            case "1.20.2":
                 return "1_20_R2";
             case "1.20.3":
             case "1.20.4":
                 return "1_20_R3";
             case "1.20.5":
+            case "1.20.6":
                 return "1_20_R4";
             default:
                 throw new AssertionError("Invalid Version: " + bukkit);
