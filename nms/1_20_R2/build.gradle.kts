@@ -26,10 +26,6 @@ tasks {
         dependsOn("remap")
     }
 
-    jar.configure {
-        enabled = false
-    }
-
     remap {
         dependsOn("shadowJar")
 
