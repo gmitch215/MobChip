@@ -1,6 +1,8 @@
 # 🚚 MobChip
 > Minecraft Entity AI and Bosses Library for 1.13 and above
 
+# This resource is no longer maintained. Thanks for playing!
+
 ## Background
 <details>
     <summary>Click to Expand</summary>
